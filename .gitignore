@@ -1,0 +1,20 @@
+# Governance (ข้อ 4.1): ห้าม commit ข้อมูลดิบ/ข้อมูลที่ประมวลผลแล้วลง Git
+data/**
+!data/**/
+!data/**/.gitkeep
+
+# Logs ที่สร้างระหว่างรัน (เก็บ manifest ไว้ commit ได้เพื่อเป็น snapshot checksum)
+logs/audit/*
+logs/quality/*
+!logs/**/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# Data files ที่อาจหลุดมาอยู่นอก data/
+*.parquet
+*.csv.gz
+

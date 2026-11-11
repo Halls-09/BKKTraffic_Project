@@ -1,0 +1,4 @@
+{"path": "data/raw/weather/point=central/2022-06-01_2022-09-30.json", "source": "open-meteo", "sha256": "1d9dd0a1a4e713f7519b6a3b19d6e78d7a87e55a511ffdbd323c4767ebd57b6b", "bytes": 99910, "registered_at": "2026-11-10T21:59:53"}
+{"path": "data/raw/weather/point=north/2022-06-01_2022-09-30.json", "source": "open-meteo", "sha256": "9ed6d20eed64d8b29879d4f37624ed69a980862a252d4d4f259102f9f844ced5", "bytes": 99911, "registered_at": "2026-11-10T21:59:54"}
+{"path": "data/raw/weather/point=east/2022-06-01_2022-09-30.json", "source": "open-meteo", "sha256": "bfdbd338591d17f7db51afdc0582c959d2b4ed59fc3d31d0dabbc78933f76087", "bytes": 99902, "registered_at": "2026-11-10T21:59:55"}
+{"path": "data/raw/calendar/calendar_2022.csv", "source": "team-calendar-2022", "sha256": "686a08e933a3ec21b2f4b60c07ffbb9c93de968d9ac057e5e19a6e3b911f8692", "bytes": 11682, "registered_at": "2026-11-11T20:01:46"}

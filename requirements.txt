@@ -1,0 +1,9 @@
+# Direct dependencies ของ pipeline (ฝั่ง Data Engineering)
+# เวอร์ชันที่ติดตั้งจริงทั้งหมดถูกล็อกไว้ใน requirements.lock (pip freeze)
+pandas
+pyarrow
+numpy
+requests
+pyyaml
+pytest
+
