@@ -1,0 +1,23 @@
+# Byte-compiled / cache
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.ruff_cache/
+
+# Data lakehouse large tables (keep checksums_manifest.json)
+data/01_bronze/*
+data/02_quarantine/*
+data/03_silver/*
+data/04_gold/*
+!data/**/.gitkeep
+!data/checksums_manifest.json
+
+# Model binaries (keep JSON metadata & reports for git tracking)
+artifacts/registry/models/*.joblib
+artifacts/registry/models/*.pkl
+
+# Virtual environments
+.venv/
+venv/
+env/

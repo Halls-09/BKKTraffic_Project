@@ -1,0 +1,92 @@
+# ==============================================================================
+# Bangkok Traffic Congestion Forecasting (1-Hour Ahead) - Master Pipeline Config
+# Course: CSS 342 Data Science and Data Engineering (KMUTT)
+# ==============================================================================
+
+project:
+  name: "bkk-traffic-forecasting"
+  version: "1.0.0"
+  random_seed: 42
+  timezone: "Asia/Bangkok"
+  grain_minutes: 15
+  forecast_horizon_minutes: 60
+  forecast_horizon_slots: 4
+
+paths:
+  bronze_dir: "data/01_bronze"
+  quarantine_dir: "data/02_quarantine"
+  silver_dir: "data/03_silver"
+  gold_dir: "data/04_gold"
+  manifest_path: "data/checksums_manifest.json"
+  artifacts_dir: "artifacts"
+  registry_dir: "artifacts/registry"
+  monitoring_dir: "artifacts/monitoring"
+  evaluation_dir: "artifacts/evaluation"
+  lineage_dir: "artifacts/lineage"
+
+temporal_split:
+  # Out-of-Time (OOT) Validation & Test Split (no random shuffling)
+  train_start: "2022-06-01T00:00:00+07:00"
+  train_end: "2022-08-15T23:45:00+07:00"
+  val_start: "2022-08-16T00:00:00+07:00"
+  val_end: "2022-08-31T23:45:00+07:00"
+  test_start: "2022-09-01T00:00:00+07:00"
+  test_end: "2022-09-15T23:45:00+07:00"
+
+feature_engineering:
+  # Rain mode: "observed_lag_only" prevents future reanalysis leakage
+  rain_mode: "observed_lag_only"
+  enable_incidents: true
+  max_forward_fill_slots: 2  # Max 30 mins short-term imputation
+  congestion_threshold_default: 0.50
+  onset_freeflow_buffer: 0.55  # Current ratio >= 0.55 -> target ratio < 0.50
+  spillback_threshold: 0.40
+
+  enabled_groups:
+    group_1_current_lags: true
+    group_2_historical_profile: true
+    group_3_temporal_cyclical: true
+    group_4_calendar: true
+    group_5_weather: true
+    group_6_spatial_graph: true
+    group_7_incidents: true
+    group_8_road_traffy_static: true
+
+model:
+  algorithm: "lightgbm_regressor"
+  hyperparameters:
+    n_estimators: 350
+    learning_rate: 0.05
+    max_depth: 8
+    num_leaves: 63
+    min_child_samples: 30
+    subsample: 0.8
+    colsample_bytree: 0.8
+    random_state: 42
+  threshold_tuning:
+    search_min: 0.42
+    search_max: 0.58
+    num_steps: 33
+    min_onset_recall_guardrail: 0.55
+
+registry:
+  # Champion promotion criteria on Validation/Test set
+  promotion_rules:
+    min_f1_improvement_over_baseline: 0.02
+    min_onset_recall: 0.55
+    max_mae_ratio: 0.15
+    require_zero_leakage_test: true
+
+monitoring:
+  psi_bins: 10
+  psi_warning_threshold: 0.10
+  psi_critical_threshold: 0.25
+  rolling_window_days: 7
+  f1_degradation_alert_delta: 0.05
+  onset_recall_floor: 0.50
+  monitored_features:
+    - "ratio_t0"
+    - "rain_mm_t0"
+    - "rain_cum_3h"
+    - "downstream_min_ratio_t0"
+    - "current_diff_from_hist"

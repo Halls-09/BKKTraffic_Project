@@ -1,0 +1,70 @@
+# ==============================================================================
+# Data Contract & Quality Gate 4.2 Specification
+# Enforced before promoting data from Bronze -> Silver Layer
+# ==============================================================================
+
+contract_version: "1.0.0"
+enforcement_mode: "quarantine_and_flag"  # Options: stop_run, quarantine_and_flag
+
+schemas:
+  road_segments:
+    primary_key: ["seg_id"]
+    required_columns:
+      - "seg_id"
+      - "road_name"
+      - "direction"
+      - "lat_start"
+      - "lon_start"
+      - "lat_end"
+      - "lon_end"
+      - "length_km"
+      - "district_name"
+      - "weather_zone_id"
+    bounds:
+      lat_start: [13.45, 14.05]
+      lon_start: [100.30, 100.95]
+      length_km: [0.05, 25.0]
+
+  traffic_15m:
+    primary_key: ["seg_id", "ts_15m"]
+    required_columns:
+      - "seg_id"
+      - "ts_15m"
+      - "speed_median_kmh"
+      - "probe_count"
+    plausibility_rules:
+      min_speed_kmh: 0.0
+      max_speed_kmh: 150.0
+      max_speed_jump_15m_kmh: 60.0
+      min_congestion_ratio: 0.0
+      max_congestion_ratio_clip: 1.2
+      min_probe_count: 1
+    completeness_rules:
+      min_daily_coverage_ratio: 0.80
+      min_daytime_coverage_ratio: 0.90  # 06:00 - 22:00
+
+  weather_15m:
+    primary_key: ["weather_zone_id", "ts_15m"]
+    required_columns:
+      - "weather_zone_id"
+      - "ts_15m"
+      - "rain_mm"
+      - "temp_c"
+    plausibility_rules:
+      min_rain_mm: 0.0
+      max_rain_mm_15m: 100.0
+      min_temp_c: 15.0
+      max_temp_c: 45.0
+
+  traffy_reports:
+    primary_key: ["ticket_id"]
+    required_columns:
+      - "ticket_id"
+      - "timestamp"
+      - "type"
+      - "district_name"
+      - "lat"
+      - "lon"
+    deduplication:
+      subset: ["type", "district_name", "lat", "lon", "timestamp_hour"]
+      action: "drop_duplicates_keep_first"
