@@ -1,0 +1,12 @@
+{
+  "timestamp_utc": "2026-11-11T16:18:12.397340+00:00",
+  "contract_version": "1.0.0",
+  "total_input_rows": 85817,
+  "valid_rows": 85792,
+  "quarantined_rows": 25,
+  "jump_outliers_flagged": 20,
+  "overall_completeness": 0.9974,
+  "daytime_completeness": 0.9997,
+  "completeness_gate_passed": true,
+  "status": "PASSED"
+}

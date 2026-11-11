@@ -1,0 +1,229 @@
+{
+  "timestamp_utc": "2026-11-11T16:17:54.471040+00:00",
+  "overall_system_health": "HEALTHY_STABLE",
+  "psi_thresholds": {
+    "warning": 0.1,
+    "critical": 0.25
+  },
+  "current_window_psi": [
+    {
+      "feature": "ratio_t0",
+      "psi": 0.0212,
+      "status": "STABLE",
+      "ref_mean": 0.8099,
+      "cur_mean": 0.7918
+    },
+    {
+      "feature": "rain_mm_t0",
+      "psi": 0.0058,
+      "status": "STABLE",
+      "ref_mean": 0.4449,
+      "cur_mean": 0.4318
+    },
+    {
+      "feature": "rain_cum_3h",
+      "psi": 0.0109,
+      "status": "STABLE",
+      "ref_mean": 5.3389,
+      "cur_mean": 5.1817
+    },
+    {
+      "feature": "downstream_min_ratio_t0",
+      "psi": 0.0249,
+      "status": "STABLE",
+      "ref_mean": 0.8072,
+      "cur_mean": 0.7894
+    },
+    {
+      "feature": "current_diff_from_hist",
+      "psi": 0.0203,
+      "status": "STABLE",
+      "ref_mean": -0.0005,
+      "cur_mean": -0.0156
+    }
+  ],
+  "monsoon_stress_test_psi": [
+    {
+      "feature": "ratio_t0",
+      "psi": 3.3513,
+      "status": "CRITICAL_DRIFT",
+      "ref_mean": 0.8099,
+      "stress_mean": 0.6431
+    },
+    {
+      "feature": "rain_mm_t0",
+      "psi": 10.2578,
+      "status": "CRITICAL_DRIFT",
+      "ref_mean": 0.4449,
+      "stress_mean": 5.5113
+    },
+    {
+      "feature": "rain_cum_3h",
+      "psi": 9.9432,
+      "status": "CRITICAL_DRIFT",
+      "ref_mean": 5.3389,
+      "stress_mean": 37.6906
+    },
+    {
+      "feature": "downstream_min_ratio_t0",
+      "psi": 3.7668,
+      "status": "CRITICAL_DRIFT",
+      "ref_mean": 0.8072,
+      "stress_mean": 0.6224
+    },
+    {
+      "feature": "current_diff_from_hist",
+      "psi": 0.0203,
+      "status": "STABLE",
+      "ref_mean": -0.0005,
+      "stress_mean": -0.0156
+    }
+  ],
+  "daily_performance_timeline": [
+    {
+      "date": "2022-08-16",
+      "split": "val",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.039,
+      "f1_b2": 0.6952,
+      "f1_b0": 0.35,
+      "onset_recall_b2": 0.463,
+      "mae_b2": 0.0316,
+      "rolling_3d_f1": 0.6952,
+      "rolling_3d_onset_recall": 0.463
+    },
+    {
+      "date": "2022-08-17",
+      "split": "val",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.054,
+      "f1_b2": 0.7892,
+      "f1_b0": 0.375,
+      "onset_recall_b2": 0.6579,
+      "mae_b2": 0.0335,
+      "rolling_3d_f1": 0.7422,
+      "rolling_3d_onset_recall": 0.5604
+    },
+    {
+      "date": "2022-08-18",
+      "split": "val",
+      "num_observations": 3072,
+      "mean_rain_mm": 1.135,
+      "f1_b2": 0.9457,
+      "f1_b0": 0.8478,
+      "onset_recall_b2": 0.626,
+      "mae_b2": 0.0362,
+      "rolling_3d_f1": 0.81,
+      "rolling_3d_onset_recall": 0.5823
+    },
+    {
+      "date": "2022-08-19",
+      "split": "val",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.06,
+      "f1_b2": 0.8782,
+      "f1_b0": 0.658,
+      "onset_recall_b2": 0.6415,
+      "mae_b2": 0.0363,
+      "rolling_3d_f1": 0.871,
+      "rolling_3d_onset_recall": 0.6418
+    },
+    {
+      "date": "2022-08-20",
+      "split": "val",
+      "num_observations": 3072,
+      "mean_rain_mm": 1.134,
+      "f1_b2": 0.9723,
+      "f1_b0": 0.8519,
+      "onset_recall_b2": 0.75,
+      "mae_b2": 0.0329,
+      "rolling_3d_f1": 0.9321,
+      "rolling_3d_onset_recall": 0.6725
+    },
+    {
+      "date": "2022-08-21",
+      "split": "val",
+      "num_observations": 2944,
+      "mean_rain_mm": 0.024,
+      "f1_b2": 0.0,
+      "f1_b0": 0.0,
+      "onset_recall_b2": 0.0,
+      "mae_b2": 0.0291,
+      "rolling_3d_f1": 0.6168,
+      "rolling_3d_onset_recall": 0.4638
+    },
+    {
+      "date": "2022-09-01",
+      "split": "test",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.033,
+      "f1_b2": 0.7826,
+      "f1_b0": 0.5769,
+      "onset_recall_b2": 0.6885,
+      "mae_b2": 0.0482,
+      "rolling_3d_f1": 0.585,
+      "rolling_3d_onset_recall": 0.4795
+    },
+    {
+      "date": "2022-09-02",
+      "split": "test",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.121,
+      "f1_b2": 0.8922,
+      "f1_b0": 0.7332,
+      "onset_recall_b2": 0.47,
+      "mae_b2": 0.0451,
+      "rolling_3d_f1": 0.5583,
+      "rolling_3d_onset_recall": 0.3862
+    },
+    {
+      "date": "2022-09-03",
+      "split": "test",
+      "num_observations": 3072,
+      "mean_rain_mm": 1.206,
+      "f1_b2": 0.9737,
+      "f1_b0": 0.8522,
+      "onset_recall_b2": 0.819,
+      "mae_b2": 0.0355,
+      "rolling_3d_f1": 0.8828,
+      "rolling_3d_onset_recall": 0.6592
+    },
+    {
+      "date": "2022-09-04",
+      "split": "test",
+      "num_observations": 3072,
+      "mean_rain_mm": 0.011,
+      "f1_b2": 0.0,
+      "f1_b0": 0.0,
+      "onset_recall_b2": 0.0,
+      "mae_b2": 0.0301,
+      "rolling_3d_f1": 0.622,
+      "rolling_3d_onset_recall": 0.4297
+    },
+    {
+      "date": "2022-09-05",
+      "split": "test",
+      "num_observations": 3072,
+      "mean_rain_mm": 1.166,
+      "f1_b2": 0.9636,
+      "f1_b0": 0.8497,
+      "onset_recall_b2": 0.6774,
+      "mae_b2": 0.0334,
+      "rolling_3d_f1": 0.6458,
+      "rolling_3d_onset_recall": 0.4988
+    },
+    {
+      "date": "2022-09-06",
+      "split": "test",
+      "num_observations": 2944,
+      "mean_rain_mm": 0.036,
+      "f1_b2": 0.7011,
+      "f1_b0": 0.321,
+      "onset_recall_b2": 0.6842,
+      "mae_b2": 0.0312,
+      "rolling_3d_f1": 0.5549,
+      "rolling_3d_onset_recall": 0.4539
+    }
+  ],
+  "recommended_action": "Normal operation: Model & feature distributions are within acceptable bounds."
+}

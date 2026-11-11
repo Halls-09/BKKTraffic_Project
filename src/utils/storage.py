@@ -39,7 +39,12 @@ def compute_sha256(file_path: Path) -> str:
     return h.hexdigest()
 
 
-def update_checksum_manifest(file_path: Path, layer: str, row_count: int, extra: dict[str, Any] | None = None) -> dict[str, Any]:
+def update_checksum_manifest(
+    file_path: Path,
+    layer: str,
+    row_count: int,
+    extra: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     manifest_path = ROOT_DIR / "data" / "checksums_manifest.json"
     manifest_path.parent.mkdir(parents=True, exist_ok=True)
     if manifest_path.exists():
@@ -83,12 +88,6 @@ def has_parquet_engine() -> bool:
 
 
 def save_table(df: pd.DataFrame, rel_or_abs_path: str | Path, layer: str = "silver") -> Path:
-    """
-    Saves a DataFrame to the Lakehouse.
-    Uses native Parquet if pyarrow/fastparquet is installed; otherwise stores
-    a high-speed pickle payload at the target path so all downstream paths
-    (`silver_traffic_15m.parquet`, etc.) remain 100% consistent.
-    """
     path = Path(rel_or_abs_path)
     if not path.is_absolute():
         path = ROOT_DIR / path
@@ -111,7 +110,6 @@ def save_table(df: pd.DataFrame, rel_or_abs_path: str | Path, layer: str = "silv
 
 
 def load_table(rel_or_abs_path: str | Path) -> pd.DataFrame:
-    """Loads a Lakehouse table transparently regardless of underlying binary engine."""
     path = Path(rel_or_abs_path)
     if not path.is_absolute():
         path = ROOT_DIR / path
@@ -131,10 +129,6 @@ def load_table(rel_or_abs_path: str | Path) -> pd.DataFrame:
 
 
 def execute_sql_query(query: str, tables: dict[str, pd.DataFrame]) -> pd.DataFrame:
-    """
-    Executes analytical SQL over registered DataFrames.
-    Uses DuckDB if installed; falls back to in-memory SQLite3.
-    """
     try:
         import duckdb
         con = duckdb.connect(database=":memory:")

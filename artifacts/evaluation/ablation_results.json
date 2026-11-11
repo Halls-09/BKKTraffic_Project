@@ -1,0 +1,178 @@
+{
+  "timestamp_utc": "2026-11-11T16:17:51.182550+00:00",
+  "full_model_test_metrics": {
+    "f1_all": 0.9311,
+    "precision_all": 0.9539,
+    "recall_all": 0.9093,
+    "onset_recall": 0.6589,
+    "f1_rush_hour": 0.9302,
+    "f1_rainy": 0.9752,
+    "mae_ratio": 0.037,
+    "rmse_ratio": 0.0606,
+    "threshold_used": 0.495,
+    "onset_support": 428
+  },
+  "ablation_experiments": [
+    {
+      "group_key": "group_1_current_lags",
+      "group_label": "G1: สภาพปัจจุบันและ Lag (Current & Lags)",
+      "removed_features": [
+        "ratio_t0",
+        "ratio_lag_15m",
+        "ratio_lag_30m",
+        "ratio_lag_45m",
+        "ratio_lag_60m",
+        "delta_ratio_15m",
+        "delta_ratio_30m",
+        "rolling_std_60m"
+      ],
+      "f1_all": 0.9264,
+      "delta_f1_all": -0.0047,
+      "onset_recall": 0.6636,
+      "delta_onset_recall": 0.0047,
+      "f1_rainy": 0.971,
+      "delta_f1_rainy": -0.0042,
+      "f1_rush_hour": 0.9266,
+      "delta_f1_rush_hour": -0.0036,
+      "mae_ratio": 0.0373
+    },
+    {
+      "group_key": "group_2_historical_profile",
+      "group_label": "G2: รูปแบบในอดีต (Historical Profile)",
+      "removed_features": [
+        "hist_avg_ratio_target_slot",
+        "hist_p25_ratio_target_slot",
+        "current_diff_from_hist"
+      ],
+      "f1_all": 0.9207,
+      "delta_f1_all": -0.0104,
+      "onset_recall": 0.6822,
+      "delta_onset_recall": 0.0233,
+      "f1_rainy": 0.9781,
+      "delta_f1_rainy": 0.0029,
+      "f1_rush_hour": 0.9103,
+      "delta_f1_rush_hour": -0.0199,
+      "mae_ratio": 0.0365
+    },
+    {
+      "group_key": "group_3_temporal_cyclical",
+      "group_label": "G3: ช่วงเวลา (Temporal Cyclical)",
+      "removed_features": [
+        "target_hour_sin",
+        "target_hour_cos",
+        "target_slot_idx",
+        "is_morning_rush",
+        "is_evening_rush"
+      ],
+      "f1_all": 0.9243,
+      "delta_f1_all": -0.0068,
+      "onset_recall": 0.6402,
+      "delta_onset_recall": -0.0187,
+      "f1_rainy": 0.9683,
+      "delta_f1_rainy": -0.0069,
+      "f1_rush_hour": 0.9215,
+      "delta_f1_rush_hour": -0.0087,
+      "mae_ratio": 0.0381
+    },
+    {
+      "group_key": "group_4_calendar",
+      "group_label": "G4: ปฏิทิน (Calendar)",
+      "removed_features": [
+        "day_of_week",
+        "is_weekend",
+        "is_public_holiday",
+        "is_friday_evening",
+        "is_payday_window",
+        "is_school_term"
+      ],
+      "f1_all": 0.9318,
+      "delta_f1_all": 0.0007,
+      "onset_recall": 0.6449,
+      "delta_onset_recall": -0.014,
+      "f1_rainy": 0.9731,
+      "delta_f1_rainy": -0.0021,
+      "f1_rush_hour": 0.9249,
+      "delta_f1_rush_hour": -0.0053,
+      "mae_ratio": 0.037
+    },
+    {
+      "group_key": "group_5_weather",
+      "group_label": "G5: ฝนและสภาพอากาศ (Weather)",
+      "removed_features": [
+        "rain_mm_t0",
+        "rain_cum_3h",
+        "rain_cum_6h",
+        "is_heavy_rain_t0",
+        "temp_c_t0"
+      ],
+      "f1_all": 0.9068,
+      "delta_f1_all": -0.0243,
+      "onset_recall": 0.6051,
+      "delta_onset_recall": -0.0538,
+      "f1_rainy": 0.9654,
+      "delta_f1_rainy": -0.0098,
+      "f1_rush_hour": 0.9103,
+      "delta_f1_rush_hour": -0.0199,
+      "mae_ratio": 0.0399
+    },
+    {
+      "group_key": "group_6_spatial_graph",
+      "group_label": "G6: ถนนข้างเคียง (Spatial Graph Neighbors)",
+      "removed_features": [
+        "downstream_min_ratio_t0",
+        "downstream_mean_ratio_t0",
+        "downstream_delta_15m",
+        "upstream_mean_ratio_t0",
+        "spatial_gradient_t0"
+      ],
+      "f1_all": 0.9205,
+      "delta_f1_all": -0.0106,
+      "onset_recall": 0.6332,
+      "delta_onset_recall": -0.0257,
+      "f1_rainy": 0.9708,
+      "delta_f1_rainy": -0.0044,
+      "f1_rush_hour": 0.9181,
+      "delta_f1_rush_hour": -0.0121,
+      "mae_ratio": 0.0378
+    },
+    {
+      "group_key": "group_7_incidents",
+      "group_label": "G7: อุบัติเหตุ (Traffic Incidents)",
+      "removed_features": [
+        "active_incident_on_seg",
+        "incident_count_within_2km_1h",
+        "mins_since_last_incident"
+      ],
+      "f1_all": 0.9298,
+      "delta_f1_all": -0.0013,
+      "onset_recall": 0.6589,
+      "delta_onset_recall": 0.0,
+      "f1_rainy": 0.975,
+      "delta_f1_rainy": -0.0002,
+      "f1_rush_hour": 0.9286,
+      "delta_f1_rush_hour": -0.0016,
+      "mae_ratio": 0.0372
+    },
+    {
+      "group_key": "group_8_road_traffy_static",
+      "group_label": "G8: ลักษณะถนนและพื้นที่เสี่ยงน้ำท่วม (Road & Traffy)",
+      "removed_features": [
+        "free_flow_speed_kmh",
+        "length_km",
+        "direction_code",
+        "traffy_flood_density_district",
+        "traffy_flood_buffer500m",
+        "rain_x_traffy_flood_interaction"
+      ],
+      "f1_all": 0.9282,
+      "delta_f1_all": -0.0029,
+      "onset_recall": 0.6425,
+      "delta_onset_recall": -0.0164,
+      "f1_rainy": 0.9734,
+      "delta_f1_rainy": -0.0018,
+      "f1_rush_hour": 0.9266,
+      "delta_f1_rush_hour": -0.0036,
+      "mae_ratio": 0.0369
+    }
+  ]
+}

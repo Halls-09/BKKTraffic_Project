@@ -1,0 +1,271 @@
+{
+  "files": {
+    "data/01_bronze/bronze_itic_segments.parquet": {
+      "sha256": "4559e6f36af05fa703d2bd14ea06601cc8bf32715894de7b5e6661a1ed7a338d",
+      "layer": "bronze",
+      "row_count": 32,
+      "size_bytes": 6607,
+      "updated_at_utc": "2026-11-11T16:15:56.529149+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "road_name",
+        "direction",
+        "lat_start",
+        "lon_start",
+        "lat_end",
+        "lon_end",
+        "length_km",
+        "district_name",
+        "weather_zone_id",
+        "upstream_seg_ids",
+        "downstream_seg_ids",
+        "true_free_flow_kmh"
+      ]
+    },
+    "data/01_bronze/bronze_itic_traffic_15m.parquet": {
+      "sha256": "27e2806b6a4b0ea1d5350f5be7c496d59eeccd0523c29479263703e39727105f",
+      "layer": "bronze",
+      "row_count": 85817,
+      "size_bytes": 2233165,
+      "updated_at_utc": "2026-11-11T16:15:56.553808+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "ts_15m",
+        "speed_median_kmh",
+        "probe_count"
+      ]
+    },
+    "data/01_bronze/bronze_weather_15m.parquet": {
+      "sha256": "09bd9406112ac86013a7f05bfe0e18bb2ebbe9c86ae75c95fed2813cc28ddf7d",
+      "layer": "bronze",
+      "row_count": 10752,
+      "size_bytes": 280775,
+      "updated_at_utc": "2026-11-11T16:15:56.574011+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "weather_zone_id",
+        "ts_15m",
+        "rain_mm",
+        "temp_c"
+      ]
+    },
+    "data/01_bronze/bronze_traffy_reports.parquet": {
+      "sha256": "2f0e2549697400c9b049b7405342b6dc7985e356560c6e82e5246ff222054f48",
+      "layer": "bronze",
+      "row_count": 4226,
+      "size_bytes": 545109,
+      "updated_at_utc": "2026-11-11T16:15:56.626115+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "ticket_id",
+        "timestamp",
+        "timestamp_hour",
+        "type",
+        "district_name",
+        "nearest_seg_id",
+        "lat",
+        "lon"
+      ]
+    },
+    "data/01_bronze/bronze_incidents.parquet": {
+      "sha256": "39174635324b0a08cb4f32d5e637daf02951e33dcea7512019505238b577772e",
+      "layer": "bronze",
+      "row_count": 266,
+      "size_bytes": 14944,
+      "updated_at_utc": "2026-11-11T16:15:56.647655+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "incident_id",
+        "seg_id",
+        "event_time",
+        "reported_time",
+        "cleared_time",
+        "severity"
+      ]
+    },
+    "data/02_quarantine/quarantine_traffic_15m.parquet": {
+      "sha256": "c656f1bc90a01b1dc88e7772b37fca9d3939ff288e795b6214c6c82183b067e5",
+      "layer": "quarantine",
+      "row_count": 25,
+      "size_bytes": 3249,
+      "updated_at_utc": "2026-11-11T16:18:12.396560+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "ts_15m",
+        "speed_median_kmh",
+        "probe_count",
+        "quarantine_reason",
+        "quarantined_at_utc"
+      ]
+    },
+    "data/03_silver/silver_road_segments.parquet": {
+      "sha256": "b350b8bdcd2bbe9614636a08d5290b2f23f6efceb526f8e42d3625502dc9b07a",
+      "layer": "silver",
+      "row_count": 32,
+      "size_bytes": 6681,
+      "updated_at_utc": "2026-11-11T16:17:27.933623+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "road_name",
+        "direction",
+        "lat_start",
+        "lon_start",
+        "lat_end",
+        "lon_end",
+        "length_km",
+        "district_name",
+        "weather_zone_id",
+        "upstream_seg_ids",
+        "downstream_seg_ids",
+        "free_flow_speed_kmh"
+      ]
+    },
+    "data/03_silver/silver_traffic_15m.parquet": {
+      "sha256": "39ad69dff2e92bf204a28f73775c32c460f07e74fd60aee6235ccf0f29840e3e",
+      "layer": "silver",
+      "row_count": 86016,
+      "size_bytes": 3959128,
+      "updated_at_utc": "2026-11-11T16:17:27.961008+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "ts_15m",
+        "speed_median_kmh",
+        "probe_count",
+        "congestion_ratio",
+        "is_outlier_flagged",
+        "is_imputed",
+        "year_month"
+      ]
+    },
+    "data/03_silver/silver_weather_15m.parquet": {
+      "sha256": "ae5f52d2f706baa73500c49b6746805bc494cc62e259ea8f39e46f88ba3c41c9",
+      "layer": "silver",
+      "row_count": 10752,
+      "size_bytes": 452960,
+      "updated_at_utc": "2026-11-11T16:17:28.001013+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "weather_zone_id",
+        "ts_15m",
+        "rain_mm",
+        "temp_c",
+        "rain_cum_3h",
+        "rain_cum_6h"
+      ]
+    },
+    "data/03_silver/silver_incidents.parquet": {
+      "sha256": "d7391435320c1d3b7949ebadbf069eb48197f4b0d3f89a6ae19c0a038cc83a1c",
+      "layer": "silver",
+      "row_count": 266,
+      "size_bytes": 15002,
+      "updated_at_utc": "2026-11-11T16:17:28.026049+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "incident_id",
+        "seg_id",
+        "event_time",
+        "reported_time",
+        "cleared_time",
+        "severity"
+      ]
+    },
+    "data/03_silver/silver_traffy_spatial_features.parquet": {
+      "sha256": "f434f63ebc74ea817acd885eab6a0fec61d55d7a1189e20d4d026eacaec7dd5f",
+      "layer": "silver",
+      "row_count": 32,
+      "size_bytes": 2884,
+      "updated_at_utc": "2026-11-11T16:17:28.205827+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "district_name",
+        "seg_buffer500m_flood_count",
+        "seg_buffer500m_road_defect_count",
+        "district_flood_reports_train",
+        "district_flood_density_per_km2"
+      ]
+    },
+    "data/04_gold/gold_features.parquet": {
+      "sha256": "acc8fc9257a2d1e6a1ce1785393c98b69d1db54b4030c4f8fd446aa2342c10b3",
+      "layer": "gold",
+      "row_count": 85504,
+      "size_bytes": 41649034,
+      "updated_at_utc": "2026-11-11T16:17:37.172323+00:00",
+      "storage_format": "pickle_compat",
+      "columns": [
+        "seg_id",
+        "ts_t",
+        "speed_median_kmh",
+        "probe_count",
+        "ratio_t0",
+        "is_outlier_flagged",
+        "is_imputed",
+        "year_month",
+        "target_ts_t60",
+        "ratio_lag_15m",
+        "ratio_lag_30m",
+        "ratio_lag_45m",
+        "ratio_lag_60m",
+        "delta_ratio_15m",
+        "delta_ratio_30m",
+        "rolling_std_60m",
+        "target_ratio_t60",
+        "split",
+        "current_slot_idx",
+        "target_slot_idx",
+        "target_hour_sin",
+        "target_hour_cos",
+        "is_morning_rush",
+        "is_evening_rush",
+        "day_of_week",
+        "is_weekend",
+        "is_public_holiday",
+        "is_day_off",
+        "is_friday_evening",
+        "is_payday_window",
+        "is_school_term",
+        "hist_avg_t0",
+        "hist_p25_t0",
+        "hist_avg_ratio_target_slot",
+        "hist_p25_ratio_target_slot",
+        "current_diff_from_hist",
+        "road_name",
+        "direction",
+        "length_km",
+        "district_name",
+        "weather_zone_id",
+        "free_flow_speed_kmh",
+        "rain_mm_t0",
+        "temp_c_t0",
+        "rain_cum_3h",
+        "rain_cum_6h",
+        "is_heavy_rain_t0",
+        "downstream_min_ratio_t0",
+        "downstream_mean_ratio_t0",
+        "downstream_delta_15m",
+        "upstream_mean_ratio_t0",
+        "spatial_gradient_t0",
+        "active_incident_on_seg",
+        "incident_count_within_2km_1h",
+        "mins_since_last_incident",
+        "traffy_flood_density_district",
+        "traffy_flood_buffer500m",
+        "direction_code",
+        "rain_x_traffy_flood_interaction",
+        "target_is_congested_t60",
+        "is_onset_event",
+        "pred_b0_persistence",
+        "pred_b1_historical",
+        "pred_b2_lgbm",
+        "pred_is_congested_t60",
+        "pred_is_onset_alert"
+      ]
+    }
+  },
+  "last_updated_utc": "2026-11-11T16:18:12.396574+00:00"
+}
