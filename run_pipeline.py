@@ -125,7 +125,7 @@ def cmd_dashboard(
         False, "--build-only", help="Only build artifacts/dashboard_index.html without starting HTTP server"
     ),
 ) -> None:
-    """Build and launch the interactive 4-View Bangkok Traffic & MLOps Dashboard."""
+    """Build and launch the interactive 4-View Bangkok Traffic & MLOps Dashboard + FastAPI Server."""
     html_file = generate_standalone_dashboard_html()
     if build_only:
         log_success(f"สร้างไฟล์ Dashboard เรียบร้อยที่: {html_file}")
@@ -133,12 +133,45 @@ def cmd_dashboard(
     serve_dashboard(host=host, port=port)
 
 
+@app.command("env-check")
+def cmd_env_check() -> None:
+    """Inspect `.env` API keys status (masked safely) and list available FastAPI endpoints."""
+    from src.utils.env_config import get_api_keys_status
+
+    status = get_api_keys_status()
+    table = Table(title=f"🔑 .env API Keys & Endpoints Status ({status['env_file_path']})")
+    table.add_column("Env Variable", style="cyan", no_wrap=True)
+    table.add_column("Provider / Service", style="white")
+    table.add_column("Mode", justify="center")
+    table.add_column("Masked Key", justify="center", style="yellow")
+    table.add_column("Endpoint / Fallback", style="dim")
+
+    for k in status["keys"]:
+        mode_badge = (
+            f"[bold green]{k['mode']}[/bold green]"
+            if k["is_configured"]
+            else f"[cyan]{k['mode']}[/cyan]"
+        )
+        table.add_row(
+            k["key_name"],
+            k["provider"],
+            mode_badge,
+            k["masked_preview"],
+            f"{k['endpoint_url']} (Fallback: {k['fallback_mode']})",
+        )
+    console.print(table)
+
+
 @app.command("test")
 def cmd_test() -> None:
-    """Run all unit tests (Data Contract 4.2, Zero Temporal Leakage, MLOps Registry & PSI Drift)."""
-    log_step("UNIT_TESTS", "รันชุดทดสอบความถูกต้องของระบบ (Data Contract, Temporal Leakage, MLOps)...")
+    """Run all unit tests (Data Contract 4.2, Zero Temporal Leakage, MLOps Registry, PSI Drift & API Endpoints)."""
+    log_step("UNIT_TESTS", "รันชุดทดสอบความถูกต้องของระบบ (Data Contract, Temporal Leakage, MLOps, API & .env)...")
     from tests.test_data_contract import test_quality_gate_quarantines_outliers
-    from tests.test_mlops_registry import test_model_registry_champion_gates, test_psi_drift_mathematics
+    from tests.test_mlops_registry import (
+        test_env_and_api_endpoints,
+        test_model_registry_champion_gates,
+        test_psi_drift_mathematics,
+    )
     from tests.test_temporal_leakage import test_zero_temporal_leakage_boundaries
 
     tests = [
@@ -146,6 +179,7 @@ def cmd_test() -> None:
         ("test_zero_temporal_leakage_boundaries (Strict As-Of Cutoff t)", test_zero_temporal_leakage_boundaries),
         ("test_psi_drift_mathematics (PSI Drift Formula)", test_psi_drift_mathematics),
         ("test_model_registry_champion_gates (Model Registry & Guardrails)", test_model_registry_champion_gates),
+        ("test_env_and_api_endpoints (.env Masking & FastAPI /api/v1/*)", test_env_and_api_endpoints),
     ]
 
     passed = 0
@@ -161,5 +195,42 @@ def cmd_test() -> None:
     log_success(f"ผ่านการทดสอบทั้งหมด {passed}/{len(tests)} ชุดทดสอบ (100% Pass)")
 
 
+@app.command("de-phase")
+def cmd_de_phase(
+    stage: str = typer.Option("all", "--stage", help="DE-Phase stage: check | calendar | weather | all"),
+) -> None:
+    """Run DE-Phase modules from `origin/DE-Phase` (`src/common.py`, `src/ingest/calendar.py`, `src/ingest/weather.py`)."""
+    from src.common import CFG, ROOT, new_run_id, path, set_seed, verify_manifest
+    from src.ingest.calendar import ingest_calendar
+    from src.ingest.weather import download_weather, stage_weather
+
+    set_seed()
+    run_id = new_run_id()
+    log_step("DE_PHASE", f"รันโมดูลจาก branch DE-Phase (run_id={run_id}, stage={stage})...")
+
+    if stage in ("all", "calendar"):
+        df_cal = ingest_calendar(run_id=run_id)
+        log_success(f"[DE-Phase] สร้างตารางปฏิทิน 2022 สำเร็จ: {len(df_cal)} วัน -> data/processed/calendar_daily.parquet")
+
+    if stage in ("all", "weather"):
+        download_weather()
+        df_wx = stage_weather(run_id=run_id)
+        log_success(f"[DE-Phase] สร้างตารางสภาพอากาศ 3 จุด (central/north/east) สำเร็จ: {len(df_wx)} แถว -> data/processed/weather_hourly.parquet")
+
+    if stage in ("all", "check"):
+        for key in ("raw", "quarantine", "staging", "processed", "features", "audit", "quality"):
+            p = path(key)
+            p.mkdir(parents=True, exist_ok=True)
+        problems = verify_manifest()
+        if problems:
+            for prob in problems:
+                log_error(f"Manifest check note: {prob}")
+        else:
+            log_success("[DE-Phase] ตรวจสอบ logs/manifest.jsonl (SHA-256 Raw Snapshot): OK 100%")
+
+
 if __name__ == "__main__":
+    # Support DE-Phase legacy flag `python run_pipeline.py --stage check` directly
+    if len(sys.argv) >= 2 and sys.argv[1] == "--stage":
+        sys.argv.insert(1, "de-phase")
     app()

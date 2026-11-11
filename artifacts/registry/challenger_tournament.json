@@ -1,0 +1,60 @@
+{
+  "timestamp_utc": "2026-11-11T16:32:08.839751+00:00",
+  "winning_strategy": "Challenger_2_Rolling_Window",
+  "challengers": [
+    {
+      "strategy_id": "Challenger_1_Expanding_Window",
+      "strategy_name_th": "Expanding Window (ใช้ข้อมูลสะสมทั้งหมด)",
+      "train_rows": 48896,
+      "optimal_threshold": 0.5,
+      "metrics_test": {
+        "f1_all": 0.9302,
+        "precision_all": 0.9481,
+        "recall_all": 0.9129,
+        "onset_recall": 0.6682,
+        "f1_rush_hour": 0.9302,
+        "f1_rainy": 0.9753,
+        "mae_ratio": 0.0369,
+        "rmse_ratio": 0.0603,
+        "threshold_used": 0.5,
+        "onset_support": 428
+      }
+    },
+    {
+      "strategy_id": "Challenger_2_Rolling_Window",
+      "strategy_name_th": "Rolling Window (หน้าต่างข้อมูลล่าสุด)",
+      "train_rows": 31783,
+      "optimal_threshold": 0.495,
+      "metrics_test": {
+        "f1_all": 0.9399,
+        "precision_all": 0.9655,
+        "recall_all": 0.9157,
+        "onset_recall": 0.6612,
+        "f1_rush_hour": 0.9324,
+        "f1_rainy": 0.9764,
+        "mae_ratio": 0.0363,
+        "rmse_ratio": 0.0558,
+        "threshold_used": 0.495,
+        "onset_support": 428
+      }
+    },
+    {
+      "strategy_id": "Challenger_3_Same_Season_Monsoon",
+      "strategy_name_th": "Same-Season Monsoon (ถ่วงน้ำหนักฤดูฝนเข้มข้น)",
+      "train_rows": 48896,
+      "optimal_threshold": 0.495,
+      "metrics_test": {
+        "f1_all": 0.9229,
+        "precision_all": 0.9374,
+        "recall_all": 0.9089,
+        "onset_recall": 0.6729,
+        "f1_rush_hour": 0.9235,
+        "f1_rainy": 0.9719,
+        "mae_ratio": 0.0377,
+        "rmse_ratio": 0.062,
+        "threshold_used": 0.495,
+        "onset_support": 428
+      }
+    }
+  ]
+}

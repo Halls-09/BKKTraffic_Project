@@ -1,0 +1,13 @@
+{
+  "source": "open-meteo",
+  "url": "https://archive-api.open-meteo.com/v1/archive?point=east&mode=offline_deterministic",
+  "params": {
+    "latitude": 13.73,
+    "longitude": 100.76,
+    "start_date": "2022-06-01",
+    "end_date": "2022-09-30",
+    "hourly": "precipitation,rain,temperature_2m",
+    "timezone": "Asia/Bangkok"
+  },
+  "license": "CC-BY 4.0 (Open-Meteo)"
+}

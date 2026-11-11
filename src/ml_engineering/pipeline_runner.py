@@ -2,15 +2,17 @@
 End-to-End Pipeline Orchestrator & Lineage Tracker.
 Responsibility: Sarit (67090500441) - ML Engineer
 
-Orchestrates the 8-stage MLOps DAG:
-1. synthetic  -> Generate realistic Bangkok Bronze dataset (if needed)
-2. ingest     -> Bronze -> Quality Gate 4.2 -> Silver Layer (iTIC, Weather, Traffy)
-3. features   -> Silver -> Gold Feature Store (8 Groups, Strict As-Of Cutoff t)
-4. train      -> Train Baselines (B0, B1) & LightGBM/HistGBR (B2) + Threshold Tuning
-5. ablation   -> Run B3 Feature Group Ablation Study
-6. explain    -> Run SHAP / Attribution & Hypotheses H1-H5 Verification
-7. registry   -> Register Challenger & Execute Champion Promotion Gates
-8. monitor    -> Compute PSI Data Drift & Rolling Concept Drift Monitoring
+Orchestrates the 10-stage MLOps DAG:
+1. synthetic     -> Generate realistic Bangkok Bronze dataset
+2. ingest        -> Bronze -> Quality Gate 4.2 -> Silver Layer (iTIC, Weather, Traffy)
+3. features      -> Silver -> Gold Feature Store (8 Groups, Strict As-Of Cutoff t)
+4. train         -> Train Baselines (B0, B1) & LightGBM/HistGBR (B2) + Threshold Tuning
+5. ablation      -> Run B3 Feature Group Ablation Study
+6. explain       -> Run SHAP / Attribution & Hypotheses H1-H5 Verification
+7. experiments   -> Run Section 11 Experiments (Horizon 15/30/45/60m, 3-Fold Robustness, Traffy Event Study 95% CI, Hourly MAE)
+8. registry      -> Run 3-Challenger Tournament (Expanding/Rolling/Same-Season) & Section 10 Promotion Gates
+9. monitor       -> Run 5-Layer MLOps Monitoring (Circuit-Breaker, PSI Drift, Rolling F1, Rollback Readiness)
+10. deliverables -> Auto-generate DATA_DICTIONARY.md & MODEL_CARD.md (Section 12)
 """
 from __future__ import annotations
 
@@ -29,19 +31,36 @@ from src.data_engineering.ingest_traffy import run_ingest_traffy
 from src.data_engineering.ingest_weather import run_ingest_weather_and_incidents
 from src.data_engineering.synthetic_generator import generate_synthetic_bronze_data
 from src.data_science.ablation_runner import run_ablation_study
+from src.data_science.experiments_suite import run_proposal_experiments
 from src.data_science.explain_shap import run_explain_shap
 from src.data_science.train_lgbm import run_train_and_evaluate
+from src.ml_engineering.deliverables_generator import generate_section12_deliverables
 from src.ml_engineering.monitoring_drift import run_monitoring_drift
 from src.ml_engineering.registry import run_model_registry_step
-from src.utils.logger import console, log_error, log_step, log_success
+from src.utils.logger import console, log_error, log_success
 from src.utils.storage import ROOT_DIR, load_config
 
 
 def _step_ingest_all() -> dict[str, Any]:
+    from src.common import new_run_id
+    from src.ingest.calendar import ingest_calendar
+    from src.ingest.weather import download_weather, stage_weather
+
+    de_run_id = new_run_id()
+    df_cal = ingest_calendar(run_id=de_run_id)
+    download_weather()
+    df_wx_de = stage_weather(run_id=de_run_id)
+
     res_itic = run_ingest_itic()
     res_weather = run_ingest_weather_and_incidents()
     res_traffy = run_ingest_traffy()
-    return {**res_itic, **res_weather, **res_traffy}
+    return {
+        "de_calendar_days": len(df_cal),
+        "de_weather_3points_rows": len(df_wx_de),
+        **res_itic,
+        **res_weather,
+        **res_traffy,
+    }
 
 
 DAG_STEPS: dict[str, tuple[str, str, Callable[[], Any]]] = {
@@ -51,8 +70,10 @@ DAG_STEPS: dict[str, tuple[str, str, Callable[[], Any]]] = {
     "train": ("Data Science", "เทรนโมเดล B0, B1, B2 + จูน Threshold บนชุด Validation", run_train_and_evaluate),
     "ablation": ("Data Science", "ทดลอง B3 Ablation Study ตัดทีละกลุ่มฟีเจอร์", run_ablation_study),
     "explain": ("Data Science", "วิเคราะห์ปัจจัย SHAP และตรวจสอบสมมุติฐาน H1–H5", run_explain_shap),
-    "registry": ("ML Engineering", "Model Registry & Champion/Challenger Promotion Gate", run_model_registry_step),
-    "monitor": ("ML Engineering", "ตรวจจับ Data Drift (PSI) & Rolling Performance Monitoring", run_monitoring_drift),
+    "experiments": ("Data Science", "การทดลองข้อ 11 (Horizon 15/30/60m, 3-Fold, Event Study, Hourly MAE)", run_proposal_experiments),
+    "registry": ("ML Engineering", "3-Challenger Tournament & Champion Promotion Gate (ข้อ 10)", run_model_registry_step),
+    "monitor": ("ML Engineering", "ระบบเฝ้าระวัง 5 ชั้น (Circuit-Breaker, PSI, Rolling F1, Rollback)", run_monitoring_drift),
+    "deliverables": ("ML Engineering", "สร้าง DATA_DICTIONARY.md และ MODEL_CARD.md อัตโนมัติ (ข้อ 12)", generate_section12_deliverables),
 }
 
 
@@ -83,9 +104,9 @@ class PipelineOrchestrator:
         run_id = f"RUN_{datetime.now(timezone.utc).strftime('%Y%m%d_%H%M%S')}_{uuid.uuid4().hex[:6]}"
         console.print(
             Panel.fit(
-                f"[bold cyan]🚦 BANGKOK TRAFFIC FORECASTING — END-TO-END MLOPS PIPELINE[/bold cyan]\n"
+                f"[bold cyan]🚦 BANGKOK TRAFFIC FORECASTING — END-TO-END MLOPS PIPELINE (10-STAGE DAG)[/bold cyan]\n"
                 f"[white]Run ID:[/white] [bold yellow]{run_id}[/bold yellow] | "
-                f"[white]Architecture:[/white] Medallion (Bronze -> Silver -> Gold -> Registry -> Monitoring)",
+                f"[white]Architecture:[/white] Medallion + 3-Challenger Registry + 5-Layer Monitoring",
                 border_style="cyan",
             )
         )
@@ -160,4 +181,4 @@ class PipelineOrchestrator:
                 f"{s.get('duration_sec', 0.0):.2f}s",
             )
         console.print(table)
-        log_success(f"รัน End-to-End Pipeline เสร็จสมบูรณ์ในเวลา {lineage_record['total_duration_sec']:.2f} วินาที")
+        log_success(f"รัน End-to-End Pipeline ทั้ง {len(lineage_record['steps'])} ขั้นตอนสำเร็จในเวลา {lineage_record['total_duration_sec']:.2f} วินาที")

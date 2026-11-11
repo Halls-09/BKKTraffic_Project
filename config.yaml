@@ -1,0 +1,64 @@
+# ============================================================
+# BKK Traffic Project - ค่าคงที่ทั้งหมดของ pipeline อยู่ที่นี่ที่เดียว
+# ห้าม hard-code วันที่ / threshold ในโค้ด ให้อ่านจากไฟล์นี้
+# อ้างอิง: BKK_Traffic_Project_Proposal.pdf ข้อ 0, 4.2, 6.2, 8
+# ============================================================
+
+project: bkk_traffic
+tz: Asia/Bangkok
+seed: 42
+
+# ช่วงศึกษา (รวมวันสุดท้าย) - ข้อ 0 Time boundary
+study:
+  start: "2022-06-01"
+  end: "2022-09-30"
+
+# Temporal split - แบ่งตามเวลา ห้ามสุ่ม (ข้อ 6.2)
+split:
+  train: ["2022-06-01", "2022-08-23"]
+  valid: ["2022-08-24", "2022-09-06"]
+  test:  ["2022-09-07", "2022-09-30"]
+
+# Unit of analysis = segment x 15 นาที
+freq: 15min
+slots_per_day: 96
+horizon_steps: 4            # 4 x 15 นาที = 60 นาที (ข้อ 8)
+
+# Target
+congested_threshold: 0.5    # ratio < 0.5 = "ติด"
+free_flow_percentile: 90    # คำนวณจากช่วง train เท่านั้น
+
+# Quality gate (ข้อ 4.2)
+quality:
+  speed_min: 0
+  speed_max: 150            # km/h
+  day_completeness: 0.80    # >= 80% ของ 96 ช่วง/วัน
+  peak_window: [6, 22]      # 06:00-22:00
+  peak_completeness: 0.90   # >= 90% ในช่วง 06:00-22:00
+  ratio_max: 1.2
+  max_jump_kmh: 60          # ความเร็วกระโดดเกิน 60 km/h ใน 15 นาที = flag
+
+# จุดวัดฝน 3 จุด (กลาง/เหนือ/ตะวันออก) - TODO: ทีมยืนยันพิกัด
+weather:
+  api_url: "https://archive-api.open-meteo.com/v1/archive"
+  hourly_vars: ["precipitation", "rain", "temperature_2m"]
+  points:
+    central: {lat: 13.7563, lon: 100.5018}
+    north:   {lat: 13.8700, lon: 100.6000}
+    east:    {lat: 13.7300, lon: 100.7600}
+
+# Bounding box กรุงเทพฯ โดยประมาณ ใช้ตรวจพิกัด
+bkk_bbox:
+  lat: [13.49, 13.96]
+  lon: [100.32, 100.94]
+
+paths:
+  raw: data/raw
+  quarantine: data/quarantine
+  staging: data/staging
+  processed: data/processed
+  features: data/features
+  manifest: logs/manifest.jsonl
+  audit: logs/audit
+  quality: logs/quality
+

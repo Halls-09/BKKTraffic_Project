@@ -86,11 +86,11 @@
       ]
     },
     "data/02_quarantine/quarantine_traffic_15m.parquet": {
-      "sha256": "c656f1bc90a01b1dc88e7772b37fca9d3939ff288e795b6214c6c82183b067e5",
+      "sha256": "2ca9359950bf0eb245d47cdb3b2584a41ddff1620121beedf551a0725e27ec5f",
       "layer": "quarantine",
       "row_count": 25,
       "size_bytes": 3249,
-      "updated_at_utc": "2026-11-11T16:18:12.396560+00:00",
+      "updated_at_utc": "2026-11-11T17:15:03.595309+00:00",
       "storage_format": "pickle_compat",
       "columns": [
         "seg_id",
@@ -267,5 +267,5 @@
       ]
     }
   },
-  "last_updated_utc": "2026-11-11T16:18:12.396574+00:00"
+  "last_updated_utc": "2026-11-11T17:15:03.595322+00:00"
 }

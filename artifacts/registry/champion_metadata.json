@@ -1,9 +1,10 @@
 {
-  "version": "v1.0.0",
-  "registered_at_utc": "2026-11-11T16:17:53.951774+00:00",
+  "version": "v1.0.1",
+  "registered_at_utc": "2026-11-11T16:32:08.897703+00:00",
   "stage": "Champion",
+  "winning_window_strategy": "Challenger_2_Rolling_Window",
   "model_backend": "HistGradientBoostingRegressor (LightGBM-Tree)",
-  "artifact_path": "artifacts/registry/models/model_v1.0.0.joblib",
+  "artifact_path": "artifacts/registry/models/model_v1.0.1.joblib",
   "model_sha256": "bf863d0dada3688a927f6cd25146406db617c1e2f74fd41a1ff2a76ad3744d4d",
   "gold_data_sha256": "acc8fc9257a2d1e6a1ce1785393c98b69d1db54b4030c4f8fd446aa2342c10b3",
   "optimal_threshold": 0.495,
@@ -61,7 +62,7 @@
   "promotion_decision": {
     "promoted_to_champion": true,
     "gates": {
-      "gate_1_beats_baseline_f1": {
+      "gate_1_f1_gain_over_baseline": {
         "passed": true,
         "challenger_f1": 0.9307,
         "best_baseline_f1": 0.7915,
@@ -72,18 +73,20 @@
         "passed": true,
         "challenger_onset_recall": 0.6659,
         "baseline_b0_onset_recall": 0.0,
-        "min_required": 0.55
+        "min_required": 0.55,
+        "max_allowed_drop_vs_champion": 0.02
       },
-      "gate_3_mae_plausibility": {
+      "gate_3_rainy_f1_non_degradation": {
+        "passed": true,
+        "challenger_f1_rainy": 0.9747,
+        "baseline_b0_f1_rainy": 0.8623,
+        "rule": "F1 ช่วงฝนตกต้องไม่ลดลง (Section 10 Page 11)"
+      },
+      "gate_4_mae_and_champion_non_regression": {
         "passed": true,
         "challenger_mae": 0.0373,
-        "max_allowed": 0.15
-      },
-      "gate_4_non_regression_vs_champion": {
-        "passed": true,
-        "previous_champion_version": null,
-        "previous_champion_f1": null,
-        "challenger_f1": 0.9307
+        "max_allowed_mae": 0.15,
+        "previous_champion_version": "v1.0.0"
       }
     }
   }

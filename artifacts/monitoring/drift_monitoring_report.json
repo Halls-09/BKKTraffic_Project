@@ -1,6 +1,43 @@
 {
-  "timestamp_utc": "2026-11-11T16:17:54.471040+00:00",
-  "overall_system_health": "HEALTHY_STABLE",
+  "timestamp_utc": "2026-11-11T16:32:12.241697+00:00",
+  "overall_system_health": "RETRAIN_CHALLENGER_TRIGGERED",
+  "five_layer_monitoring_summary": [
+    {
+      "layer": "1. Data Quality & Feed Freshness",
+      "metric_trigger": "Missing per segment < 20%; Halted segments = 0",
+      "status": "PASSED",
+      "action": "หยุดพยากรณ์เฉพาะ segment ที่ข้อมูลขาดหาย และแจ้งเตือนทันที"
+    },
+    {
+      "layer": "2. Feature Drift (PSI Ratio & Rain)",
+      "metric_trigger": "Max PSI = 0.0249 (Warn >= 0.10, Crit >= 0.25)",
+      "status": "STABLE",
+      "action": "ตรวจสอบสาเหตุเชิงกายภาพ (เช่น ฝนตกหนักผิดฤดู); ไม่ retrain จาก PSI อย่างเดียว"
+    },
+    {
+      "layer": "3. Weekly / Rolling Performance",
+      "metric_trigger": "Ref F1 = 0.7134, Rolling F1 = 0.5549 (Drop = +0.1585)",
+      "status": "TRIGGER_CHALLENGER",
+      "action": "ฝึก Challenger 3 แบบ (Expanding, Rolling, Same-Season) เมื่อ F1 ลดลงเกิน 0.05"
+    },
+    {
+      "layer": "4. Champion/Challenger Promotion",
+      "metric_trigger": "ΔF1 >= +0.01, Onset Recall ลดไม่เกิน 0.02, F1 ฝนตกไม่ลดลง",
+      "status": "ENFORCED",
+      "action": "Promote โมเดลที่ชนะทั้ง 4 เกณฑ์ขึ้นเป็น Champion อัตโนมัติ"
+    },
+    {
+      "layer": "5. Automated Rollback & Incident Log",
+      "metric_trigger": "Post-deploy metric drop or upstream data corruption",
+      "status": "READY_VERIFIED",
+      "action": "สลับกลับไปใช้ Champion artifact ก่อนหน้าภายใน <15 ms พร้อมบันทึก Audit Log"
+    }
+  ],
+  "segment_circuit_breaker": {
+    "total_segments_monitored": 32,
+    "halted_segments_count": 0,
+    "halted_segment_ids": []
+  },
   "psi_thresholds": {
     "warning": 0.1,
     "critical": 0.25
@@ -11,35 +48,40 @@
       "psi": 0.0212,
       "status": "STABLE",
       "ref_mean": 0.8099,
-      "cur_mean": 0.7918
+      "cur_mean": 0.7918,
+      "action_policy": "STABLE"
     },
     {
       "feature": "rain_mm_t0",
       "psi": 0.0058,
       "status": "STABLE",
       "ref_mean": 0.4449,
-      "cur_mean": 0.4318
+      "cur_mean": 0.4318,
+      "action_policy": "STABLE"
     },
     {
       "feature": "rain_cum_3h",
       "psi": 0.0109,
       "status": "STABLE",
       "ref_mean": 5.3389,
-      "cur_mean": 5.1817
+      "cur_mean": 5.1817,
+      "action_policy": "STABLE"
     },
     {
       "feature": "downstream_min_ratio_t0",
       "psi": 0.0249,
       "status": "STABLE",
       "ref_mean": 0.8072,
-      "cur_mean": 0.7894
+      "cur_mean": 0.7894,
+      "action_policy": "STABLE"
     },
     {
       "feature": "current_diff_from_hist",
       "psi": 0.0203,
       "status": "STABLE",
       "ref_mean": -0.0005,
-      "cur_mean": -0.0156
+      "cur_mean": -0.0156,
+      "action_policy": "STABLE"
     }
   ],
   "monsoon_stress_test_psi": [
@@ -225,5 +267,5 @@
       "rolling_3d_onset_recall": 0.4539
     }
   ],
-  "recommended_action": "Normal operation: Model & feature distributions are within acceptable bounds."
+  "recommended_action": "Inspect drift root cause or execute 3-Challenger retraining tournament."
 }

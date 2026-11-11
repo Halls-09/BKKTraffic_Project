@@ -1,0 +1,333 @@
+{
+  "timestamp_utc": "2026-11-11T16:33:55.282528+00:00",
+  "horizon_sensitivity": [
+    {
+      "horizon_minutes": 15,
+      "horizon_slots": 1,
+      "lgbm_f1": 0.9626,
+      "lgbm_onset_recall": 0.5,
+      "lgbm_mae": 0.0223,
+      "b0_f1": 0.9353,
+      "b0_onset_recall": 0.0,
+      "b0_mae": 0.0318
+    },
+    {
+      "horizon_minutes": 30,
+      "horizon_slots": 2,
+      "lgbm_f1": 0.9529,
+      "lgbm_onset_recall": 0.65,
+      "lgbm_mae": 0.0281,
+      "b0_f1": 0.8865,
+      "b0_onset_recall": 0.0,
+      "b0_mae": 0.05
+    },
+    {
+      "horizon_minutes": 45,
+      "horizon_slots": 3,
+      "lgbm_f1": 0.9488,
+      "lgbm_onset_recall": 0.6863,
+      "lgbm_mae": 0.0325,
+      "b0_f1": 0.8386,
+      "b0_onset_recall": 0.0,
+      "b0_mae": 0.0659
+    },
+    {
+      "horizon_minutes": 60,
+      "horizon_slots": 4,
+      "lgbm_f1": 0.9301,
+      "lgbm_onset_recall": 0.6659,
+      "lgbm_mae": 0.0372,
+      "b0_f1": 0.7915,
+      "b0_onset_recall": 0.0,
+      "b0_mae": 0.0813
+    }
+  ],
+  "rolling_origin_3fold_robustness": {
+    "folds": [
+      {
+        "fold": "Fold_1",
+        "train_end_ts": "2022-07-29 17:30:00+07:00",
+        "eval_end_ts": "2022-08-17 08:00:00+07:00",
+        "train_rows": 35936,
+        "eval_rows": 17088,
+        "f1_all": 0.8845,
+        "onset_recall": 0.5673,
+        "mae_ratio": 0.0387
+      },
+      {
+        "fold": "Fold_2",
+        "train_end_ts": "2022-08-16 18:45:00+07:00",
+        "eval_end_ts": "2022-09-01 09:15:00+07:00",
+        "train_rows": 51328,
+        "eval_rows": 17088,
+        "f1_all": 0.9403,
+        "onset_recall": 0.6994,
+        "mae_ratio": 0.0341
+      },
+      {
+        "fold": "Fold_3",
+        "train_end_ts": "2022-08-21 19:00:00+07:00",
+        "eval_end_ts": "2022-09-06 09:30:00+07:00",
+        "train_rows": 66720,
+        "eval_rows": 17088,
+        "f1_all": 0.9453,
+        "onset_recall": 0.6625,
+        "mae_ratio": 0.0351
+      }
+    ],
+    "mean_f1": 0.9234,
+    "std_f1": 0.0276,
+    "max_deviation_from_mean": 0.0389,
+    "acceptance_criterion_max_005_passed": true
+  },
+  "traffy_flood_event_study": {
+    "event_date": "2022-07-21 (Peak Traffy Flood Day - 1,333 reports)",
+    "window_hours": "15:00 - 22:00",
+    "flood_day_mean_ratio": 0.1565,
+    "normal_day_mean_ratio": 0.6303,
+    "delta_ratio": -0.4738,
+    "ci_95": [
+      -0.4811,
+      -0.4665
+    ],
+    "welch_t_stat": -127.526,
+    "p_value": 0.0,
+    "statistically_significant": true
+  },
+  "hourly_mae_error_analysis": [
+    {
+      "hour": 0,
+      "hour_label": "00:00",
+      "mae_b2_lgbm": 0.035,
+      "mae_b0_persistence": 0.1319,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 1,
+      "hour_label": "01:00",
+      "mae_b2_lgbm": 0.0259,
+      "mae_b0_persistence": 0.0497,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 2,
+      "hour_label": "02:00",
+      "mae_b2_lgbm": 0.0259,
+      "mae_b0_persistence": 0.0357,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 3,
+      "hour_label": "03:00",
+      "mae_b2_lgbm": 0.032,
+      "mae_b0_persistence": 0.0383,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 4,
+      "hour_label": "04:00",
+      "mae_b2_lgbm": 0.0277,
+      "mae_b0_persistence": 0.0369,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 5,
+      "hour_label": "05:00",
+      "mae_b2_lgbm": 0.0274,
+      "mae_b0_persistence": 0.0372,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 6,
+      "hour_label": "06:00",
+      "mae_b2_lgbm": 0.0328,
+      "mae_b0_persistence": 0.0726,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 7,
+      "hour_label": "07:00",
+      "mae_b2_lgbm": 0.0307,
+      "mae_b0_persistence": 0.1144,
+      "congested_rate": 0.0078
+    },
+    {
+      "hour": 8,
+      "hour_label": "08:00",
+      "mae_b2_lgbm": 0.0275,
+      "mae_b0_persistence": 0.067,
+      "congested_rate": 0.0391
+    },
+    {
+      "hour": 9,
+      "hour_label": "09:00",
+      "mae_b2_lgbm": 0.0327,
+      "mae_b0_persistence": 0.0734,
+      "congested_rate": 0.0013
+    },
+    {
+      "hour": 10,
+      "hour_label": "10:00",
+      "mae_b2_lgbm": 0.0256,
+      "mae_b0_persistence": 0.0924,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 11,
+      "hour_label": "11:00",
+      "mae_b2_lgbm": 0.0264,
+      "mae_b0_persistence": 0.0436,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 12,
+      "hour_label": "12:00",
+      "mae_b2_lgbm": 0.0339,
+      "mae_b0_persistence": 0.0411,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 13,
+      "hour_label": "13:00",
+      "mae_b2_lgbm": 0.0279,
+      "mae_b0_persistence": 0.0385,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 14,
+      "hour_label": "14:00",
+      "mae_b2_lgbm": 0.0343,
+      "mae_b0_persistence": 0.0376,
+      "congested_rate": 0.0
+    },
+    {
+      "hour": 15,
+      "hour_label": "15:00",
+      "mae_b2_lgbm": 0.1126,
+      "mae_b0_persistence": 0.0807,
+      "congested_rate": 0.0052
+    },
+    {
+      "hour": 16,
+      "hour_label": "16:00",
+      "mae_b2_lgbm": 0.0983,
+      "mae_b0_persistence": 0.2324,
+      "congested_rate": 0.2969
+    },
+    {
+      "hour": 17,
+      "hour_label": "17:00",
+      "mae_b2_lgbm": 0.0409,
+      "mae_b0_persistence": 0.1616,
+      "congested_rate": 0.5508
+    },
+    {
+      "hour": 18,
+      "hour_label": "18:00",
+      "mae_b2_lgbm": 0.0312,
+      "mae_b0_persistence": 0.0519,
+      "congested_rate": 0.6159
+    },
+    {
+      "hour": 19,
+      "hour_label": "19:00",
+      "mae_b2_lgbm": 0.0306,
+      "mae_b0_persistence": 0.0501,
+      "congested_rate": 0.5599
+    },
+    {
+      "hour": 20,
+      "hour_label": "20:00",
+      "mae_b2_lgbm": 0.0289,
+      "mae_b0_persistence": 0.0918,
+      "congested_rate": 0.4544
+    },
+    {
+      "hour": 21,
+      "hour_label": "21:00",
+      "mae_b2_lgbm": 0.0321,
+      "mae_b0_persistence": 0.1075,
+      "congested_rate": 0.3529
+    },
+    {
+      "hour": 22,
+      "hour_label": "22:00",
+      "mae_b2_lgbm": 0.0392,
+      "mae_b0_persistence": 0.1113,
+      "congested_rate": 0.3099
+    },
+    {
+      "hour": 23,
+      "hour_label": "23:00",
+      "mae_b2_lgbm": 0.0352,
+      "mae_b0_persistence": 0.1566,
+      "congested_rate": 0.0651
+    }
+  ],
+  "feature_gate_section_9_3": [
+    {
+      "group_key": "group_1_current_lags",
+      "group_label": "G1: สภาพปัจจุบันและ Lag (Current & Lags)",
+      "marginal_f1_gain": 0.0047,
+      "marginal_onset_recall_gain": -0.0047,
+      "marginal_rainy_f1_gain": 0.0042,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_2_historical_profile",
+      "group_label": "G2: รูปแบบในอดีต (Historical Profile)",
+      "marginal_f1_gain": 0.0104,
+      "marginal_onset_recall_gain": -0.0233,
+      "marginal_rainy_f1_gain": -0.0029,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_3_temporal_cyclical",
+      "group_label": "G3: ช่วงเวลา (Temporal Cyclical)",
+      "marginal_f1_gain": 0.0068,
+      "marginal_onset_recall_gain": 0.0187,
+      "marginal_rainy_f1_gain": 0.0069,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_4_calendar",
+      "group_label": "G4: ปฏิทิน (Calendar)",
+      "marginal_f1_gain": -0.0007,
+      "marginal_onset_recall_gain": 0.014,
+      "marginal_rainy_f1_gain": 0.0021,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_5_weather",
+      "group_label": "G5: ฝนและสภาพอากาศ (Weather)",
+      "marginal_f1_gain": 0.0243,
+      "marginal_onset_recall_gain": 0.0538,
+      "marginal_rainy_f1_gain": 0.0098,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_6_spatial_graph",
+      "group_label": "G6: ถนนข้างเคียง (Spatial Graph Neighbors)",
+      "marginal_f1_gain": 0.0106,
+      "marginal_onset_recall_gain": 0.0257,
+      "marginal_rainy_f1_gain": 0.0044,
+      "retained_by_feature_gate": true
+    },
+    {
+      "group_key": "group_7_incidents",
+      "group_label": "G7: อุบัติเหตุ (Traffic Incidents)",
+      "marginal_f1_gain": 0.0013,
+      "marginal_onset_recall_gain": -0.0,
+      "marginal_rainy_f1_gain": 0.0002,
+      "retained_by_feature_gate": false
+    },
+    {
+      "group_key": "group_8_road_traffy_static",
+      "group_label": "G8: ลักษณะถนนและพื้นที่เสี่ยงน้ำท่วม (Road & Traffy)",
+      "marginal_f1_gain": 0.0029,
+      "marginal_onset_recall_gain": 0.0164,
+      "marginal_rainy_f1_gain": 0.0018,
+      "retained_by_feature_gate": true
+    }
+  ]
+}

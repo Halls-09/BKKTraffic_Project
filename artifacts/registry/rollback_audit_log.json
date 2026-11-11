@@ -1,0 +1,8 @@
+{
+  "timestamp_utc": "2026-11-11T16:32:08.903748+00:00",
+  "drill_type": "AUTOMATED_ROLLBACK_READINESS_DRILL",
+  "simulated_trigger": "Post-promotion metric degradation or upstream sensor incident",
+  "action_taken": "Verified instant atomic pointer switch back to v1.0.1 (bf863d0dada3...)",
+  "recovery_time_ms": 12.4,
+  "status": "VERIFIED_READY"
+}

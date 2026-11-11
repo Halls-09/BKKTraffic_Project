@@ -1,0 +1,39 @@
+{
+  "expected_hours_per_point": 2928,
+  "points": {
+    "central": {
+      "rows": 2928,
+      "duplicate_ts": 0,
+      "missing_hours": 0,
+      "null_precip": 0,
+      "negative_precip": 0,
+      "max_precip_mm": 43.3,
+      "total_precip_mm": 3016.2,
+      "rainy_hours_gt_1mm": 361,
+      "pass": true
+    },
+    "east": {
+      "rows": 2928,
+      "duplicate_ts": 0,
+      "missing_hours": 0,
+      "null_precip": 0,
+      "negative_precip": 0,
+      "max_precip_mm": 55.5,
+      "total_precip_mm": 2776.7,
+      "rainy_hours_gt_1mm": 354,
+      "pass": true
+    },
+    "north": {
+      "rows": 2928,
+      "duplicate_ts": 0,
+      "missing_hours": 0,
+      "null_precip": 0,
+      "negative_precip": 0,
+      "max_precip_mm": 53.7,
+      "total_precip_mm": 3111.6,
+      "rainy_hours_gt_1mm": 365,
+      "pass": true
+    }
+  },
+  "pass": true
+}

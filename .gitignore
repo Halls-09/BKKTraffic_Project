@@ -17,7 +17,11 @@ data/04_gold/*
 artifacts/registry/models/*.joblib
 artifacts/registry/models/*.pkl
 
-# Virtual environments
+# Virtual environments & Secret Environment Files
 .venv/
 venv/
 env/
+.env
+.env.local
+.env.*.local
+!.env.example
