@@ -1,0 +1,41 @@
+[project]
+name = "bkk-traffic"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "duckdb>=2.0.0",
+    "evidently>=0.4.36",
+    "geopandas>=1.2.0",
+    "lightgbm>=4.7.0",
+    "matplotlib>=3.11.2",
+    "mlflow>=3.18.0",
+    "openmeteo-requests>=1.7.5",
+    "pandas>=3.1.1",
+    "pandera>=0.36.0",
+    "plotly>=7.1.0",
+    "polars>=2.1.0",
+    "prefect>=3.9.3",
+    "pyarrow>=26.0.1",
+    "pydeck>=0.9.3",
+    "python-dotenv>=1.2.4",
+    "pyyaml>=6.0.3",
+    "requests>=2.34.2",
+    "requests-cache>=1.3.3",
+    "retry-requests>=2.0.0",
+    "scikit-learn>=1.9.1",
+    "seaborn>=0.13.2",
+    "shap>=0.54.1",
+    "streamlit>=1.67.0",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=7.4.0",
+    "jupyterlab>=4.6.6",
+    "nbstripout>=0.9.1",
+    "pre-commit>=4.7.0",
+    "pytest>=9.2.0",
+    "ruff>=0.17.5",
+]

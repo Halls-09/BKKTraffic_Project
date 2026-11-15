@@ -1,0 +1,11 @@
+@'
+.venv/
+__pycache__/
+.ipynb_checkpoints/
+.env
+data/**
+!data/**/.gitkeep
+mlruns/
+mlartifacts/
+*.parquet
+'@ | Out-File -Encoding utf8 .gitignore
