@@ -187,9 +187,11 @@ def stage_weather(run_id: str = "manual") -> pd.DataFrame:
 
     out_stage = path("staging") / "weather_hourly.parquet"
     out_proc = path("processed") / "weather_hourly.parquet"
+    out_csv = path("processed") / "weather_hourly.csv"
     df.to_parquet(out_stage, index=False)
     df.to_parquet(out_proc, index=False)
-    log.info("staged %s rows -> %s and %s", len(df), out_stage, out_proc)
+    df.to_csv(out_csv, index=False, encoding="utf-8-sig")
+    log.info("staged %s rows -> %s and %s", len(df), out_proc, out_csv)
     return df
 
 

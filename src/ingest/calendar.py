@@ -116,8 +116,10 @@ def ingest_calendar(run_id: str = "manual") -> pd.DataFrame:
 
     out_stage = path("staging") / "calendar_daily.parquet"
     out_proc = path("processed") / "calendar_daily.parquet"
+    out_csv = path("processed") / "calendar_daily.csv"
     df.to_parquet(out_stage, index=False)
     df.to_parquet(out_proc, index=False)
+    df.to_csv(out_csv, index=False, encoding="utf-8-sig")
 
     report = {
         "rows": len(df),
