@@ -1,11 +1,17 @@
-@'
 .venv/
 __pycache__/
 .ipynb_checkpoints/
+.ruff_cache/
 .env
-data/**
-!data/**/.gitkeep
 mlruns/
 mlartifacts/
 *.parquet
-'@ | Out-File -Encoding utf8 .gitignore
+
+data/**
+!data/**/
+!data/**/.gitkeep
+
+data/raw/**
+data/interim/**
+data/processed/**
+data/external/**
