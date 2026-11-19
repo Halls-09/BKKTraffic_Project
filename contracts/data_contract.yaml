@@ -1,0 +1,123 @@
+# =============================================================================
+# BKK Traffic Project - Data Contract (ข้อ 4.2, 6.2, 7 และ 12 ใน Proposal)
+# ระบุ Schema, Type, Unit, Event Time, Available Time, Owner, License และ Quality Gate
+# =============================================================================
+
+version: "1.0.0"
+owner: "ธนากร การดี (67090500409) - Data Engineer"
+consumer_eda_ml: "อภิเชษฐ์ ไชยสัจ (67090500422) - Data Scientist"
+consumer_mlops: "สฤษดิ์ ศรีดิษ (67090500441) - ML Engineer"
+timezone: "Asia/Bangkok"
+study_period:
+  start: "2022-06-01"
+  end: "2022-09-30"
+temporal_split:
+  train: ["2022-06-01", "2022-08-23"]
+  valid: ["2022-08-24", "2022-09-06"]
+  test:  ["2022-09-07", "2022-09-30"]
+
+datasets:
+  weather_hourly:
+    file_parquet: "data/processed/weather_hourly.parquet"
+    file_csv: "data/processed/weather_hourly.csv"
+    owner: "ธนากร การดี"
+    source: "Open-Meteo Historical Weather API (ERA5 Reanalysis)"
+    license: "CC-BY 4.0 (Open-Meteo)"
+    grain: "point x ts (1 แถว = 1 จุดวัดฝน x 1 ชั่วโมง)"
+    expected_rows: 8784
+    event_time_col: "event_start (ts - 1 ชั่วโมง ถึง ts)"
+    available_time_col: "available_time (= ts)"
+    quality_rules:
+      completeness: "ครบ 2,928 ชั่วโมงต่อจุด (3 จุด = 8,784 แถว) ไม่มีค่าว่าง"
+      uniqueness: "(point, ts) ห้ามซ้ำ"
+      plausibility: "precip_mm >= 0 และ <= 200 มม./ชม.; temp_c อยู่ระหว่าง 10 ถึง 45 C"
+
+  calendar_daily:
+    file_parquet: "data/processed/calendar_daily.parquet"
+    file_csv: "data/processed/calendar_daily.csv"
+    owner: "ธนากร การดี"
+    source: "ประกาศสำนักนายกรัฐมนตรี/มติ ครม. ปี 2565, ปฏิทินกรมบัญชีกลาง, ประกาศ สพฐ."
+    license: "Public Domain (ข้อมูลประกาศราชการ)"
+    grain: "date (1 แถว = 1 วัน)"
+    expected_rows: 122
+    event_time_col: "date"
+    available_time_col: "ทราบล่วงหน้าก่อนเริ่มช่วงศึกษา (ข้อยกเว้นตามข้อ 6.2 & 8 ใช้กับเวลาเป้าหมาย t+60 ได้)"
+    quality_rules:
+      completeness: "ครบ 122 วัน (2022-06-01 ถึง 2022-09-30) ไม่มีค่าว่าง"
+      uniqueness: "date ห้ามซ้ำ"
+
+  dim_district:
+    file_parquet: "data/processed/dim_district.parquet"
+    file_csv: "data/processed/dim_district.csv"
+    owner: "ธนากร การดี"
+    source: "Bangkok-districts.geojson (motethansen/bkk-traffy-data / กทม.)"
+    license: "Open Data"
+    grain: "district (1 แถว = 1 เขตปกครองของกรุงเทพมหานคร)"
+    expected_rows: 50
+    event_time_col: "Static reference"
+    available_time_col: "ทราบล่วงหน้าก่อนเริ่มช่วงศึกษา"
+    quality_rules:
+      completeness: "ครบ 50 เขต กทม."
+      uniqueness: "dcode และ district ห้ามซ้ำ"
+
+  traffy_district_hourly:
+    file_parquet: "data/processed/traffy_district_hourly.parquet"
+    file_csv: "data/processed/traffy_district_hourly.csv"
+    owner: "ธนากร การดี"
+    source: "NECTEC Traffy Fondue Open API (export: github.com/motethansen/bkk-traffy-data)"
+    license: "Open Data (ตัดข้อความและรูปภาพส่วนบุคคลตามข้อเสนอด้าน Governance ข้อ 4.1)"
+    grain: "district x ts (1 แถว = 1 เขต x 1 ชั่วโมงที่มีการรายงาน)"
+    event_time_col: "event_start (= ts)"
+    available_time_col: "available_time (= ts + 1 ชั่วโมง เมื่อสิ้นสุดชั่วโมงนั้น)"
+    quality_rules:
+      uniqueness: "(district, ts) ห้ามซ้ำ; ลบ ticket_id ซ้ำก่อนรวม (295,000 -> 185,159)"
+      join_coverage: "ทุก district ต้องอยู่ใน dim_district (50 เขต กทม.)"
+      governance: "ห้ามมีคอลัมน์ comment, address, photo, after_photo"
+
+  traffy_district_daily:
+    file_parquet: "data/processed/traffy_district_daily.parquet"
+    file_csv: "data/processed/traffy_district_daily.csv"
+    owner: "ธนากร การดี"
+    source: "NECTEC Traffy Fondue Open API (export: github.com/motethansen/bkk-traffy-data)"
+    license: "Open Data (Aggregated)"
+    grain: "date x district (1 แถว = 1 วัน x 1 เขต)"
+    event_time_col: "date"
+    available_time_col: "สิ้นสุดของวันนั้น (date 23:59:59+07:00)"
+
+  traffy_district_static_train:
+    file_parquet: "data/processed/traffy_district_static_train.parquet"
+    file_csv: "data/processed/traffy_district_static_train.csv"
+    owner: "ธนากร การดี"
+    source: "คำนวณจาก Traffy Fondue เฉพาะช่วง Train (2022-06-01 ถึง 2022-08-23) เท่านั้น"
+    license: "Open Data (Aggregated)"
+    grain: "district (1 แถว = 1 เขต กทม., ครบ 50 เขต)"
+    expected_rows: 50
+    event_time_col: "2022-06-01 ถึง 2022-08-23 (Train period only)"
+    available_time_col: "2022-08-23T23:59:59+07:00 (ห้ามใช้ข้อมูลหลังวันที่ 23 ส.ค. 2022 เพื่อป้องกัน Leakage ข้อ 6.2)"
+
+  district_hourly_panel:
+    file_parquet: "data/processed/district_hourly_panel.parquet"
+    file_csv: "data/processed/district_hourly_panel.csv"
+    owner: "ธนากร การดี"
+    source: "Joined panel: dim_district + traffy_district_hourly + weather_hourly + calendar_daily + traffy_district_static_train"
+    license: "CC-BY 4.0 / Open Data"
+    grain: "district x ts (Complete grid: 50 เขต x 2,928 ชั่วโมง = 146,400 แถว)"
+    expected_rows: 146400
+    event_time_col: "ts"
+    available_time_col: "ts + 1 ชั่วโมง (สำหรับยอดรายงาน Traffy ในชั่วโมงนั้น) / ts (สำหรับค่าฝนที่วัดจบ ณ เวลา ts)"
+
+  itic_seg15_spec:
+    status: "Specification ready (ใช้เมื่อรันประมวลผลไฟล์ iTIC)"
+    owner: "ธนากร การดี"
+    source: "มูลนิธิ iTIC (https://itic.longdo.com/opendata/)"
+    license: "CC-BY 4.0 (iTIC Foundation)"
+    grain: "seg_id x ts (1 แถว = 1 ช่วงถนนที่มีทิศทาง x 15 นาที)"
+    event_time_col: "ts (เริ่มต้นช่วง 15 นาที)"
+    available_time_col: "ts + 15 นาที"
+    quality_rules:
+      schema: "ts parse ได้ (Asia/Bangkok); speed_kmh เป็นตัวเลข 0-150 กม./ชม. (ถ้าผิด -> quarantine)"
+      completeness: "แต่ละ segment-day มีข้อมูล >= 80% ของ 96 ช่วง (06:00-22:00 >= 90%) -> flag segment-day"
+      uniqueness: "(seg_id, ts) ไม่ซ้ำหลังรวมด้วย median ราย 15 นาที"
+      plausibility: "ratio <= 1.2; ความเร็วไม่กระโดดเกิน 60 กม./ชม. ใน 15 นาที -> flag outlier ไม่ลบอัตโนมัติ"
+      join_coverage: "ทุก seg_id มีใน Location Table (dim_segment)"
+      leakage_control: "free_flow_kmh (percentile 90) คำนวณจากช่วง train (1 มิ.ย. - 23 ส.ค. 2022) เท่านั้น"

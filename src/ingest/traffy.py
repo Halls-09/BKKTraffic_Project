@@ -219,12 +219,14 @@ def stage_traffy(run_id: str = "manual") -> dict:
     df_study_clean.to_parquet(out_stage, index=False)
 
     # -----------------------------------------------------------------------
-    # สร้างตารางสำหรับส่งมอบใน data/processed/ (ทั้ง .parquet และ .csv)
+    # สร้างตารางสำหรับส่งมอบใน data/processed/ (.parquet) และ data/processed/csv/ (.csv)
     # -----------------------------------------------------------------------
+    csv_dir = path("processed") / "csv"
+    csv_dir.mkdir(parents=True, exist_ok=True)
 
     # ตารางที่ 1: dim_district (ข้อมูลอ้างอิง 50 เขต กทม. + จุดวัดฝนที่ใกล้ที่สุด)
     dim_district.to_parquet(path("processed") / "dim_district.parquet", index=False)
-    dim_district.to_csv(path("processed") / "dim_district.csv", index=False, encoding="utf-8-sig")
+    dim_district.to_csv(csv_dir / "dim_district.csv", index=False, encoding="utf-8-sig")
 
     # ตารางที่ 2: traffy_district_hourly (จำนวนรายงานต่อเขต x ชั่วโมง สำหรับทำ EDA)
     df_study_clean["hour_ts"] = df_study_clean["ts"].dt.floor("h")
@@ -245,7 +247,7 @@ def stage_traffy(run_id: str = "manual") -> dict:
     hourly["event_start"] = hourly["ts"]
     hourly["available_time"] = hourly["ts"] + pd.Timedelta(hours=1)
     hourly.to_parquet(path("processed") / "traffy_district_hourly.parquet", index=False)
-    hourly.to_csv(path("processed") / "traffy_district_hourly.csv", index=False, encoding="utf-8-sig")
+    hourly.to_csv(csv_dir / "traffy_district_hourly.csv", index=False, encoding="utf-8-sig")
 
     # ตารางที่ 3: traffy_district_daily (จำนวนรายงานต่อเขต x วัน สำหรับทำ Event Study วันน้ำท่วมหนัก)
     df_study_clean["date"] = df_study_clean["ts"].dt.strftime("%Y-%m-%d")
@@ -262,7 +264,7 @@ def stage_traffy(run_id: str = "manual") -> dict:
         .reset_index(drop=True)
     )
     daily.to_parquet(path("processed") / "traffy_district_daily.parquet", index=False)
-    daily.to_csv(path("processed") / "traffy_district_daily.csv", index=False, encoding="utf-8-sig")
+    daily.to_csv(csv_dir / "traffy_district_daily.csv", index=False, encoding="utf-8-sig")
 
     # ตารางที่ 4: traffy_district_static_train (Static Feature ระดับเขต คำนวณเฉพาะช่วง Train เท่านั้น!)
     # Proposal ข้อ 6.2: "feature จาก Traffy Fondue ระดับเขตคำนวณจากรายงานในช่วง train เท่านั้น"
@@ -296,7 +298,7 @@ def stage_traffy(run_id: str = "manual") -> dict:
     static_df["available_time"] = f"{train_end}T23:59:59+07:00"
 
     static_df.to_parquet(path("processed") / "traffy_district_static_train.parquet", index=False)
-    static_df.to_csv(path("processed") / "traffy_district_static_train.csv", index=False, encoding="utf-8-sig")
+    static_df.to_csv(csv_dir / "traffy_district_static_train.csv", index=False, encoding="utf-8-sig")
 
     # -----------------------------------------------------------------------
     # บันทึก Audit Log และ Quality Report (Proposal ข้อ 4.2 & 6)

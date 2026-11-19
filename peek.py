@@ -8,7 +8,14 @@ Usage examples:
 from __future__ import annotations
 
 import argparse
+import subprocess
+import sys
 from pathlib import Path
+
+_VENV_PY = Path(__file__).resolve().parent / ".venv" / "Scripts" / "python.exe"
+if _VENV_PY.exists() and Path(sys.executable).resolve() != _VENV_PY.resolve():
+    raise SystemExit(subprocess.call([str(_VENV_PY), *sys.argv]))
+
 import pandas as pd
 
 pd.set_option("display.max_columns", None)
