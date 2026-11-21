@@ -1,8 +1,9 @@
-# Data Dictionary — BKK Traffic Congestion Forecasting Project
+# Data Dictionary — BKK Traffic Congestion Forecasting Project (DuckDB Medallion Warehouse)
 
-> **Deliverable ข้อ 12 (Data contract/dictionary):** ระบุ `field`, `type`, `unit`, `event_time`, `available_time`, `owner`, `license` ครบทุกตารางใน `data/processed/` เพื่อส่งมอบให้ **อภิเชษฐ์ ไชยสัจ (Data Scientist)** ทำ EDA และสร้างโมเดล
+> **Deliverable ข้อ 12 (Data contract/dictionary):** ระบุ `field`, `type`, `unit`, `event_time`, `available_time`, `owner`, `license` ครบทั้ง **17 ตาราง (`bronze.*`, `silver.*`, `gold.*`)** ในฐานข้อมูล **`data/bkk_traffic.duckdb`** และไฟล์ใน `data/processed/` เพื่อส่งมอบให้ **อภิเชษฐ์ ไชยสัจ (Data Scientist)** ทำ EDA และเทรนโมเดล LightGBM
 
 * **Owner (Data Engineer):** ธนากร การดี (67090500409)
+* **Database File:** `data/bkk_traffic.duckdb` (ขนาด ~786 MB, เปิดดูผ่านเว็บด้วย `python inspect_duckdb.py --ui`)
 * **Timezone มาตรฐานของทั้งโปรเจกต์:** `Asia/Bangkok` (UTC+07:00)
 * **ช่วงเวลาศึกษา (Study Period):** `2022-06-01` ถึง `2022-09-30` (122 วัน / 2,928 ชั่วโมง / 11,712 ช่วงเวลา 15 นาที)
 * **การแบ่งชุดข้อมูลตามเวลา (Temporal Split — ข้อ 0 & 6.2):**
@@ -12,120 +13,83 @@
 
 ---
 
-## 1. ตาราง `weather_hourly` (`data/processed/weather_hourly.csv` & `.parquet`)
+## สารบัญทั้ง 17 ตารางใน `data/bkk_traffic.duckdb` (Bronze ➔ Silver ➔ Gold)
 
-* **Grain:** `point × ts` (3 จุดวัด × 2,928 ชั่วโมง = **8,784 แถว**)
-* **Source & License:** Open-Meteo Historical Weather API (`CC-BY 4.0`)
-* **Owner:** ธนากร การดี
-
-| Field | Type | Unit | Event Time | Available Time | คำอธิบาย |
-|---|---|---|---|---|---|
-| `point` | `string` | — | `ts - 1h .. ts` | `ts` | โซนจุดวัดสภาพอากาศใน กทม. (`central`, `north`, `east`) |
-| `ts` | `datetime[Asia/Bangkok]` | เวลาไทย | `ts - 1h .. ts` | `ts` | เวลาสิ้นสุดชั่วโมงที่วัด (เช่น `17:00` คือฝนช่วง `16:00–17:00`) |
-| `precip_mm` | `float64` | `mm/h` | `ts - 1h .. ts` | `ts` | ปริมาณน้ำฝนรวมใน 1 ชั่วโมงที่ผ่านมา |
-| `rain_mm` | `float64` | `mm/h` | `ts - 1h .. ts` | `ts` | ปริมาณน้ำฝนเฉพาะของเหลว (เท่ากับ `precip_mm` ในไทย) |
-| `temp_c` | `float64` | `°C` | `ts` | `ts` | อุณหภูมิอากาศที่ความสูง 2 เมตร ณ เวลา `ts` |
-| `lat` | `float64` | `degrees` | Static | Static | ละติจูดของจุดกริดสภาพอากาศ Open-Meteo |
-| `lon` | `float64` | `degrees` | Static | Static | ลองจิจูดของจุดกริดสภาพอากาศ Open-Meteo |
-| `precip_3h_mm` | `float64` | `mm` | `ts - 3h .. ts` | `ts` | ปริมาณฝนสะสมย้อนหลัง 3 ชั่วโมง (ใช้แทนน้ำท่วมขังสะสม) |
-| `precip_6h_mm` | `float64` | `mm` | `ts - 6h .. ts` | `ts` | ปริมาณฝนสะสมย้อนหลัง 6 ชั่วโมง |
-| `rain_bin` | `string` | ระดับฝน | `ts - 1h .. ts` | `ts` | ระดับความแรงของฝนตามเกณฑ์ EDA ข้อ 6.1 (`0_none`, `0_0.5_trace`, `0.5_2`, `2_5`, `5_10`, `10_20`, `gt_20`) |
-| `is_rainy_gt_1mm` | `bool` | `True/False` | `ts - 1h .. ts` | `ts` | `True` เมื่อ `precip_mm > 1.0` มม./ชม. (ใช้ทดสอบสมมุติฐาน H2) |
-| `event_start` | `datetime[Asia/Bangkok]` | เวลาไทย | — | `ts` | เวลาเริ่มต้นของชั่วโมงที่วัดฝน (`ts - 1h`) |
-| `available_time` | `datetime[Asia/Bangkok]` | เวลาไทย | — | `ts` | เวลาที่ค่าฝนแถวนี้พร้อมใช้โดยไม่เกิด Data Leakage (`= ts`) |
-
----
-
-## 2. ตาราง `calendar_daily` (`data/processed/calendar_daily.csv` & `.parquet`)
-
-* **Grain:** `date` (122 วัน = **122 แถว**)
-* **Source & License:** ประกาศสำนักนายกรัฐมนตรี/มติ ครม. ปี 2565, ปฏิทินกรมบัญชีกลาง, ประกาศ สพฐ. (`Public Domain`)
-* **Owner:** ธนากร การดี
-* **Leakage Note (ข้อ 6.2 & 8):** ข้อมูลปฏิทินทราบล่วงหน้าตั้งแต่วันต้นปี จึงใช้ค่าของเวลาเป้าหมาย ($t + 60$ นาที) ได้โดยไม่เกิด Leakage
-
-| Field | Type | Unit | Event Time | Available Time | คำอธิบาย |
-|---|---|---|---|---|---|
-| `date` | `string` | `YYYY-MM-DD` | `date` | ทราบล่วงหน้า | วันที่ (`2022-06-01` ถึง `2022-09-30`) |
-| `dow` | `int32` | `0..6` | `date` | ทราบล่วงหน้า | วันในสัปดาห์ (`0` = จันทร์, ..., `4` = ศุกร์, `5` = เสาร์, `6` = อาทิตย์) |
-| `day_name` | `string` | — | `date` | ทราบล่วงหน้า | ชื่อวันภาษาอังกฤษ (`Monday`..`Sunday`) |
-| `is_weekend` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าเป็นวันเสาร์หรืออาทิตย์ |
-| `is_friday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าเป็นวันศุกร์ (ใช้ทดสอบสมมุติฐาน H5 ช่วง 16–20 น.) |
-| `holiday_name` | `string` | — | `date` | ทราบล่วงหน้า | ชื่อวันหยุดราชการภาษาไทย (ว่างถ้าไม่ใช่วันหยุด) |
-| `is_holiday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าเป็นวันหยุดราชการ/วันหยุดพิเศษตามมติ ครม. (รวม 7 วัน) |
-| `is_bank_holiday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าเป็นวันหยุดธนาคาร/เอกชน (ตัดวันเข้าพรรษา 14 ก.ค. ออก) |
-| `is_working_day` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าเป็นวันทำงานปกติ (ไม่ใช่เสาร์-อาทิตย์ และไม่ใช่วันหยุดราชการ) |
-| `day_type` | `string` | — | `date` | ทราบล่วงหน้า | ประเภทวัน (`workday`, `weekend`, `holiday`) สำหรับคำนวณ Baseline B1 |
-| `is_gov_payday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | วันเงินเดือนออกข้าราชการตามกรมบัญชีกลาง (3 วันทำการก่อนสิ้นเดือน) |
-| `is_payday_25` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | วันเงินเดือนออกเอกชนรอบวันที่ 25 (เลื่อนขึ้นถ้าชนวันหยุด) |
-| `is_month_end_workday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | วันทำการสุดท้ายของเดือน |
-| `is_payday` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าตรงกับวันเงินเดือนออกรอบใดรอบหนึ่ง (ใช้ทดสอบ H5) |
-| `is_school_term` | `bool` | `True/False` | `date` | ทราบล่วงหน้า | `True` ถ้าอยู่ในช่วงเปิดภาคเรียน สพฐ. (17 พ.ค. – 10 ต.ค. 2022) |
+| ชั้น (Schema) | ชื่อตารางใน DuckDB | จำนวนแถว | Grain (1 แถวคืออะไร) | ผู้ใช้งานหลัก |
+|---|---|---|---|---|
+| **1. Bronze** | `bronze.raw_manifest_log` | `5` | 1 ไฟล์ข้อมูลดิบต้นฉบับ + รหัส SHA-256 Checksum | DE / Audit |
+| **1. Bronze** | `bronze.itic_bkk_daily_raw` | `~200,000,000` | 1 ระเบียนความเร็ว iTIC ดิบ (ทุก 10 นาที × sub-offset จาก 122 ไฟล์รายวัน) | DE |
+| **2. Silver** | `silver.dim_district` | `50` | 1 เขตปกครองของกรุงเทพมหานคร (ครบ 50 เขต) | DS (EDA) |
+| **2. Silver** | `silver.itic_location_table` | `4,174` | 1 รหัสจุดอ้างอิงถนน (`loc_code`) ของ iTIC ในเขต กทม. | DE / DS |
+| **2. Silver** | `silver.dim_segment` | `4,068` | 1 ช่วงถนนที่มีทิศทาง (`seg_id = from_loc_to_loc`) + พิกัด + ขาเข้า/ออก + ถนนข้างหน้า (`downstream_seg_ids`) + `free_flow_kmh` | DS (EDA / H3) |
+| **2. Silver** | `silver.weather_hourly` | `8,784` | 1 จุดวัดฝน (`central`/`north`/`east`) × 1 ชั่วโมง | DS (EDA / H2) |
+| **2. Silver** | `silver.calendar_daily` | `122` | 1 วัน (วันหยุดราชการ/ธนาคาร, วันศุกร์, วันเงินเดือนออก 3 รอบ, เปิดเทอม) | DS (EDA / H5) |
+| **2. Silver** | `silver.traffy_district_15m` | `104,251` | 1 เขต × 1 ช่วงเวลา 15 นาทีที่มีการรายงาน Traffy Fondue (ตัด PII แล้ว) | DS |
+| **2. Silver** | `silver.traffy_district_hourly` | `65,119` | 1 เขต × 1 ชั่วโมงที่มีการรายงาน Traffy Fondue | DS (EDA) |
+| **2. Silver** | `silver.traffy_district_daily` | `6,084` | 1 วัน × 1 เขต (สำหรับทำ Event Study วันน้ำท่วมหนัก 21 ก.ค. ฯลฯ) | DS (EDA) |
+| **2. Silver** | `silver.itic_segment_15m` | `23,840,561` | 1 ช่วงถนน (`seg_id`) × 15 นาที (ยุบด้วยค่ามัธยฐาน Median, กรอง 0–150 km/h) | DE / DS |
+| **2. Silver** | `silver.quality_completeness_seg_day` | `481,506` | 1 ช่วงถนน (`seg_id`) × 1 วัน (เช็กความครบถ้วน $\ge 80\%$ ทั้งวัน, $\ge 90\%$ ช่วงพีค) | DS (Missing Heatmap) |
+| **3. Gold** | `gold.traffy_district_static_train` | `50` | 1 เขต กทม. (ความเสี่ยงน้ำท่วม/จราจรสะสม **คำนวณเฉพาะช่วง Train เท่านั้น!**) | DS (H4 / ML) |
+| **3. Gold** | `gold.district_hourly_panel` | `146,400` | กริดเต็ม 50 เขต × 2,928 ชั่วโมง (Traffy + ฝน + ปฏิทิน) | DS (EDA รายชั่วโมง) |
+| **3. Gold** | `gold.itic_seg15_targets` | `23,840,561` | 1 ช่วงถนน (`seg_id`) × 15 นาที พร้อม `ratio`, `target_ratio` ($t+60$ นาที), `new_onset` และ Quality Flags | DS (EDA / ML) |
+| **3. Gold** | ⭐ **`gold.merged_district_15m`** | **`585,600`** | **กริดเต็ม 50 เขต × 11,712 ช่องเวลา 15 นาที (รวม iTIC + Traffy 15 นาที + ฝน + ปฏิทิน)** | ⭐ **DS (EDA หลักระดับเขต)** |
+| **3. Gold** | ⭐ **`gold.merged_segment_15m`** | **`23,840,561`** | **1 ช่วงถนน (`seg_id`) × 15 นาที (รวม iTIC + Targets + ถนน + ฝน + Traffy + ปฏิทิน)** | ⭐ **DS (EDA ถนน & LightGBM)** |
 
 ---
 
-## 3. ตาราง `dim_district` (`data/processed/dim_district.csv` & `.parquet`)
+## รายละเอียดคอลัมน์ของตารางหลักในชั้น Silver และ Gold
 
-* **Grain:** `district` (ครบ **50 เขตของกรุงเทพมหานคร**)
-* **Source & License:** `Bangkok-districts.geojson` (`motethansen/bkk-traffy-data`, `Open Data`)
-* **Owner:** ธนากร การดี
-
-| Field | Type | Unit | Event Time | Available Time | คำอธิบาย |
-|---|---|---|---|---|---|
-| `dcode` | `string` | รหัสเขต 4 หลัก | Static | Static | รหัสเขตมาตรฐาน กทม. (`1001`..`1050`) |
-| `district` | `string` | — | Static | Static | ชื่อเขตภาษาไทย (ไม่มีคำว่า "เขต" นำหน้า เช่น `จตุจักร`, `ราษฎร์บูรณะ`) |
-| `district_en` | `string` | — | Static | Static | ชื่อเขตภาษาอังกฤษ |
-| `area_sq_km` | `float64` | $\text{km}^2$ | Static | Static | พื้นที่เขต (ตารางกิโลเมตร) |
-| `centroid_lat` | `float64` | `degrees` | Static | Static | ละติจูดจุดศูนย์กลางเขต |
-| `centroid_lon` | `float64` | `degrees` | Static | Static | ลองจิจูดจุดศูนย์กลางเขต |
-| `weather_point` | `string` | — | Static | Static | โซนจุดวัดฝนที่อยู่ใกล้จุดศูนย์กลางเขตที่สุด (`central`, `north`, `east`) |
-
----
-
-## 4. ตาราง `traffy_district_hourly` และ `traffy_district_daily`
-
-* **Grain:**
-  * `traffy_district_hourly`: `district × ts` (**65,119 แถว** เฉพาะชั่วโมงที่มีรายงาน)
-  * `traffy_district_daily`: `date × district` (**6,084 แถว**)
-* **Source & License:** NECTEC Traffy Fondue Open API (`github.com/motethansen/bkk-traffy-data`, `Open Data`)
-* **Governance (ข้อ 4.1):** ลบ `comment`, `address`, `photo`, `after_photo` ออกทั้งหมด เผยแพร่เฉพาะจำนวนนับระดับเขต
-* **Owner:** ธนากร การดี
+### A. ตาราง `silver.dim_segment` (`4,068 ช่วงถนนที่มีทิศทางใน กทม.`)
+* **Source & License:** มูลนิธิ iTIC Location Table v3.2 (`CC-BY-SA 4.0`) + HDX/BMA District Boundaries
 
 | Field | Type | Unit | Event Time | Available Time | คำอธิบาย |
 |---|---|---|---|---|---|
-| `district` | `string` | — | `ts` / `date` | `ts + 1h` | ชื่อเขต กทม. (เติมเขตที่ว่าง 37 รายการด้วย Polygon ครบ 100% แล้ว) |
-| `ts` / `date` | `datetime` / `string` | เวลาไทย | `ts` / `date` | `ts + 1h` | เวลาเริ่มต้นชั่วโมง (ใน hourly) หรือวันที่ (ใน daily) |
-| `n_total` | `int64` | รายงาน | `ts .. ts+1h` | `ts + 1h` | จำนวนเรื่องร้องเรียนทั้งหมดในชั่วโมง/วันนั้น (รวมทุกหมวดกว่า 20 หมวด) |
-| `n_traffic` | `int64` | รายงาน | `ts .. ts+1h` | `ts + 1h` | จำนวนรายงานที่มีป้ายหมวด `จราจร` (รวมทั้งช่วงศึกษา = 6,008) |
-| `n_flood` | `int64` | รายงาน | `ts .. ts+1h` | `ts + 1h` | จำนวนรายงานที่มีป้ายหมวด `น้ำท่วม` (รวมทั้งช่วงศึกษา = 15,024) |
-| `n_road` | `int64` | รายงาน | `ts .. ts+1h` | `ts + 1h` | จำนวนรายงานที่มีป้ายหมวด `ถนน` (รวมทั้งช่วงศึกษา = 36,191) |
-| `n_unspecified` | `int64` | รายงาน | `ts .. ts+1h` | `ts + 1h` | จำนวนรายงานที่ไม่ระบุหมวด (`{}`) |
-| `event_start` | `datetime[Asia/Bangkok]` | เวลาไทย | `ts` | `ts + 1h` | เวลาเริ่มต้นชั่วโมงที่รวบรวมรายงาน (`= ts`) |
-| `available_time` | `datetime[Asia/Bangkok]` | เวลาไทย | — | `ts + 1h` | เวลาที่ยอดรวมของชั่วโมงนั้นนิ่งและพร้อมใช้งาน (`= ts + 1 ชั่วโมง`) |
+| `seg_id` | `VARCHAR` | `{from_loc}_{to_loc}` | Static | Static | รหัสช่วงถนนที่มีทิศทาง เช่น `10009_10010` |
+| `from_loc`, `to_loc` | `INTEGER` | TMC Code | Static | Static | รหัสจุดเริ่มต้นและจุดสิ้นสุดของช่วงถนน |
+| `road_name_th`, `road_name_en` | `VARCHAR` | — | Static | Static | ชื่อถนนภาษาไทยและภาษาอังกฤษ (เช่น `ถนนพหลโยธิน`) |
+| `from_place_th`, `to_place_th` | `VARCHAR` | — | Static | Static | ชื่อแยก/สถานที่ต้นทางและปลายทางของช่วงถนน |
+| `lat`, `lon` | `DOUBLE` | `degrees` | Static | Static | พิกัดกึ่งกลางของช่วงถนน |
+| `length_m` | `DOUBLE` | `meters` | Static | Static | ระยะทางของช่วงถนนคำนวณด้วยสูตร Haversine (เมตร) |
+| `inbound_outbound` | `VARCHAR` | `inbound`/`outbound` | Static | Static | ทิศทางมุ่งหน้าเข้าเมือง (`inbound`) หรือออกเมือง (`outbound`) เทียบกับใจกลาง กทม. (ข้อ 6.1) |
+| `adm2_pcode`, `district`, `district_en` | `VARCHAR` | — | Static | Static | รหัสเขตและชื่อเขต กทม. ที่ถนนตั้งอยู่ |
+| `weather_point` | `VARCHAR` | `central`/`north`/`east` | Static | Static | โซนจุดวัดฝนที่อยู่ใกล้ที่สุด |
+| `n_downstream` | `INTEGER` | จำนวนเส้น | Static | Static | จำนวนช่วงถนนข้างหน้าที่เชื่อมต่อถัดไป |
+| `downstream_seg_ids` | `VARCHAR` | comma-separated | Static | Static | รหัส `seg_id` ของถนนข้างหน้า (ตรงจุดที่ `next.from_loc == this.to_loc` ใช้ทดสอบสมมุติฐาน **H3**) |
+| `free_flow_kmh` | `DOUBLE` | `km/h` | ช่วง Train | `2022-08-23 23:59:59` | ความเร็วคล่องตัว (Percentile 90 ของถนนเส้นนั้น **คำนวณเฉพาะช่วง Train เท่านั้น!** ข้อ 6.2) |
+| `train_obs_slots` | `INTEGER` | ช่องเวลา | ช่วง Train | `2022-08-23 23:59:59` | จำนวนช่องเวลา 15 นาทีที่มีข้อมูลในช่วง Train |
 
 ---
 
-## 5. ตาราง `traffy_district_static_train` (`data/processed/traffy_district_static_train.csv` & `.parquet`)
-
-* **Grain:** `district` (ครบ **50 เขต กทม.**)
-* **Leakage Control (ข้อ 6.2):** คำนวณจากรายงานในช่วง **Train (`2022-06-01` ถึง `2022-08-23`, 84 วัน) เท่านั้น!** ห้ามนำข้อมูลช่วง Validation หรือ Test มาคำนวณรวมเด็ดขาด ใช้เป็น Static Feature ประจำเขตสำหรับทดสอบสมมุติฐาน **H4**
+### B. ตาราง `gold.itic_seg15_targets` และ `gold.merged_segment_15m` (`23,840,561 แถว`)
+* **Grain:** `seg_id × ts` (1 แถว = 1 ช่วงถนนที่มีทิศทาง × 1 ช่วงเวลา 15 นาที)
+* **Source & License:** มูลนิธิ iTIC (`CC-BY 4.0`) + Open-Meteo (`CC-BY 4.0`) + Traffy Fondue + ปฏิทิน 2022
 
 | Field | Type | Unit | Event Time | Available Time | คำอธิบาย |
 |---|---|---|---|---|---|
-| `dcode`, `district`, `district_en`, `area_sq_km`, `weather_point` | ตาม `dim_district` | — | Static | Static | ข้อมูลอ้างอิงประจำเขต |
-| `train_total_reports` | `int64` | รายงาน | `2022-06-01..2022-08-23` | `2022-08-23 23:59:59+07:00` | รายงานทั้งหมดในเขตนั้นเฉพาะช่วง Train (84 วัน) |
-| `train_traffic_reports` | `int64` | รายงาน | `2022-06-01..2022-08-23` | `2022-08-23 23:59:59+07:00` | รายงานหมวดจราจรสะสมในช่วง Train |
-| `train_flood_reports` | `int64` | รายงาน | `2022-06-01..2022-08-23` | `2022-08-23 23:59:59+07:00` | รายงานหมวดน้ำท่วมสะสมในช่วง Train (ใช้ทดสอบสมมุติฐาน H4) |
-| `train_road_reports` | `int64` | รายงาน | `2022-06-01..2022-08-23` | `2022-08-23 23:59:59+07:00` | รายงานหมวดถนนสะสมในช่วง Train |
-| `train_flood_per_day` | `float64` | รายงาน/วัน | ช่วง Train | สิ้นสุดช่วง Train | ค่าเฉลี่ยรายงานน้ำท่วมต่อวันในช่วง Train (`train_flood_reports / 84`) |
-| `train_traffic_per_day` | `float64` | รายงาน/วัน | ช่วง Train | สิ้นสุดช่วง Train | ค่าเฉลี่ยรายงานจราจรต่อวันในช่วง Train |
-| `train_flood_per_sq_km` | `float64` | รายงาน/$\text{km}^2$ | ช่วง Train | สิ้นสุดช่วง Train | ความหนาแน่นรายงานน้ำท่วมต่อตารางกิโลเมตรในช่วง Train |
-| `train_traffic_per_sq_km` | `float64` | รายงาน/$\text{km}^2$ | ช่วง Train | สิ้นสุดช่วง Train | ความหนาแน่นรายงานจราจรต่อตารางกิโลเมตรในช่วง Train |
-| `computed_from_split` | `string` | — | — | — | ระบุแหล่งช่วงเวลาที่ใช้คำนวณ (`train (2022-06-01..2022-08-23)`) |
-| `available_time` | `string` | เวลาไทย | — | `2022-08-23T23:59:59+07:00` | เวลาสิ้นสุดช่วง Train |
+| `seg_id`, `from_loc`, `to_loc` | `VARCHAR`/`INT` | — | `ts` | `ts + 15m` | รหัสช่วงถนนที่มีทิศทาง |
+| `ts`, `date`, `hour`, `minute` | `TIMESTAMP`/ฯลฯ | เวลาไทย | `ts .. ts+15m` | `ts + 15m` | เวลาเริ่มต้นของช่อง 15 นาที (`:00, :15, :30, :45`) |
+| `speed_kmh` | `DOUBLE` | `km/h` | `ts .. ts+15m` | `ts + 15m` | ความเร็วมัธยฐาน (Median) ในช่วง 15 นาทีนั้น (กรอง `0 < speed <= 150`) |
+| `congestion_level` | `TINYINT` | `1, 2, 3` | `ts .. ts+15m` | `ts + 15m` | ระดับสีรถติดของ iTIC (`1`=เขียวคล่องตัว, `2`=เหลืองชะลอตัว, `3`=แดงติดขัด) |
+| `n_obs` | `SMALLINT` | จุดวัด | `ts .. ts+15m` | `ts + 15m` | จำนวนระเบียนย่อยที่นำมายุบรวมในช่อง 15 นาทีนั้น |
+| `free_flow_kmh` | `DOUBLE` | `km/h` | ช่วง Train | สิ้นสุดช่วง Train | ความเร็ว Free-flow (Percentile 90 จากช่วง Train เท่านั้น) |
+| `ratio` | `DOUBLE` | สัดส่วน | `ts .. ts+15m` | `ts + 15m` | `speed_kmh / free_flow_kmh` ณ เวลาปัจจุบัน $t$ |
+| `is_congested` | `BOOLEAN` | `True/False` | `ts .. ts+15m` | `ts + 15m` | `True` เมื่อ `ratio < 0.5` ณ เวลาปัจจุบัน $t$ |
+| `target_ts` | `TIMESTAMP` | เวลาไทย | `ts + 60m` | `ts + 75m` | เวลาเป้าหมายอีก 1 ชั่วโมงข้างหน้า ($t + 60$ นาที) |
+| `target_speed_kmh` | `DOUBLE` | `km/h` | `ts + 60m` | `ts + 75m` | ความเร็วจริงของถนนเส้นนี้ ณ เวลา $t + 60$ นาที |
+| `target_ratio` | `DOUBLE` | สัดส่วน | `ts + 60m` | `ts + 75m` | **Target หลักของโมเดล Regression:** `congestion ratio` ณ เวลา $t + 60$ นาที |
+| `target_congested` | `BOOLEAN` | `True/False` | `ts + 60m` | `ts + 75m` | **Target คลาส "ติด":** `True` เมื่อ `target_ratio < 0.5` |
+| `new_onset` | `BOOLEAN` | `True/False` | `ts -> ts+60m` | `ts + 75m` | **เหตุการณ์ "เริ่มติดใหม่" (Guardrail Metric):** ตอนนี้ไม่ติด (`is_congested=False`) แต่อีก 1 ชม. ติด (`target_congested=True`) |
+| `flag_ratio_gt_1_2` | `BOOLEAN` | `True/False` | `ts` | `ts + 15m` | Quality Flag ข้อ 4.2 (Plausibility): `True` เมื่อ `ratio > 1.2` |
+| `flag_jump_gt_60` | `BOOLEAN` | `True/False` | `ts` | `ts + 15m` | Quality Flag ข้อ 4.2 (Plausibility): `True` เมื่อความเร็วกระโดดเกิน 60 กม./ชม. ใน 15 นาที |
+| `flag_incomplete_day` | `BOOLEAN` | `True/False` | `date` | สิ้นวัน | Quality Flag ข้อ 4.2 (Completeness): `True` เมื่อวันนั้นมีข้อมูลไม่ถึง 80% (หรือช่วง 06–22 น. ไม่ถึง 90%) |
+| `precip_mm`, `precip_3h_mm`, `precip_6h_mm`, `rain_bin`, `is_rainy_gt_1mm`, `temp_c` | จาก `weather_hourly` | `mm` / `°C` | ชั่วโมงล่าสุด | $\le ts$ | ข้อมูลฝนและอุณหภูมิของโซนถนนเส้นนั้น (ใช้ค่าชั่วโมงล่าสุดที่รู้ผลแล้ว ไม่เกิด Leakage) |
+| `traffy_total_15m`, `traffy_traffic_15m`, `traffy_flood_15m`, `traffy_road_15m` | `BIGINT` | รายงาน | `ts .. ts+15m` | `ts + 15m` | จำนวนรายงาน Traffy ในเขตนั้นในช่วง 15 นาทีนั้น |
+| `train_flood_reports`, `train_flood_per_sq_km`, `train_traffic_per_sq_km` | จาก `traffy_district_static_train` | รายงาน / $\text{km}^2$ | ช่วง Train | สิ้นสุดช่วง Train | ความเสี่ยงน้ำท่วมและจราจรสะสมของเขตนั้น (คำนวณจากช่วง Train เท่านั้น สำหรับสมมุติฐาน **H4**) |
+| `dow`, `day_type`, `is_weekend`, `is_friday`, `is_holiday`, `is_bank_holiday`, `is_working_day`, `is_payday`, `is_school_term` | จาก `calendar_daily` | — | `date` | ทราบล่วงหน้า | ข้อมูลปฏิทินทั้งหมด (สำหรับ Baseline B1 และสมมุติฐาน **H5**) |
+| `split` | `VARCHAR` | `train`/`valid`/`test` | `date` | Static | ชุดข้อมูลตามการแบ่งเวลาใน Proposal ข้อ 0 |
 
 ---
 
-## 6. ตาราง `district_hourly_panel` (`data/processed/district_hourly_panel.csv` & `.parquet`)
-
-* **Grain:** `district × ts` (Complete Grid: **50 เขต × 2,928 ชั่วโมง = 146,400 แถว** ไม่มีช่องเวลาแหว่ง)
-* **Purpose:** ตารางสำเร็จรูปที่เชื่อมข้อมูล **เขต + Traffy รายชั่วโมง (เติม 0 ในชั่วโมงที่ไม่มีรายงาน) + ฝนตามโซนของเขต + ปฏิทิน + ค่าความเสี่ยงน้ำท่วมช่วง Train + ป้ายแบ่งชุด `split` (`train`/`valid`/`test`)** เข้าไว้ด้วยกัน เพื่อให้อภิเชษฐ์เปิดไฟล์เดียวทำ EDA และวิเคราะห์ปัจจัยเชิงพื้นที่ได้ทันที
+### C. ตาราง `gold.merged_district_15m` (`585,600 แถว = 50 เขต × 11,712 ช่องเวลา 15 นาที`)
+* ตารางสรุประดับ **เขต × 15 นาที** (ไม่มีช่องเวลาแหว่ง) ที่รวมตัวชี้วัดความเร็วรถของเขตนั้น (`itic_active_segments`, `itic_avg_speed_kmh`, `itic_median_speed_kmh`, `itic_p10_speed_kmh`, `itic_avg_ratio`, `itic_pct_congested`, `itic_pct_level3_red`, `itic_new_onset_segments`) เข้ากับ **Traffy ราย 15 นาที + ค่าสะสมช่วง Train + ฝน Open-Meteo + ปฏิทิน + ช่วงเวลาเร่งด่วน (`is_morning_rush`, `is_evening_rush`, `is_top_flood_day`) + `split`**
+* **เหมาะที่สุดสำหรับให้อภิเชษฐ์เริ่มต้นทำ EDA ภาพรวมระดับเขตและระดับเวลา!**

@@ -1,0 +1,906 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>รายงานเปรียบเทียบข้อมูล ก่อน Clean vs หลัง Clean — BKK Traffic Forecasting</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --border: #e2e8f0;
+      --text: #0f172a;
+      --muted: #64748b;
+      --red: #dc2626;
+      --red-bg: #fef2f2;
+      --red-border: #fecaca;
+      --amber: #d97706;
+      --amber-bg: #fffbeb;
+      --amber-border: #fde68a;
+      --green: #059669;
+      --green-bg: #ecfdf5;
+      --green-border: #a7f3d0;
+      --blue: #2563eb;
+      --blue-bg: #eff6ff;
+      --blue-border: #bfdbfe;
+      --indigo: #4f46e5;
+      --shadow: 0 1px 3px rgba(15, 23, 42, 0.06), 0 4px 12px rgba(15, 23, 42, 0.04);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans Thai", "Tahoma", system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 28px 20px 64px;
+    }
+
+    /* Header */
+    .hero {
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #0f766e 100%);
+      color: #ffffff;
+      border-radius: 20px;
+      padding: 32px 36px;
+      box-shadow: 0 10px 30px rgba(15, 23, 42, 0.16);
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      margin-bottom: 12px;
+    }
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      line-height: 1.25;
+      font-weight: 800;
+    }
+    .hero p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.86);
+      font-size: 14.5px;
+      max-width: 760px;
+    }
+    .hero-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: none;
+      border-radius: 10px;
+      padding: 10px 16px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: transform 0.12s ease, opacity 0.12s ease;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.95; }
+    .btn-light { background: #ffffff; color: #0f172a; }
+    .btn-ghost { background: rgba(255,255,255,0.16); color: #ffffff; border: 1px solid rgba(255,255,255,0.28); }
+
+    /* KPI Grid */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .kpi-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 18px 20px;
+      box-shadow: var(--shadow);
+    }
+    .kpi-label {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+    .kpi-value {
+      font-size: 26px;
+      font-weight: 800;
+      margin: 6px 0 4px;
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+    }
+    .kpi-sub {
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .text-green { color: var(--green); }
+    .text-red { color: var(--red); }
+    .text-blue { color: var(--blue); }
+    .text-amber { color: var(--amber); }
+
+    /* Tabs */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+      background: var(--card);
+      padding: 8px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+    }
+    .tab-btn {
+      border: none;
+      background: transparent;
+      color: var(--muted);
+      padding: 9px 15px;
+      border-radius: 10px;
+      font-size: 13.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .tab-btn:hover { background: #f1f5f9; color: var(--text); }
+    .tab-btn.active {
+      background: #0f172a;
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(15, 23, 42, 0.2);
+    }
+
+    /* Section Title */
+    .section-title {
+      font-size: 18px;
+      font-weight: 800;
+      margin: 26px 0 14px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-pill {
+      font-size: 12px;
+      font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      background: var(--blue-bg);
+      color: var(--blue);
+      border: 1px solid var(--blue-border);
+    }
+
+    /* Comparison Cards */
+    .issue-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .issue-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+    .issue-header {
+      padding: 14px 20px;
+      background: #f8fafc;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .issue-title {
+      font-size: 15.5px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tag {
+      font-size: 11.5px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 999px;
+    }
+    .tag-critical { background: var(--red-bg); color: var(--red); border: 1px solid var(--red-border); }
+    .tag-quality { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+    .tag-governance { background: var(--blue-bg); color: var(--blue); border: 1px solid var(--blue-border); }
+    .tag-done { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+
+    .compare-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    @media (max-width: 780px) {
+      .compare-grid { grid-template-columns: 1fr; }
+    }
+    .col-before, .col-after {
+      padding: 18px 20px;
+    }
+    .col-before {
+      background: #fffafa;
+      border-right: 1px solid var(--border);
+    }
+    .col-after {
+      background: #f7fefb;
+    }
+    .col-heading {
+      font-size: 12.5px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .col-before .col-heading { color: var(--red); }
+    .col-after .col-heading { color: var(--green); }
+    .col-before ul, .col-after ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 14px;
+    }
+    .col-before li, .col-after li { margin-bottom: 6px; }
+    .code-inline {
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 12.5px;
+      background: rgba(15, 23, 42, 0.06);
+      padding: 2px 6px;
+      border-radius: 5px;
+      color: #0f172a;
+    }
+    .issue-footer {
+      padding: 10px 20px;
+      background: #f8fafc;
+      border-top: 1px solid var(--border);
+      font-size: 12.5px;
+      color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    /* Visual Charts Grid */
+    .visual-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 22px;
+      box-shadow: var(--shadow);
+    }
+    .panel h3 {
+      margin: 0 0 4px;
+      font-size: 15.5px;
+      font-weight: 800;
+    }
+    .panel .panel-sub {
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* Funnel Bars */
+    .bar-row {
+      margin-bottom: 12px;
+    }
+    .bar-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .bar-track {
+      height: 12px;
+      background: #e2e8f0;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.6s ease;
+    }
+
+    /* Sample Diff Table */
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: var(--card);
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13.5px;
+    }
+    th, td {
+      padding: 11px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+    th {
+      background: #f1f5f9;
+      font-weight: 700;
+      color: #334155;
+      white-space: nowrap;
+    }
+    tr:last-child td { border-bottom: none; }
+    .cell-bad {
+      background: var(--red-bg);
+      color: var(--red);
+      font-weight: 700;
+    }
+    .cell-good {
+      background: var(--green-bg);
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    /* Quality Gate Checklist */
+    .gate-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 12px;
+    }
+    .gate-card {
+      background: var(--green-bg);
+      border: 1px solid var(--green-border);
+      border-radius: 12px;
+      padding: 14px 16px;
+    }
+    .gate-card strong {
+      display: block;
+      color: #065f46;
+      font-size: 13.5px;
+      margin-bottom: 4px;
+    }
+    .gate-card span {
+      font-size: 12.5px;
+      color: #047857;
+    }
+
+    .hidden { display: none !important; }
+
+    @media print {
+      body { background: #fff; }
+      .tabs, .hero-actions { display: none !important; }
+      .issue-card { break-inside: avoid; box-shadow: none; }
+      .hidden { display: block !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Hero -->
+    <header class="hero">
+      <div class="hero-top">
+        <div>
+          <div class="hero-badge">CSS 342 • Data Engineering Report • Medallion Pipeline (Bronze → Silver → Gold)</div>
+          <h1>รายงานเปรียบเทียบข้อมูล ก่อน Clean vs หลัง Clean</h1>
+          <p>สรุปปัญหาที่ตรวจพบในข้อมูลดิบทั้ง 4 แหล่ง (iTIC Traffic 20.3 GB, Traffy Fondue, Open-Meteo, ปฏิทินไทย 2022) พร้อมวิธีทำความสะอาดและผลลัพธ์จริงที่ยืนยันผ่าน Quality Gate 5 ข้อ และ Pytest 7/7</p>
+        </div>
+        <div class="hero-actions">
+          <button class="btn btn-light" onclick="window.print()">🖨️ พิมพ์ / บันทึกเป็น PDF</button>
+          <button class="btn btn-ghost" onclick="setFilter('all')">🔄 แสดงทั้งหมด</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- KPI Summary -->
+    <section class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-label">ลดขนาดข้อมูล & จัดโครงสร้าง</div>
+        <div class="kpi-value"><span class="text-red" style="font-size:18px;text-decoration:line-through;">20.3 GB</span> → <span class="text-green">1.34 GB</span></div>
+        <div class="kpi-sub">บีบอัด iTIC ~200 ล้านแถว → DuckDB 23.84 ล้านแถว (ลดลง 93.4%)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">ข้อมูลซ้ำที่กำจัดออก (Traffy)</div>
+        <div class="kpi-value"><span class="text-red">109,841</span> <span style="font-size:14px;color:var(--muted);">แถว (37.2%)</span></div>
+        <div class="kpi-sub">จาก 295,000 แถวดิบ → 185,159 ไม่ซ้ำ → 151,248 ในช่วงศึกษา</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">Missing Values หลัง Clean</div>
+        <div class="kpi-value"><span class="text-green">0</span> <span style="font-size:14px;color:var(--muted);">Nulls</span></div>
+        <div class="kpi-sub">ซ่อมเขตว่าง Traffy 37 แถว + เชื่อมถนนปลายทาง 92% (0 Nulls)</div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-label">การตรวจคุณภาพ & ความปลอดภัย</div>
+        <div class="kpi-value"><span class="text-green">PASS 100%</span></div>
+        <div class="kpi-sub">Quality Gate 5/5 • Airflow 8/8 Tasks • Pytest 7/7 • Zero Leakage</div>
+      </div>
+    </section>
+
+    <!-- Filter Tabs -->
+    <nav class="tabs" aria-label="ตัวกรองแหล่งข้อมูล">
+      <button class="tab-btn active" data-filter="all" onclick="setFilter('all')">📋 ทั้งหมด (9 รายการ)</button>
+      <button class="tab-btn" data-filter="itic" onclick="setFilter('itic')">🚗 iTIC Traffic (3)</button>
+      <button class="tab-btn" data-filter="traffy" onclick="setFilter('traffy')">📣 Traffy Fondue (3)</button>
+      <button class="tab-btn" data-filter="weather" onclick="setFilter('weather')">🌧️ Open-Meteo (1)</button>
+      <button class="tab-btn" data-filter="calendar" onclick="setFilter('calendar')">📅 Calendar 2022 (1)</button>
+      <button class="tab-btn" data-filter="leakage" onclick="setFilter('leakage')">🛡️ Leakage & Governance (1)</button>
+    </nav>
+
+    <!-- Visual Charts Section -->
+    <section class="visual-grid" id="visual-section">
+      <!-- Funnel: Traffy Fondue -->
+      <div class="panel">
+        <h3>📉 Traffy Fondue Cleaning Funnel</h3>
+        <div class="panel-sub">จำนวนรายการตั้งแต่ไฟล์ดิบ 295 JSON จนถึงข้อมูลพร้อมวิเคราะห์</div>
+
+        <div class="bar-row">
+          <div class="bar-meta"><span>1. ข้อมูลดิบทั้งหมด (295 ไฟล์ JSON)</span><span>295,000 (100%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:100%; background:#94a3b8;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>2. หลังลบ ticket_id ซ้ำ (−109,841 แถว)</span><span>185,159 (62.8%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:62.8%; background:#f59e0b;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>3. เฉพาะในกรุงเทพมหานคร (−764 นอก กทม.)</span><span>184,395 (62.5%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:62.5%; background:#3b82f6;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>4. ช่วงศึกษา มิ.ย.–ก.ย. 2022 + เติมเขตว่าง 37 รายการ</span><span class="text-green">151,248 (51.3%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:51.3%; background:#059669;"></div></div>
+        </div>
+      </div>
+
+      <!-- Downstream Road Graph -->
+      <div class="panel">
+        <h3>🛣️ การเชื่อมกราฟถนนปลายทาง (downstream_seg_ids)</h3>
+        <div class="panel-sub">แก้ปัญหา Missing Values จาก 45.5% (1,852 เส้น) เหลือ 0% ใน 4,068 เส้นถนน</div>
+
+        <div class="bar-row">
+          <div class="bar-meta"><span>Tier 1: เชื่อมโหนดตรงกันเป๊ะ (Exact Node)</span><span>2,216 เส้น (54.5%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:54.5%; background:#059669;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>Tier 2: เชื่อมช่วงย่อยบนถนนเดียวกัน (Offset Hop)</span><span>147 เส้น (3.6%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:3.6%; background:#0d9488;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>Tier 3: เชื่อมทางแยกใกล้สุดในรัศมี 400 ม.</span><span>1,379 เส้น (33.9%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:33.9%; background:#2563eb;"></div></div>
+        </div>
+        <div class="bar-row">
+          <div class="bar-meta"><span>ปลายทางสุดสาย/ออกนอก กทม. (ติดป้าย 'NONE' ไม่เป็น Null)</span><span>326 เส้น (8.0%)</span></div>
+          <div class="bar-track"><div class="bar-fill" style="width:8.0%; background:#64748b;"></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Before vs After Issue Cards -->
+    <h2 class="section-title">
+      🔍 รายละเอียดข้อผิดพลาดก่อน Clean เทียบกับหลัง Clean
+      <span class="section-pill" id="count-pill">แสดง 9 รายการ</span>
+    </h2>
+
+    <section class="issue-list" id="issue-list">
+      <!-- 1. iTIC Regex Bug -->
+      <article class="issue-card" data-cat="itic">
+        <div class="issue-header">
+          <div class="issue-title">1. [iTIC Traffic] บั๊กการแกะไฟล์ XML ทำให้ความเร็วผิดเพี้ยนทั้ง 122 วัน</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-critical">Critical Bug</span>
+            <span class="tag tag-done">แก้ไข 100%</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>สคริปต์แกะ XML เดิมอ่าน Regex ผิดช่อง (<span class="code-inline">group(11)</span> แทน <span class="code-inline">group(12)</span>)</li>
+              <li>ค่า <span class="code-inline">link_speed_kmh</span> กลายเป็นเลข <span class="code-inline">1, 2, 3</span> (ซึ่งจริงๆ คือระดับรถติด <span class="code-inline">&lt;Quantity&gt;</span>)</li>
+              <li>ค่า <span class="code-inline">congestion_level</span> ค้างอยู่ที่เลข <span class="code-inline">3</span> ทุกแถว ทำให้เอาไปคำนวณความเร็วหรือเทรนโมเดลไม่ได้เลย</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>แก้ Regex ให้ดึงค่า <span class="code-inline">&lt;LinkSpeed&gt;</span> และ <span class="code-inline">&lt;Quantity&gt;</span> ตรงช่อง แล้วแกะใหม่ครบทั้ง 122 วัน (มิ.ย.–ก.ย. 2022)</li>
+              <li>ได้ความเร็วจริงในกรอบ <strong>3.0 – 120.0 km/h</strong> (ค่าเฉลี่ย กทม. = <strong>37.97 km/h</strong>)</li>
+              <li>ได้ระดับความหนาแน่น <span class="code-inline">congestion_level</span> จริงครบทั้ง 3 ระดับ (<span class="code-inline">1, 2, 3</span>)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/itic_traffic.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">silver.itic_segment_15m</span> (23,840,561 แถว, 0 Nulls)</span>
+        </div>
+      </article>
+
+      <!-- 2. iTIC 20.3 GB Raw Bloat, Outliers & 15-min Aggregation -->
+      <article class="issue-card" data-cat="itic">
+        <div class="issue-header">
+          <div class="issue-title">2. [iTIC Traffic] ข้อมูลดิบใหญ่เกิน 20.3 GB, มีค่าความเร็วผิดปกติ และเวลาไม่ตรงกรอบ 15 นาที</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-quality">Data Quality & Scale</span>
+            <span class="tag tag-done">แก้ไข 100%</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>ไฟล์ดิบใหญ่ถึง <strong>20.3 GB</strong> (~200 ล้านแถว) เพราะมี sub-offset ซ้ำหลายช่วงบนถนนเดียวกัน</li>
+              <li>เวลาที่เก็บมาเป็น snapshot ทุก 10 นาที (<span class="code-inline">:00, :10, :20...</span>) และมีเศษวินาทีไม่สม่ำเสมอ</li>
+              <li>มีค่าความเร็วหลุดขอบเขตความเป็นจริง (<span class="code-inline">&lt; 3 km/h</span> หรือ <span class="code-inline">&gt; 120 km/h</span>) และค่ากระโดดผิดปกติ</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>กรองค่าความเร็วหลุดกรอบ (<span class="code-inline">3 ≤ speed ≤ 120 km/h</span>) ตามกฎ Plausibility ของ Proposal</li>
+              <li>ยุบรวมเป็นช่วงเวลา <strong>15 นาที</strong> ต่อ <strong>4,068 เส้นถนนมีทิศทาง</strong> เหลือ <strong>23.84 ล้านแถว</strong> บีบอัดลง DuckDB เหลือ <strong>1.34 GB</strong> (เล็กลง 93.4%)</li>
+              <li>ติดธงความผิดปกติแบบไม่ลบทิ้งเงียบๆ: <span class="code-inline">flag_ratio_gt_1_2</span> (700,967 แถว) และ <span class="code-inline">flag_jump_gt_60</span> (135,420 แถว)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/transform/itic_aggregate.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">gold.itic_seg15_targets</span> (รถติด 23.09%, เกิดใหม่ 2,174,625 เหตุการณ์)</span>
+        </div>
+      </article>
+
+      <!-- 3. iTIC Road Graph Missing Downstream -->
+      <article class="issue-card" data-cat="itic">
+        <div class="issue-header">
+          <div class="issue-title">3. [iTIC Road Graph] คอลัมน์ถนนเชื่อมต่อปลายทาง (downstream_seg_ids) มี Missing 45.5%</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-quality">Graph Completeness</span>
+            <span class="tag tag-done">เหลือ 0 Nulls</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>การจับคู่โหนดแบบตรงตัว (<span class="code-inline">to_loc == from_loc</span>) เชื่อมได้แค่ 2,216 เส้น (54.5%)</li>
+              <li>อีก <strong>1,852 เส้น (45.5%) เป็นค่าว่าง (NULL)</strong> เพราะรหัสทางแยกคนละสายถนนของ iTIC ใช้คนละ ID กัน</li>
+              <li>ทำให้ไม่สามารถทดสอบสมมุติฐาน <strong>H3 (รถติดลุกลามจากถนนปลายทาง)</strong> ได้ครบถ้วน</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>พัฒนาอัลกอริทึม <strong>3-Tier Matching</strong>: Tier 1 โหนดตรง (2,216) + Tier 2 ข้ามช่วงย่อย (147) + Tier 3 หาทางแยกใกล้สุดใน 400 ม. (1,379)</li>
+              <li>เชื่อมกราฟถนนได้สำเร็จถึง <strong>3,742 / 4,068 เส้น (92.0%)</strong></li>
+              <li>อีก 326 เส้นที่เป็นทางตัน/สุดขอบ กทม. ติดป้าย <span class="code-inline">NONE</span> + <span class="code-inline">terminus_or_bkk_border</span> → <strong>Missing Values = 0</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/transform/itic_aggregate.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">silver.dim_segment</span> (4,068 แถว, 0 Nulls)</span>
+        </div>
+      </article>
+
+      <!-- 4. Traffy Duplicates & Out-of-Scope -->
+      <article class="issue-card" data-cat="traffy">
+        <div class="issue-header">
+          <div class="issue-title">4. [Traffy Fondue] มีข้อมูลซ้ำถึง 37.2% และมีรายงานนอก กทม. / นอกช่วงเวลาศึกษาปนอยู่</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-critical">High Duplication</span>
+            <span class="tag tag-done">ตรง Audit 100%</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>ไฟล์ดิบ 295 JSON มีทั้งหมด <strong>295,000 แถว</strong> แต่มี <span class="code-inline">ticket_id</span> ซ้ำกันถึง <strong>109,841 แถว (37.2%)</strong></li>
+              <li>มีรายงานนอกจังหวัดกรุงเทพฯ ปนอยู่ <strong>764 รายการ</strong></li>
+              <li>ช่วงเวลาของไฟล์ดิบยาวถึง ธ.ค. 2022 (มีรายการนอกช่วง มิ.ย.–ก.ย. ปนอยู่ <strong>33,147 รายการ</strong>)</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>ตัดซ้ำด้วย <span class="code-inline">ticket_id</span> เหลือ <strong>185,159 รายงานไม่ซ้ำ</strong> พร้อมบันทึก Audit Log ที่ <span class="code-inline">logs/audit/traffy_dedupe.json</span></li>
+              <li>กรองเฉพาะ <span class="code-inline">province == 'กรุงเทพมหานคร'</span> เหลือ <strong>184,395 รายการ (99.59%)</strong></li>
+              <li>แปลงเวลา UTC → <span class="code-inline">Asia/Bangkok</span> และกรองช่วงศึกษา 1 มิ.ย.–30 ก.ย. 2022 ได้ <strong>151,248 รายการ</strong> (ตรงกับ Proposal เป๊ะ)</li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/traffy.py</span></span>
+          <span>ผลลัพธ์: จราจร 6,008 • น้ำท่วม 15,024 • ถนน 36,191 • ไม่ระบุหมวด 45,609</span>
+        </div>
+      </article>
+
+      <!-- 5. Traffy Missing Districts & Typo -->
+      <article class="issue-card" data-cat="traffy">
+        <div class="issue-header">
+          <div class="issue-title">5. [Traffy Fondue] ชื่อเขตว่าง 37 รายการ และชื่อเขตสะกดผิดใน GeoJSON</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-quality">Join Coverage</span>
+            <span class="tag tag-done">ครบทั้ง 50 เขต</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>พบรายงานที่ช่อง <span class="code-inline">district</span> เป็นค่าว่าง <strong>37 รายการ (0.02%)</strong> แม้จะมีพิกัด GPS ครบ</li>
+              <li>ในไฟล์ <span class="code-inline">Bangkok-districts.geojson</span> สะกดชื่อเขตผิดเป็น <span class="code-inline">"ราษฏร์บูรณะ"</span> (ฏ ปฏัก) ทำให้ Join กับ Traffy ไม่ติด</li>
+              <li>ชั่วโมงที่ไม่มีคนแจ้งเรื่องหายไปจากตาราง (มีแค่ 65,119 แถว ไม่ครบ 50 เขต × 2,928 ชม.)</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>ใช้อัลกอริทึม <strong>Point-in-Polygon (Ray-Casting)</strong> เทียบพิกัด GPS กับขอบเขต 50 เขต เติมชื่อเขตครบ 37 รายการ → <strong>0 Nulls</strong></li>
+              <li>แก้คำสะกดเป็น <span class="code-inline">"ราษฎร์บูรณะ"</span> (ฎ ชฎา) ให้ตรงกันทั้งระบบ Join ติดครบ 50/50 เขต</li>
+              <li>สร้าง Complete Grid เติมเลข 0 ในชั่วโมงที่ไม่มีเหตุ → <span class="code-inline">gold.district_hourly_panel</span> <strong>146,400 แถว (0 Nulls)</strong></li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/traffy.py</span>, <span class="code-inline">src/transform/district_panel.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">silver.dim_district</span> (50 เขต) + <span class="code-inline">gold.merged_district_15m</span> (585,600 แถว)</span>
+        </div>
+      </article>
+
+      <!-- 6. Traffy PII Governance -->
+      <article class="issue-card" data-cat="traffy">
+        <div class="issue-header">
+          <div class="issue-title">6. [Traffy Fondue] ข้อมูลดิบมีข้อมูลส่วนบุคคล (PII) ของผู้แจ้งร้องเรียน</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-governance">Governance / PDPA</span>
+            <span class="tag tag-done">ลบออกทั้งหมด</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>ไฟล์ดิบมีข้อความร้องเรียน (<span class="code-inline">comment</span>), ที่อยู่ละเอียด (<span class="code-inline">address</span>) และลิงก์รูปภาพ (<span class="code-inline">photo</span>, <span class="code-inline">after_photo</span>)</li>
+              <li>อาจมีเบอร์โทรศัพท์ ทะเบียนรถ หรือใบหน้าบุคคลติดอยู่ในข้อมูลดิบ</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>ลบคอลัมน์ <span class="code-inline">comment, address, photo, after_photo</span> ทิ้ง 100% ตั้งแต่ชั้น Staging</li>
+              <li>เผยแพร่ในชั้น Silver/Gold เฉพาะยอดรวมระดับเขต/ช่วงเวลา และตรวจซ้ำด้วย Automated Quality Gate</li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/traffy.py</span>, <span class="code-inline">src/quality/gates.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">no_pii_in_processed_tables = true</span></span>
+        </div>
+      </article>
+
+      <!-- 7. Open-Meteo Weather -->
+      <article class="issue-card" data-cat="weather">
+        <div class="issue-header">
+          <div class="issue-title">7. [Open-Meteo Weather] ข้อมูลดิบแยก 3 ไฟล์ JSON และยังไม่มีฟีเจอร์ฝนสะสม / เวลาพร้อมใช้งาน</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-quality">Feature Engineering</span>
+            <span class="tag tag-done">ครบ 8,784 ชม.</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>แยกเป็น 3 ไฟล์ JSON (<span class="code-inline">central, north, east</span>) ไม่มีตัวแปรฝนสะสม 3 ชม./6 ชม. สำหรับแทนภาวะน้ำท่วมขัง</li>
+              <li>ยังไม่มีการแบ่งระดับฝน (<span class="code-inline">rain_bin</span>) และยังไม่ได้ระบุ <span class="code-inline">available_time</span> เพื่อกัน Data Leakage</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>รวมเป็นตารางเดียว <strong>8,784 แถว</strong> (2,928 ชม. × 3 โซน) ตรวจผ่านว่า <strong>0 Missing Hours, 0 Nulls, 0 ค่าติดลบ</strong></li>
+              <li>เพิ่ม <span class="code-inline">precip_3h_mm</span>, <span class="code-inline">precip_6h_mm</span>, <span class="code-inline">rain_bin</span> (7 ระดับ), <span class="code-inline">is_rainy_gt_1mm</span> (สำหรับ H2) และ <span class="code-inline">available_time</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/weather.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">silver.weather_hourly</span> (8,784 แถว, Asia/Bangkok)</span>
+        </div>
+      </article>
+
+      <!-- 8. Calendar 2022 -->
+      <article class="issue-card" data-cat="calendar">
+        <div class="issue-header">
+          <div class="issue-title">8. [Calendar 2022] ขาดปฏิทินบริบทไทย (วันหยุดพิเศษ ครม., วันเข้าพรรษาธนาคารเปิด, รอบเงินเดือนออก)</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-quality">Domain Context</span>
+            <span class="tag tag-done">ครบ 122 วัน</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ข้อมูลมีปัญหา)</div>
+            <ul>
+              <li>ไลบรารีปฏิทินทั่วไปไม่มีวันหยุดกรณีพิเศษตามมติ ครม. ปี 2565 (<strong>15 ก.ค.</strong> และ <strong>29 ก.ค. 2022</strong>)</li>
+              <li>ไม่แยกแยะว่า <strong>14 ก.ค. (วันเข้าพรรษา)</strong> เป็นวันหยุดราชการแต่ธนาคาร/เอกชนส่วนใหญ่เปิดทำการ</li>
+              <li>ไม่มีตัวแปรวันเงินเดือนออก 3 รอบของไทย (ข้าราชการ / วันที่ 25 / สิ้นเดือน) สำหรับทดสอบสมมุติฐาน H5</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (แก้ไขแล้ว)</div>
+            <ul>
+              <li>สร้างตารางปฏิทินไทยปี 2022 ครบ <strong>122 วัน</strong> (81 วันทำงาน, 34 เสาร์-อาทิตย์, 7 วันหยุดราชการ)</li>
+              <li>เพิ่มคอลัมน์ <span class="code-inline">is_bank_holiday</span>, <span class="code-inline">is_gov_payday</span>, <span class="code-inline">is_payday_25</span>, <span class="code-inline">is_month_end_workday</span>, <span class="code-inline">is_friday</span>, <span class="code-inline">is_school_term</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/ingest/calendar.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">silver.calendar_daily</span> (122 แถว, 0 Nulls, 0 ซ้ำ)</span>
+        </div>
+      </article>
+
+      <!-- 9. Data Leakage Prevention -->
+      <article class="issue-card" data-cat="leakage">
+        <div class="issue-header">
+          <div class="issue-title">9. [Leakage & Reproducibility] ความเสี่ยงข้อมูลอนาคตรั่วไหล (Data Leakage) และไฟล์ดิบถูกแก้ไขโดยไม่ตั้งใจ</div>
+          <div style="display:flex;gap:6px;">
+            <span class="tag tag-governance">ML Rigor</span>
+            <span class="tag tag-done">Zero Leakage</span>
+          </div>
+        </div>
+        <div class="compare-grid">
+          <div class="col-before">
+            <div class="col-heading">❌ ก่อน Clean (ความเสี่ยง)</div>
+            <ul>
+              <li>หากคำนวณ <span class="code-inline">free_flow_kmh (P90)</span> หรือสถิติ Traffy สะสมจากทั้ง 4 เดือน จะเกิด Target/Feature Leakage จากช่วง Test</li>
+              <li>หากสุ่มแบ่ง Train/Test (Random Split) โมเดลจะแอบเห็นรถติดในชั่วโมงถัดไป</li>
+              <li>ไฟล์ดิบไม่มี Checksum ยืนยัน อาจถูกเขียนทับโดยไม่รู้ตัว</li>
+            </ul>
+          </div>
+          <div class="col-after">
+            <div class="col-heading">✅ หลัง Clean (ป้องกันครบ)</div>
+            <ul>
+              <li>คำนวณ <span class="code-inline">free_flow_kmh</span> และ <span class="code-inline">gold.traffy_district_static_train</span> จากช่วง <strong>Train (1 มิ.ย.–23 ส.ค.) เท่านั้น</strong></li>
+              <li>แบ่งข้อมูลตามลำดับเวลาเคร่งครัด: <strong>Train</strong> (1 มิ.ย.–23 ส.ค.) → <strong>Valid</strong> (24 ส.ค.–10 ก.ย.) → <strong>Test</strong> (11–30 ก.ย.)</li>
+              <li>ล็อกไฟล์ดิบเป็น Read-Only พร้อม SHA-256 Checksum ใน <span class="code-inline">logs/manifest.jsonl</span> และตรวจอัตโนมัติใน Airflow + Pytest</li>
+            </ul>
+          </div>
+        </div>
+        <div class="issue-footer">
+          <span>ไฟล์โค้ด: <span class="code-inline">src/common.py</span>, <span class="code-inline">src/quality/gates.py</span>, <span class="code-inline">tests/test_quality_and_leakage.py</span></span>
+          <span>ผลลัพธ์: <span class="code-inline">pytest -v → 7 passed</span></span>
+        </div>
+      </article>
+    </section>
+
+    <!-- Concrete Sample Diff Table -->
+    <h2 class="section-title">📊 ตัวอย่างข้อมูลจริง ก่อน Clean vs หลัง Clean</h2>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>แหล่งข้อมูล</th>
+            <th>คอลัมน์ / รายการ</th>
+            <th>❌ ค่าก่อน Clean (Raw / Bug)</th>
+            <th>✅ ค่าหลัง Clean (Silver / Gold)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>iTIC Traffic</strong></td>
+            <td><span class="code-inline">link_speed_kmh</span></td>
+            <td class="cell-bad">1, 2, 3 (อ่านผิดเป็นระดับรถติด)</td>
+            <td class="cell-good">3.0 – 120.0 km/h (เฉลี่ย 37.97 km/h)</td>
+          </tr>
+          <tr>
+            <td><strong>iTIC Traffic</strong></td>
+            <td><span class="code-inline">congestion_level</span></td>
+            <td class="cell-bad">3 ทุกแถว (100% ค้าง)</td>
+            <td class="cell-good">1 (คล่องตัว), 2 (ชะลอตัว), 3 (ติดขัด)</td>
+          </tr>
+          <tr>
+            <td><strong>iTIC Road Graph</strong></td>
+            <td><span class="code-inline">downstream_seg_ids</span></td>
+            <td class="cell-bad">NULL 1,852 เส้น (45.5%)</td>
+            <td class="cell-good">เชื่อมได้ 3,742 เส้น (92%) + 'NONE' 326 เส้น (0 Nulls)</td>
+          </tr>
+          <tr>
+            <td><strong>Traffy Fondue</strong></td>
+            <td>จำนวนแถว / ซ้ำ</td>
+            <td class="cell-bad">295,000 แถว (ซ้ำ 109,841 แถว)</td>
+            <td class="cell-good">151,248 แถวใน กทม. ช่วงศึกษา (0 ซ้ำ)</td>
+          </tr>
+          <tr>
+            <td><strong>Traffy Fondue</strong></td>
+            <td>ชื่อเขต (GeoJSON)</td>
+            <td class="cell-bad">"ราษฏร์บูรณะ" + ว่าง 37 แถว</td>
+            <td class="cell-good">"ราษฎร์บูรณะ" + เติมครบ 50 เขต (0 Nulls)</td>
+          </tr>
+          <tr>
+            <td><strong>Traffy Fondue</strong></td>
+            <td>คอลัมน์ PII</td>
+            <td class="cell-bad">มี comment, address, photo</td>
+            <td class="cell-good">ลบออกทั้งหมด 100% ก่อนเข้า Silver/Gold</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Quality Gate Summary -->
+    <h2 class="section-title">✅ ผลการตรวจ Quality Gate 5 ข้อ (Verified from Airflow &amp; Pytest)</h2>
+    <section class="gate-grid">
+      <div class="gate-card">
+        <strong>1. Schema &amp; Plausibility — PASS</strong>
+        <span>Timezone Asia/Bangkok, ความเร็ว 3–120 km/h, ฝน/อุณหภูมิไม่ติดลบ</span>
+      </div>
+      <div class="gate-card">
+        <strong>2. Completeness — PASS</strong>
+        <span>ฝน 8,784 ชม., ปฏิทิน 122 วัน, 50 เขต, Panel 146,400 แถว (0 Nulls)</span>
+      </div>
+      <div class="gate-card">
+        <strong>3. Uniqueness — PASS</strong>
+        <span>ลบ Traffy ซ้ำ 109,841 แถว, Primary Key ทุกตารางไม่ซ้ำ 100%</span>
+      </div>
+      <div class="gate-card">
+        <strong>4. Join Coverage — PASS</strong>
+        <span>Traffy เชื่อม 50/50 เขต, ทุกเขตเชื่อมโซนฝน, ถนนเชื่อมปลายทาง 92%</span>
+      </div>
+      <div class="gate-card">
+        <strong>5. Leakage &amp; Governance — PASS</strong>
+        <span>ไร้ PII, available_time ถูกต้อง, P90/Static คำนวณเฉพาะ Train</span>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function setFilter(cat) {
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.filter === cat);
+      });
+      const cards = document.querySelectorAll('.issue-card');
+      let visible = 0;
+      cards.forEach(card => {
+        const show = (cat === 'all' || card.dataset.cat === cat);
+        card.classList.toggle('hidden', !show);
+        if (show) visible++;
+      });
+      document.getElementById('count-pill').textContent = `แสดง ${visible} รายการ`;
+    }
+  </script>
+</body>
+</html>

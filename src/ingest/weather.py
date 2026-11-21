@@ -187,7 +187,7 @@ def stage_weather(run_id: str = "manual") -> pd.DataFrame:
 
     out_stage = path("staging") / "weather_hourly.parquet"
     out_proc = path("processed") / "weather_hourly.parquet"
-    csv_dir = path("processed") / "csv"
+    csv_dir = path("processed") / "csv" / "Open-Meo"
     csv_dir.mkdir(parents=True, exist_ok=True)
     out_csv = csv_dir / "weather_hourly.csv"
     df.to_parquet(out_stage, index=False)

@@ -1,9 +1,8 @@
 """Helper script to inspect any .parquet, .csv, or .json file in the project.
 
 Usage examples:
-    python peek.py data/processed/weather_hourly.parquet
-    python peek.py data/processed/calendar_daily.parquet --rows 20
-    python peek.py data/raw/calendar/calendar_2022.csv
+    python scripts/peek.py data/processed/weather_hourly.parquet
+    python scripts/peek.py data/processed/calendar_daily.parquet --rows 20
 """
 from __future__ import annotations
 
@@ -12,7 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-_VENV_PY = Path(__file__).resolve().parent / ".venv" / "Scripts" / "python.exe"
+ROOT = Path(__file__).resolve().parents[1]
+_VENV_PY = ROOT / ".venv" / "Scripts" / "python.exe"
 if _VENV_PY.exists() and Path(sys.executable).resolve() != _VENV_PY.resolve():
     raise SystemExit(subprocess.call([str(_VENV_PY), *sys.argv]))
 
@@ -68,4 +68,3 @@ if __name__ == "__main__":
     ap.add_argument("--csv", action="store_true", help="Also export a .preview.csv file for Excel")
     args = ap.parse_args()
     inspect_file(args.file, args.rows, args.csv)
-

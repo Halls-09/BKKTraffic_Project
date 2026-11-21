@@ -27,6 +27,7 @@ from src.ingest.traffy import stage_traffy
 from src.ingest.weather import download_weather, stage_weather
 from src.quality.gates import verify_all_processed_tables
 from src.transform.district_panel import build_district_panel
+from src.warehouse.duckdb_loader import build_duckdb_warehouse
 
 log = get_logger("pipeline")
 
@@ -63,6 +64,10 @@ def stage_panel_step(run_id: str) -> None:
     build_district_panel(run_id=run_id)
 
 
+def stage_duckdb_step(run_id: str) -> None:
+    build_duckdb_warehouse(run_id=run_id)
+
+
 def stage_quality_step(run_id: str) -> None:
     verify_all_processed_tables(run_id=run_id)
 
@@ -73,6 +78,7 @@ STAGES = {
     "calendar": stage_calendar_step,
     "traffy": stage_traffy_step,
     "panel": stage_panel_step,
+    "duckdb": stage_duckdb_step,
     "quality": stage_quality_step,
 }
 

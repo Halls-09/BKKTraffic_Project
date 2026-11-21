@@ -221,7 +221,7 @@ def stage_traffy(run_id: str = "manual") -> dict:
     # -----------------------------------------------------------------------
     # สร้างตารางสำหรับส่งมอบใน data/processed/ (.parquet) และ data/processed/csv/ (.csv)
     # -----------------------------------------------------------------------
-    csv_dir = path("processed") / "csv"
+    csv_dir = path("processed") / "csv" / "traffy"
     csv_dir.mkdir(parents=True, exist_ok=True)
 
     # ตารางที่ 1: dim_district (ข้อมูลอ้างอิง 50 เขต กทม. + จุดวัดฝนที่ใกล้ที่สุด)

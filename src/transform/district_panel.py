@@ -33,8 +33,15 @@ def assign_split(dates: pd.Series) -> pd.Series:
     return out
 
 
-def build_district_panel(run_id: str = "manual") -> pd.DataFrame:
+def build_district_panel(run_id: str = "manual", force_rebuild: bool = False) -> pd.DataFrame:
     proc = path("processed")
+    out_pq = proc / "district_hourly_panel.parquet"
+    out_csv = proc / "csv" / "merge-traffy-calendar-open" / "district_hourly_panel.csv"
+    if not force_rebuild and out_pq.exists() and out_csv.exists():
+        panel = pd.read_parquet(out_pq)
+        if len(panel) == 146400 and int(panel.isna().sum().sum()) == 0:
+            log.info("district_hourly_panel already up-to-date (146,400 rows), skipping rebuild.")
+            return panel
     dim_dist = pd.read_parquet(proc / "dim_district.parquet")
     traffy_h = pd.read_parquet(proc / "traffy_district_hourly.parquet")
     weather_h = pd.read_parquet(proc / "weather_hourly.parquet")
@@ -147,7 +154,7 @@ def build_district_panel(run_id: str = "manual") -> pd.DataFrame:
         raise RuntimeError(f"district_panel quality check failed: {report}")
 
     out_pq = proc / "district_hourly_panel.parquet"
-    csv_dir = proc / "csv"
+    csv_dir = proc / "csv" / "merge-traffy-calendar-open"
     csv_dir.mkdir(parents=True, exist_ok=True)
     out_csv = csv_dir / "district_hourly_panel.csv"
     panel.to_parquet(out_pq, index=False)

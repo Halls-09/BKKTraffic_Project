@@ -8,8 +8,9 @@ logs/audit/*
 logs/quality/*
 !logs/**/.gitkeep
 
-# Python
+# Python & Airflow runtime
 .venv/
+airflow_home/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/

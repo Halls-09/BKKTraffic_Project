@@ -1,0 +1,29 @@
+# =============================================================================
+# Apache Airflow (Standalone Web UI) + DuckDB Medallion Pipeline on Docker
+# วิธีรัน:
+#   1. เปิดโปรแกรม Docker Desktop ให้สถานะเป็น Engine running
+#   2. รันคำสั่ง:  docker compose up -d
+#   3. เปิดเบราว์เซอร์ไปที่:  http://localhost:8080
+#      - Username: admin
+#      - Password:ดูจากคำสั่ง `docker compose logs airflow` หรือไฟล์ `airflow_home/standalone_admin_password.txt`
+# =============================================================================
+
+services:
+  airflow:
+    image: apache/airflow:2.10.2-python3.12
+    container_name: bkk_traffic_airflow
+    environment:
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__LOAD_EXAMPLES=False
+      - AIRFLOW__WEBSERVER__EXPOSE_CONFIG=True
+      - PYTHONPATH=/opt/airflow/project
+      - _PIP_ADDITIONAL_REQUIREMENTS=duckdb pandas pyarrow requests pyyaml
+    volumes:
+      - ./dags:/opt/airflow/dags
+      - .:/opt/airflow/project
+      - ./airflow_home:/opt/airflow
+    ports:
+      - "8080:8080"
+    working_dir: /opt/airflow/project
+    command: standalone
