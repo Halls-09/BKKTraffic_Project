@@ -1,0 +1,15 @@
+# Exact Reproducibility Lockfile (Proposal Section 0 & 12)
+# Environment: Python 3.12 (Windows x64) | Seed: 42
+numpy==2.4.1
+pandas==3.0.0
+scikit-learn==1.8.0
+lightgbm==4.7.0
+shap==0.54.1
+matplotlib==3.10.8
+PyYAML==6.0.3
+joblib==1.5.3
+rich==15.0.0
+typer==0.24.1
+fastapi==0.135.3
+uvicorn==0.44.0
+pydantic==2.12.5

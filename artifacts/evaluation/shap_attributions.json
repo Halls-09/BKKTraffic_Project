@@ -1,370 +1,310 @@
 {
-  "timestamp_utc": "2026-11-11T16:17:53.886761+00:00",
-  "attribution_method": "Permutation_SHAP_Approximation",
+  "timestamp_utc": "2026-11-21T13:50:03.770726+00:00",
+  "attribution_method": "TreeSHAP (shap v0.54.1, n_samples=3000)",
   "top_features": [
     {
-      "feature": "hist_avg_ratio_target_slot",
-      "mean_abs_impact": 0.06253,
-      "share_pct": 28.15
+      "feature": "hist_avg_red_target_slot",
+      "mean_abs_shap": 0.12441,
+      "mean_signed_shap": 0.00051,
+      "share_pct": 54.31
     },
     {
-      "feature": "rain_cum_3h",
-      "mean_abs_impact": 0.02673,
-      "share_pct": 12.03
-    },
-    {
-      "feature": "hist_p25_ratio_target_slot",
-      "mean_abs_impact": 0.01849,
-      "share_pct": 8.32
-    },
-    {
-      "feature": "downstream_mean_ratio_t0",
-      "mean_abs_impact": 0.01813,
-      "share_pct": 8.16
-    },
-    {
-      "feature": "ratio_t0",
-      "mean_abs_impact": 0.01751,
-      "share_pct": 7.88
-    },
-    {
-      "feature": "rain_mm_t0",
-      "mean_abs_impact": 0.0149,
-      "share_pct": 6.71
-    },
-    {
-      "feature": "target_hour_cos",
-      "mean_abs_impact": 0.01179,
-      "share_pct": 5.31
-    },
-    {
-      "feature": "downstream_min_ratio_t0",
-      "mean_abs_impact": 0.00972,
-      "share_pct": 4.38
+      "feature": "hist_p75_red_target_slot",
+      "mean_abs_shap": 0.02084,
+      "mean_signed_shap": -0.00118,
+      "share_pct": 9.1
     },
     {
       "feature": "current_diff_from_hist",
-      "mean_abs_impact": 0.00937,
-      "share_pct": 4.22
+      "mean_abs_shap": 0.01996,
+      "mean_signed_shap": 0.00421,
+      "share_pct": 8.71
     },
     {
-      "feature": "day_of_week",
-      "mean_abs_impact": 0.00928,
-      "share_pct": 4.18
+      "feature": "district_red_rate_t0",
+      "mean_abs_shap": 0.01162,
+      "mean_signed_shap": 0.00078,
+      "share_pct": 5.07
     },
     {
-      "feature": "upstream_mean_ratio_t0",
-      "mean_abs_impact": 0.00657,
-      "share_pct": 2.96
+      "feature": "link_cat",
+      "mean_abs_shap": 0.00964,
+      "mean_signed_shap": 0.0006,
+      "share_pct": 4.21
+    },
+    {
+      "feature": "dow",
+      "mean_abs_shap": 0.00572,
+      "mean_signed_shap": 0.00077,
+      "share_pct": 2.5
+    },
+    {
+      "feature": "is_holiday",
+      "mean_abs_shap": 0.00503,
+      "mean_signed_shap": 0.00503,
+      "share_pct": 2.2
+    },
+    {
+      "feature": "downstream_red_rate_t0",
+      "mean_abs_shap": 0.00488,
+      "mean_signed_shap": 0.00063,
+      "share_pct": 2.13
+    },
+    {
+      "feature": "yellow_rate_t0",
+      "mean_abs_shap": 0.00465,
+      "mean_signed_shap": -0.00044,
+      "share_pct": 2.03
+    },
+    {
+      "feature": "red_rate_t0",
+      "mean_abs_shap": 0.00435,
+      "mean_signed_shap": 0.00018,
+      "share_pct": 1.9
+    },
+    {
+      "feature": "target_hour",
+      "mean_abs_shap": 0.00366,
+      "mean_signed_shap": 0.00026,
+      "share_pct": 1.6
+    },
+    {
+      "feature": "target_hour_cos",
+      "mean_abs_shap": 0.00264,
+      "mean_signed_shap": -0.0005,
+      "share_pct": 1.15
+    },
+    {
+      "feature": "red_rate_lag_24h",
+      "mean_abs_shap": 0.00233,
+      "mean_signed_shap": 7e-05,
+      "share_pct": 1.02
     },
     {
       "feature": "target_hour_sin",
-      "mean_abs_impact": 0.00491,
-      "share_pct": 2.21
+      "mean_abs_shap": 0.0022,
+      "mean_signed_shap": -0.00011,
+      "share_pct": 0.96
     },
     {
-      "feature": "delta_ratio_30m",
-      "mean_abs_impact": 0.00375,
-      "share_pct": 1.69
-    },
-    {
-      "feature": "rain_cum_6h",
-      "mean_abs_impact": 0.00334,
-      "share_pct": 1.5
-    },
-    {
-      "feature": "is_friday_evening",
-      "mean_abs_impact": 0.00076,
-      "share_pct": 0.34
+      "feature": "precip_mm_t0",
+      "mean_abs_shap": 0.00185,
+      "mean_signed_shap": 0.00073,
+      "share_pct": 0.81
     }
   ],
   "all_features_ranked": [
     {
-      "feature": "hist_avg_ratio_target_slot",
-      "mean_abs_impact": 0.06253,
-      "share_pct": 28.15
+      "feature": "hist_avg_red_target_slot",
+      "mean_abs_shap": 0.12441,
+      "mean_signed_shap": 0.00051,
+      "share_pct": 54.31
     },
     {
-      "feature": "rain_cum_3h",
-      "mean_abs_impact": 0.02673,
-      "share_pct": 12.03
-    },
-    {
-      "feature": "hist_p25_ratio_target_slot",
-      "mean_abs_impact": 0.01849,
-      "share_pct": 8.32
-    },
-    {
-      "feature": "downstream_mean_ratio_t0",
-      "mean_abs_impact": 0.01813,
-      "share_pct": 8.16
-    },
-    {
-      "feature": "ratio_t0",
-      "mean_abs_impact": 0.01751,
-      "share_pct": 7.88
-    },
-    {
-      "feature": "rain_mm_t0",
-      "mean_abs_impact": 0.0149,
-      "share_pct": 6.71
-    },
-    {
-      "feature": "target_hour_cos",
-      "mean_abs_impact": 0.01179,
-      "share_pct": 5.31
-    },
-    {
-      "feature": "downstream_min_ratio_t0",
-      "mean_abs_impact": 0.00972,
-      "share_pct": 4.38
+      "feature": "hist_p75_red_target_slot",
+      "mean_abs_shap": 0.02084,
+      "mean_signed_shap": -0.00118,
+      "share_pct": 9.1
     },
     {
       "feature": "current_diff_from_hist",
-      "mean_abs_impact": 0.00937,
-      "share_pct": 4.22
+      "mean_abs_shap": 0.01996,
+      "mean_signed_shap": 0.00421,
+      "share_pct": 8.71
     },
     {
-      "feature": "day_of_week",
-      "mean_abs_impact": 0.00928,
-      "share_pct": 4.18
+      "feature": "district_red_rate_t0",
+      "mean_abs_shap": 0.01162,
+      "mean_signed_shap": 0.00078,
+      "share_pct": 5.07
     },
     {
-      "feature": "upstream_mean_ratio_t0",
-      "mean_abs_impact": 0.00657,
-      "share_pct": 2.96
+      "feature": "link_cat",
+      "mean_abs_shap": 0.00964,
+      "mean_signed_shap": 0.0006,
+      "share_pct": 4.21
+    },
+    {
+      "feature": "dow",
+      "mean_abs_shap": 0.00572,
+      "mean_signed_shap": 0.00077,
+      "share_pct": 2.5
+    },
+    {
+      "feature": "is_holiday",
+      "mean_abs_shap": 0.00503,
+      "mean_signed_shap": 0.00503,
+      "share_pct": 2.2
+    },
+    {
+      "feature": "downstream_red_rate_t0",
+      "mean_abs_shap": 0.00488,
+      "mean_signed_shap": 0.00063,
+      "share_pct": 2.13
+    },
+    {
+      "feature": "yellow_rate_t0",
+      "mean_abs_shap": 0.00465,
+      "mean_signed_shap": -0.00044,
+      "share_pct": 2.03
+    },
+    {
+      "feature": "red_rate_t0",
+      "mean_abs_shap": 0.00435,
+      "mean_signed_shap": 0.00018,
+      "share_pct": 1.9
+    },
+    {
+      "feature": "target_hour",
+      "mean_abs_shap": 0.00366,
+      "mean_signed_shap": 0.00026,
+      "share_pct": 1.6
+    },
+    {
+      "feature": "target_hour_cos",
+      "mean_abs_shap": 0.00264,
+      "mean_signed_shap": -0.0005,
+      "share_pct": 1.15
+    },
+    {
+      "feature": "red_rate_lag_24h",
+      "mean_abs_shap": 0.00233,
+      "mean_signed_shap": 7e-05,
+      "share_pct": 1.02
     },
     {
       "feature": "target_hour_sin",
-      "mean_abs_impact": 0.00491,
-      "share_pct": 2.21
+      "mean_abs_shap": 0.0022,
+      "mean_signed_shap": -0.00011,
+      "share_pct": 0.96
     },
     {
-      "feature": "delta_ratio_30m",
-      "mean_abs_impact": 0.00375,
-      "share_pct": 1.69
+      "feature": "precip_mm_t0",
+      "mean_abs_shap": 0.00185,
+      "mean_signed_shap": 0.00073,
+      "share_pct": 0.81
     },
     {
-      "feature": "rain_cum_6h",
-      "mean_abs_impact": 0.00334,
-      "share_pct": 1.5
+      "feature": "precip_3h_mm_t0",
+      "mean_abs_shap": 0.00177,
+      "mean_signed_shap": 0.00063,
+      "share_pct": 0.77
+    },
+    {
+      "feature": "delta_red_1h",
+      "mean_abs_shap": 0.00161,
+      "mean_signed_shap": -0.0,
+      "share_pct": 0.7
+    },
+    {
+      "feature": "rain_x_flood_interaction",
+      "mean_abs_shap": 0.00103,
+      "mean_signed_shap": 0.00041,
+      "share_pct": 0.45
     },
     {
       "feature": "is_friday_evening",
-      "mean_abs_impact": 0.00076,
-      "share_pct": 0.34
+      "mean_abs_shap": 0.0004,
+      "mean_signed_shap": 9e-05,
+      "share_pct": 0.17
     },
     {
-      "feature": "downstream_delta_15m",
-      "mean_abs_impact": 0.00072,
-      "share_pct": 0.32
-    },
-    {
-      "feature": "target_slot_idx",
-      "mean_abs_impact": 0.00052,
-      "share_pct": 0.23
-    },
-    {
-      "feature": "is_payday_window",
-      "mean_abs_impact": 0.00051,
-      "share_pct": 0.23
-    },
-    {
-      "feature": "ratio_lag_15m",
-      "mean_abs_impact": 0.00048,
-      "share_pct": 0.22
-    },
-    {
-      "feature": "direction_code",
-      "mean_abs_impact": 0.00041,
-      "share_pct": 0.18
-    },
-    {
-      "feature": "rolling_std_60m",
-      "mean_abs_impact": 0.00034,
-      "share_pct": 0.15
-    },
-    {
-      "feature": "mins_since_last_incident",
-      "mean_abs_impact": 0.00023,
+      "feature": "is_payday",
+      "mean_abs_shap": 0.00024,
+      "mean_signed_shap": 5e-05,
       "share_pct": 0.1
     },
     {
-      "feature": "spatial_gradient_t0",
-      "mean_abs_impact": 0.0002,
-      "share_pct": 0.09
-    },
-    {
-      "feature": "ratio_lag_30m",
-      "mean_abs_impact": 0.00019,
-      "share_pct": 0.09
-    },
-    {
-      "feature": "ratio_lag_60m",
-      "mean_abs_impact": 0.00016,
-      "share_pct": 0.07
-    },
-    {
-      "feature": "length_km",
-      "mean_abs_impact": 0.00015,
-      "share_pct": 0.07
-    },
-    {
-      "feature": "traffy_flood_density_district",
-      "mean_abs_impact": 0.00013,
-      "share_pct": 0.06
-    },
-    {
-      "feature": "delta_ratio_15m",
-      "mean_abs_impact": 0.00012,
-      "share_pct": 0.05
-    },
-    {
-      "feature": "rain_x_traffy_flood_interaction",
-      "mean_abs_impact": 7e-05,
-      "share_pct": 0.03
-    },
-    {
-      "feature": "free_flow_speed_kmh",
-      "mean_abs_impact": 6e-05,
-      "share_pct": 0.03
-    },
-    {
-      "feature": "traffy_flood_buffer500m",
-      "mean_abs_impact": 3e-05,
-      "share_pct": 0.01
-    },
-    {
-      "feature": "ratio_lag_45m",
-      "mean_abs_impact": 2e-05,
-      "share_pct": 0.01
-    },
-    {
-      "feature": "is_morning_rush",
-      "mean_abs_impact": 1e-05,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "is_heavy_rain_t0",
-      "mean_abs_impact": 1e-05,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "is_evening_rush",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "is_weekend",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "is_public_holiday",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "is_school_term",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "temp_c_t0",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "active_incident_on_seg",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
-    },
-    {
-      "feature": "incident_count_within_2km_1h",
-      "mean_abs_impact": 0.0,
-      "share_pct": 0.0
+      "feature": "train_flood_per_sq_km",
+      "mean_abs_shap": 0.00024,
+      "mean_signed_shap": 7e-05,
+      "share_pct": 0.1
     }
   ],
   "group_attribution": [
     {
       "group_key": "group_2_historical_profile",
       "group_label": "G2: รูปแบบในอดีต (Historical Profile)",
-      "total_impact": 0.09039,
-      "share_pct": 40.69
-    },
-    {
-      "group_key": "group_5_weather",
-      "group_label": "G5: ฝนและสภาพอากาศ (Weather)",
-      "total_impact": 0.04498,
-      "share_pct": 20.25
+      "total_impact": 0.16521,
+      "share_pct": 72.12
     },
     {
       "group_key": "group_6_spatial_graph",
-      "group_label": "G6: ถนนข้างเคียง (Spatial Graph Neighbors)",
-      "total_impact": 0.03534,
-      "share_pct": 15.91
+      "group_label": "G6: ถนนข้างหน้าและภาพรวมเขต (Spatial Graph)",
+      "total_impact": 0.0165,
+      "share_pct": 7.2
     },
     {
       "group_key": "group_1_current_lags",
-      "group_label": "G1: สภาพปัจจุบันและ Lag (Current & Lags)",
-      "total_impact": 0.02257,
-      "share_pct": 10.16
-    },
-    {
-      "group_key": "group_3_temporal_cyclical",
-      "group_label": "G3: ช่วงเวลา (Temporal Cyclical)",
-      "total_impact": 0.01723,
-      "share_pct": 7.76
+      "group_label": "G1: สภาพปัจจุบันและแนวโน้ม (Current & Lags)",
+      "total_impact": 0.01294,
+      "share_pct": 5.65
     },
     {
       "group_key": "group_4_calendar",
-      "group_label": "G4: ปฏิทิน (Calendar)",
-      "total_impact": 0.01055,
-      "share_pct": 4.75
+      "group_label": "G4: ปฏิทินและวันเงินเดือนออก (Calendar)",
+      "total_impact": 0.01139,
+      "share_pct": 4.97
     },
     {
-      "group_key": "group_8_road_traffy_static",
-      "group_label": "G8: ลักษณะถนนและพื้นที่เสี่ยงน้ำท่วม (Road & Traffy)",
-      "total_impact": 0.00085,
-      "share_pct": 0.38
+      "group_key": "group_7_road_traffy_static",
+      "group_label": "G7: กายภาพถนนและจุดเสี่ยงน้ำท่วม (Road & Traffy)",
+      "total_impact": 0.01091,
+      "share_pct": 4.76
     },
     {
-      "group_key": "group_7_incidents",
-      "group_label": "G7: อุบัติเหตุ (Traffic Incidents)",
-      "total_impact": 0.00023,
-      "share_pct": 0.1
+      "group_key": "group_3_temporal_cyclical",
+      "group_label": "G3: ช่วงเวลาเป้าหมาย (Temporal Cyclical)",
+      "total_impact": 0.0085,
+      "share_pct": 3.71
+    },
+    {
+      "group_key": "group_5_weather",
+      "group_label": "G5: ฝนสะสม Open-Meteo (Weather)",
+      "total_impact": 0.00362,
+      "share_pct": 1.58
     }
   ],
   "hypotheses_verification": [
     {
       "id": "H1",
-      "title": "อิทธิพลเวลาเร่งด่วนแยกตามทิศทาง (Directional Rush-Hour Asymmetry)",
+      "title": "LightGBM ชนะ Baseline ทั้งสองใน F1 และ Onset Recall (Benchmark Superiority)",
       "supported": true,
-      "evidence": "ค่าเฉลี่ย Ratio ช่วงเช้าขาเข้า (0.745) และเย็นขาออก (0.417) ต่ำกว่าช่วงปกติ (0.875) อย่างชัดเจน"
+      "metric_high_pct": 69.78,
+      "metric_low_pct": 60.08,
+      "evidence": "LightGBM ได้ Test F1 = 69.8% (ชนะ B0=62.0%, B1=60.1%) และ Onset Recall = 56.3% (B1=24.1%)"
     },
     {
       "id": "H2",
-      "title": "ผลกระทบเย็นวันศุกร์และช่วงเงินเดือนออก (Friday Evening & Payday Surge)",
-      "supported": false,
-      "evidence": "ค่าเฉลี่ย Ratio ช่วงศุกร์เย็น/สิ้นเดือน (0.794) ต่ำกว่าวันปกติ (0.791) สะท้อนปริมาณรถสะสม"
+      "title": "ฟีเจอร์ฝนช่วยยกระดับความแม่นยำในชั่วโมงฝนตก (Rainy-Hour Gain)",
+      "supported": true,
+      "metric_high_pct": 71.24,
+      "metric_low_pct": 65.55,
+      "evidence": "ช่วงฝนตก (>1 มม./ชม.) LightGBM ได้ Rainy F1 = 71.2% (ชนะ B0=65.5%, B1=61.1%)"
     },
     {
       "id": "H3",
-      "title": "การติดลามย้อนกลับจากถนนข้างหน้า (Downstream Spillback Effect)",
+      "title": "สภาพถนนข้างหน้าช่วยจับเหตุการณ์เริ่มติดใหม่ (Downstream Spillback & Onset)",
       "supported": true,
-      "evidence": "เมื่อถนนข้างหน้าติดขัด (<0.45) ค่า Ratio อีก 1 ชม. ตกลงเหลือ 0.262 เทียบกับ 0.868 เมื่อถนนข้างหน้าคล่องตัว"
+      "metric_high_pct": 45.95,
+      "metric_low_pct": 13.29,
+      "evidence": "ตัดกลุ่มถนนข้างเคียงทำ Onset Recall ลดลง 0.49% · เมื่อถนนข้างหน้าติด (>=50%) ถนนเส้นนี้ติด 46.0% (เทียบ 13.3%)"
     },
     {
       "id": "H4",
-      "title": "ปฏิสัมพันธ์ระหว่างฝนสะสมกับพื้นที่เปราะบางน้ำท่วม (Rain × Traffy Flood Interaction)",
+      "title": "เขตที่มีรายงานน้ำท่วม Traffy Fondue สูง รถติดหนักกว่าเมื่อฝนตก (Rain × Flood 95% CI)",
       "supported": true,
-      "evidence": "ถนนที่มีประวัติร้องเรียนน้ำท่วมสูงเมื่อเจอฝนสะสม 3 ชม. มีค่า Ratio ลดลงเหลือ 0.272 (เทียบกับ 0.890 ตอนฝนไม่ตก)"
+      "metric_high_pct": 25.5,
+      "metric_low_pct": 13.5,
+      "evidence": "เขตเสี่ยงน้ำท่วมเมื่อฝน >3mm รถติด 25.5% เทียบวันปกติ 13.5% (ผลต่าง +12.0%, 95% CI: [+11.5%, +12.5%])"
     },
     {
       "id": "H5",
-      "title": "ผลกระทบจากอุบัติเหตุบนสายทาง (Active Incident Disruption)",
-      "supported": false,
-      "evidence": "เมื่อมีอุบัติเหตุที่ยังไม่ปิดงาน ค่า Ratio เฉลี่ยลดลงเหลือ 0.820 เทียบกับ 0.791 ในสภาวะปกติ"
+      "title": "วันเงินเดือนออกและเย็นวันศุกร์ (16–20 น.) รถติดกว่าปกติ (Payday & Friday Surge)",
+      "supported": true,
+      "metric_high_pct": 34.42,
+      "metric_low_pct": 29.05,
+      "evidence": "ช่วง 16–20 น. ของศุกร์เย็น/วันเงินเดือนออก รถติดเฉลี่ย 34.4% สูงกว่าเย็นวันอื่น (29.0%) และช่วยเพิ่ม Onset Recall +2.51%"
     }
   ]
 }

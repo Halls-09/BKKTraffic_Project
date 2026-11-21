@@ -1,0 +1,471 @@
+{
+  "timestamp_utc": "2026-11-21T13:50:09.046592+00:00",
+  "test_rows_forecasted": 246451,
+  "total_onset_alerts_predicted": 12296,
+  "hourly_forecast_analysis": [
+    {
+      "hour": 0,
+      "hour_label": "00:00",
+      "actual_red_rate": 0.0455,
+      "pred_red_rate": 0.0458,
+      "mae_lgbm": 0.0555,
+      "mae_b0": 0.0669,
+      "actual_congested_pct": 1.92,
+      "onset_alerts": 3
+    },
+    {
+      "hour": 1,
+      "hour_label": "01:00",
+      "actual_red_rate": 0.041,
+      "pred_red_rate": 0.0406,
+      "mae_lgbm": 0.0522,
+      "mae_b0": 0.0583,
+      "actual_congested_pct": 1.8,
+      "onset_alerts": 0
+    },
+    {
+      "hour": 2,
+      "hour_label": "02:00",
+      "actual_red_rate": 0.0389,
+      "pred_red_rate": 0.036,
+      "mae_lgbm": 0.0499,
+      "mae_b0": 0.0559,
+      "actual_congested_pct": 1.72,
+      "onset_alerts": 6
+    },
+    {
+      "hour": 3,
+      "hour_label": "03:00",
+      "actual_red_rate": 0.033,
+      "pred_red_rate": 0.0334,
+      "mae_lgbm": 0.0457,
+      "mae_b0": 0.0519,
+      "actual_congested_pct": 1.35,
+      "onset_alerts": 1
+    },
+    {
+      "hour": 4,
+      "hour_label": "04:00",
+      "actual_red_rate": 0.031,
+      "pred_red_rate": 0.0323,
+      "mae_lgbm": 0.0422,
+      "mae_b0": 0.0459,
+      "actual_congested_pct": 1.1,
+      "onset_alerts": 7
+    },
+    {
+      "hour": 5,
+      "hour_label": "05:00",
+      "actual_red_rate": 0.0357,
+      "pred_red_rate": 0.0356,
+      "mae_lgbm": 0.0374,
+      "mae_b0": 0.0471,
+      "actual_congested_pct": 0.44,
+      "onset_alerts": 0
+    },
+    {
+      "hour": 6,
+      "hour_label": "06:00",
+      "actual_red_rate": 0.0973,
+      "pred_red_rate": 0.0884,
+      "mae_lgbm": 0.0601,
+      "mae_b0": 0.0892,
+      "actual_congested_pct": 3.54,
+      "onset_alerts": 530
+    },
+    {
+      "hour": 7,
+      "hour_label": "07:00",
+      "actual_red_rate": 0.2429,
+      "pred_red_rate": 0.2434,
+      "mae_lgbm": 0.1081,
+      "mae_b0": 0.1736,
+      "actual_congested_pct": 21.42,
+      "onset_alerts": 2369
+    },
+    {
+      "hour": 8,
+      "hour_label": "08:00",
+      "actual_red_rate": 0.2726,
+      "pred_red_rate": 0.2758,
+      "mae_lgbm": 0.1175,
+      "mae_b0": 0.1328,
+      "actual_congested_pct": 24.37,
+      "onset_alerts": 954
+    },
+    {
+      "hour": 9,
+      "hour_label": "09:00",
+      "actual_red_rate": 0.2361,
+      "pred_red_rate": 0.2433,
+      "mae_lgbm": 0.1067,
+      "mae_b0": 0.138,
+      "actual_congested_pct": 19.57,
+      "onset_alerts": 531
+    },
+    {
+      "hour": 10,
+      "hour_label": "10:00",
+      "actual_red_rate": 0.2174,
+      "pred_red_rate": 0.2251,
+      "mae_lgbm": 0.1059,
+      "mae_b0": 0.1264,
+      "actual_congested_pct": 17.97,
+      "onset_alerts": 645
+    },
+    {
+      "hour": 11,
+      "hour_label": "11:00",
+      "actual_red_rate": 0.2185,
+      "pred_red_rate": 0.2173,
+      "mae_lgbm": 0.1072,
+      "mae_b0": 0.1023,
+      "actual_congested_pct": 18.03,
+      "onset_alerts": 625
+    },
+    {
+      "hour": 12,
+      "hour_label": "12:00",
+      "actual_red_rate": 0.213,
+      "pred_red_rate": 0.2126,
+      "mae_lgbm": 0.11,
+      "mae_b0": 0.1346,
+      "actual_congested_pct": 17.9,
+      "onset_alerts": 516
+    },
+    {
+      "hour": 13,
+      "hour_label": "13:00",
+      "actual_red_rate": 0.2066,
+      "pred_red_rate": 0.2062,
+      "mae_lgbm": 0.109,
+      "mae_b0": 0.1227,
+      "actual_congested_pct": 17.46,
+      "onset_alerts": 376
+    },
+    {
+      "hour": 14,
+      "hour_label": "14:00",
+      "actual_red_rate": 0.2163,
+      "pred_red_rate": 0.2157,
+      "mae_lgbm": 0.1153,
+      "mae_b0": 0.0994,
+      "actual_congested_pct": 19.04,
+      "onset_alerts": 517
+    },
+    {
+      "hour": 15,
+      "hour_label": "15:00",
+      "actual_red_rate": 0.2567,
+      "pred_red_rate": 0.2497,
+      "mae_lgbm": 0.1275,
+      "mae_b0": 0.1555,
+      "actual_congested_pct": 21.95,
+      "onset_alerts": 667
+    },
+    {
+      "hour": 16,
+      "hour_label": "16:00",
+      "actual_red_rate": 0.298,
+      "pred_red_rate": 0.2946,
+      "mae_lgbm": 0.1265,
+      "mae_b0": 0.1432,
+      "actual_congested_pct": 26.53,
+      "onset_alerts": 824
+    },
+    {
+      "hour": 17,
+      "hour_label": "17:00",
+      "actual_red_rate": 0.3724,
+      "pred_red_rate": 0.3883,
+      "mae_lgbm": 0.1409,
+      "mae_b0": 0.1698,
+      "actual_congested_pct": 35.81,
+      "onset_alerts": 1691
+    },
+    {
+      "hour": 18,
+      "hour_label": "18:00",
+      "actual_red_rate": 0.3844,
+      "pred_red_rate": 0.3989,
+      "mae_lgbm": 0.1447,
+      "mae_b0": 0.1656,
+      "actual_congested_pct": 37.28,
+      "onset_alerts": 1229
+    },
+    {
+      "hour": 19,
+      "hour_label": "19:00",
+      "actual_red_rate": 0.2847,
+      "pred_red_rate": 0.3079,
+      "mae_lgbm": 0.1331,
+      "mae_b0": 0.1811,
+      "actual_congested_pct": 24.59,
+      "onset_alerts": 412
+    },
+    {
+      "hour": 20,
+      "hour_label": "20:00",
+      "actual_red_rate": 0.1751,
+      "pred_red_rate": 0.1924,
+      "mae_lgbm": 0.0979,
+      "mae_b0": 0.167,
+      "actual_congested_pct": 11.94,
+      "onset_alerts": 206
+    },
+    {
+      "hour": 21,
+      "hour_label": "21:00",
+      "actual_red_rate": 0.112,
+      "pred_red_rate": 0.1154,
+      "mae_lgbm": 0.0668,
+      "mae_b0": 0.1119,
+      "actual_congested_pct": 5.68,
+      "onset_alerts": 83
+    },
+    {
+      "hour": 22,
+      "hour_label": "22:00",
+      "actual_red_rate": 0.0857,
+      "pred_red_rate": 0.0869,
+      "mae_lgbm": 0.0705,
+      "mae_b0": 0.0898,
+      "actual_congested_pct": 4.39,
+      "onset_alerts": 69
+    },
+    {
+      "hour": 23,
+      "hour_label": "23:00",
+      "actual_red_rate": 0.0606,
+      "pred_red_rate": 0.0579,
+      "mae_lgbm": 0.065,
+      "mae_b0": 0.0844,
+      "actual_congested_pct": 2.84,
+      "onset_alerts": 35
+    }
+  ],
+  "top_15_congested_hotspots": [
+    {
+      "link_id": "24019_24018",
+      "district": "ราชเทวี",
+      "district_en": "Ratchathewi",
+      "road_name": "ถนนรัชดาภิเษก (แยกอโศก-เพชรบุรีตัดใหม่ 643 → ซีมิกทาวเวอร์)",
+      "mean_actual_red": 0.6243,
+      "mean_pred_red": 0.6085,
+      "congested_hours_pct": 66.8,
+      "mae": 0.1095
+    },
+    {
+      "link_id": "16511_16510",
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "road_name": "ถนนสุขุมวิท (แยกพระโขนง → แยกสุขุมวิท-พระราม 4 - 517)",
+      "mean_actual_red": 0.5927,
+      "mean_pred_red": 0.5952,
+      "congested_hours_pct": 65.2,
+      "mae": 0.1647
+    },
+    {
+      "link_id": "16504_16503",
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "road_name": "ถนนสุขุมวิท (แยกซอยอารีย์ → แยกสวัสดี)",
+      "mean_actual_red": 0.5642,
+      "mean_pred_red": 0.5787,
+      "congested_hours_pct": 59.2,
+      "mae": 0.1142
+    },
+    {
+      "link_id": "16508_16509",
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "road_name": "ถนนสุขุมวิท (แยกเอกมัย-สุขุมวิท → แยกชัยพฤกษ์)",
+      "mean_actual_red": 0.5637,
+      "mean_pred_red": 0.5851,
+      "congested_hours_pct": 62.9,
+      "mae": 0.1513
+    },
+    {
+      "link_id": "30505_30504",
+      "district": "ราชเทวี",
+      "district_en": "Ratchathewi",
+      "road_name": "ถนนราชดำริ (แยกประตูน้ำ 546 → แยกราชประสงค์ 546)",
+      "mean_actual_red": 0.5382,
+      "mean_pred_red": 0.5462,
+      "congested_hours_pct": 60.3,
+      "mae": 0.1386
+    },
+    {
+      "link_id": "24018_24017",
+      "district": "วัฒนา",
+      "district_en": "Vadhana",
+      "road_name": "ถนนรัชดาภิเษก (ซีมิกทาวเวอร์ → ซอยสุขุมวิท 21 ซอย 1)",
+      "mean_actual_red": 0.5322,
+      "mean_pred_red": 0.5144,
+      "congested_hours_pct": 57.9,
+      "mae": 0.1061
+    },
+    {
+      "link_id": "24017_24016",
+      "district": "วัฒนา",
+      "district_en": "Vadhana",
+      "road_name": "ถนนรัชดาภิเษก (ซอยสุขุมวิท 21 ซอย 1 → แยกอโศก-สุขุมวิท 643)",
+      "mean_actual_red": 0.5314,
+      "mean_pred_red": 0.5304,
+      "congested_hours_pct": 56.8,
+      "mae": 0.1442
+    },
+    {
+      "link_id": "46144_46143",
+      "district": "ราษฎร์บูรณะ",
+      "district_en": "Rat Burana",
+      "road_name": "ถนนสุขสวัสดิ์ (ถนนประชาอุทิศ → ทางพิเศษเฉลิมมหานคร)",
+      "mean_actual_red": 0.5014,
+      "mean_pred_red": 0.5033,
+      "congested_hours_pct": 52.5,
+      "mae": 0.1686
+    },
+    {
+      "link_id": "16514_16516",
+      "district": "บางนา",
+      "district_en": "Bang Na",
+      "road_name": "ถนนสุขุมวิท (แยกอุดมสุข 517 → แยกปุณณวิถี)",
+      "mean_actual_red": 0.4983,
+      "mean_pred_red": 0.4946,
+      "congested_hours_pct": 57.7,
+      "mae": 0.1063
+    },
+    {
+      "link_id": "30506_30505",
+      "district": "ราชเทวี",
+      "district_en": "Ratchathewi",
+      "road_name": "ถนนราชดำริ (แยกมักกะสัน 546 → แยกประตูน้ำ 546)",
+      "mean_actual_red": 0.4839,
+      "mean_pred_red": 0.4852,
+      "congested_hours_pct": 51.9,
+      "mae": 0.1333
+    },
+    {
+      "link_id": "16506_16505",
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "road_name": "ถนนสุขุมวิท (แยกทองหล่อ → แยกซอยกลาง)",
+      "mean_actual_red": 0.4772,
+      "mean_pred_red": 0.4683,
+      "congested_hours_pct": 49.9,
+      "mae": 0.1323
+    },
+    {
+      "link_id": "45909_53729",
+      "district": "ลาดพร้าว",
+      "district_en": "Lat Phrao",
+      "road_name": "ถนนเกษตร-นวมินทร์ (แยกทางพิเศษเอกมัย-รามอินทรา → ถนนประดิษฐ์มนูธรรม)",
+      "mean_actual_red": 0.4705,
+      "mean_pred_red": 0.4167,
+      "congested_hours_pct": 53.5,
+      "mae": 0.2157
+    },
+    {
+      "link_id": "16510_16509",
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "road_name": "ถนนสุขุมวิท (แยกสุขุมวิท-พระราม 4 - 517 → แยกชัยพฤกษ์)",
+      "mean_actual_red": 0.4689,
+      "mean_pred_red": 0.4631,
+      "congested_hours_pct": 46.5,
+      "mae": 0.1236
+    },
+    {
+      "link_id": "25010_25011",
+      "district": "บางรัก",
+      "district_en": "Bang Rak",
+      "road_name": "ถนนสาทร (ซอยสาทร 11 → แยกนรินทร)",
+      "mean_actual_red": 0.4458,
+      "mean_pred_red": 0.4076,
+      "congested_hours_pct": 46.4,
+      "mae": 0.158
+    },
+    {
+      "link_id": "45017_45018",
+      "district": "ห้วยขวาง",
+      "district_en": "Huai Khwang",
+      "road_name": "ถนนเพชรบุรี (แยกทองหล่อเหนือ → แยกเอกมัยเหนือ)",
+      "mean_actual_red": 0.4433,
+      "mean_pred_red": 0.4439,
+      "congested_hours_pct": 46.3,
+      "mae": 0.1359
+    }
+  ],
+  "top_10_evening_rush_districts": [
+    {
+      "district": "วัฒนา",
+      "district_en": "Vadhana",
+      "evening_actual_red": 0.66,
+      "evening_pred_red": 0.6627,
+      "mae": 0.1314
+    },
+    {
+      "district": "สาทร",
+      "district_en": "Sathon",
+      "evening_actual_red": 0.579,
+      "evening_pred_red": 0.6001,
+      "mae": 0.1599
+    },
+    {
+      "district": "บางรัก",
+      "district_en": "Bang Rak",
+      "evening_actual_red": 0.5297,
+      "evening_pred_red": 0.5785,
+      "mae": 0.1901
+    },
+    {
+      "district": "คลองเตย",
+      "district_en": "Khlong Toei",
+      "evening_actual_red": 0.5136,
+      "evening_pred_red": 0.5325,
+      "mae": 0.1549
+    },
+    {
+      "district": "ราชเทวี",
+      "district_en": "Ratchathewi",
+      "evening_actual_red": 0.5001,
+      "evening_pred_red": 0.5065,
+      "mae": 0.1503
+    },
+    {
+      "district": "บางนา",
+      "district_en": "Bang Na",
+      "evening_actual_red": 0.4394,
+      "evening_pred_red": 0.436,
+      "mae": 0.1193
+    },
+    {
+      "district": "พระโขนง",
+      "district_en": "Phra Khanong",
+      "evening_actual_red": 0.43,
+      "evening_pred_red": 0.4427,
+      "mae": 0.1529
+    },
+    {
+      "district": "บางเขน",
+      "district_en": "Bang Khen",
+      "evening_actual_red": 0.3809,
+      "evening_pred_red": 0.4064,
+      "mae": 0.1346
+    },
+    {
+      "district": "บางกะปิ",
+      "district_en": "Bang Kapi",
+      "evening_actual_red": 0.3804,
+      "evening_pred_red": 0.3689,
+      "mae": 0.1146
+    },
+    {
+      "district": "วังทองหลาง",
+      "district_en": "Wang Thong Lang",
+      "evening_actual_red": 0.3695,
+      "evening_pred_red": 0.3816,
+      "mae": 0.1477
+    }
+  ]
+}

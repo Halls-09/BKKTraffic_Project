@@ -1,236 +1,175 @@
 """
-Master CLI Entrypoint for Bangkok Traffic Congestion Forecasting & MLOps Platform.
-Responsibility: Sarit (67090500441) - ML Engineer
+Master MLOps CLI Entrypoint for Bangkok Traffic 1-Hour-Ahead Forecasting Platform.
+Role: ML Engineer (Pipeline Orchestration, Model Registry, Drift Monitoring, Dashboard & API)
 
-Usage Examples:
-  python run_pipeline.py run-all
-  python run_pipeline.py step registry
-  python run_pipeline.py step monitor
-  python run_pipeline.py status
-  python run_pipeline.py dashboard
-  python run_pipeline.py test
+Usage:
+  python run_pipeline.py run-all             # Run full end-to-end MLOps DAG + build dashboard
+  python run_pipeline.py step <name>         # Run single stage: prepare|train|explain|forecast|registry|monitor|charts|dashboard
+  python run_pipeline.py status              # Show Champion Model, Promotion Gates, PSI Drift & Lineage
+  python run_pipeline.py rollback v1.0.0     # Roll back Champion model to a specific registered version
+  python run_pipeline.py dashboard           # Build & launch FastAPI + Interactive 4-Tab Dashboard (port 8050)
+  python run_pipeline.py test                # Run automated MLOps, Temporal Leakage & API tests
 """
 from __future__ import annotations
 
 import json
 import sys
-from typing import Optional
 
 import typer
 from rich.panel import Panel
 from rich.table import Table
 
-from src.ml_engineering.app_dashboard import generate_standalone_dashboard_html, serve_dashboard
+from src.ml_engineering.api_server import serve_dashboard
+from src.ml_engineering.app_dashboard import generate_standalone_dashboard_html
+from src.ml_engineering.data_contract_adapter import ingest_external_teammate_dataset
 from src.ml_engineering.pipeline_runner import PipelineOrchestrator
-from src.utils.logger import console, log_error, log_info, log_step, log_success
+from src.ml_engineering.registry import ModelRegistry
+from src.utils.logger import console, log_error, log_step, log_success
 from src.utils.storage import ROOT_DIR, load_config
 
 app = typer.Typer(
-    name="bkk-pipeline",
-    help="Bangkok 1-Hour-Ahead Traffic Congestion Forecasting & MLOps CLI (CSS 342)",
+    name="bkk-mlops",
+    help="Bangkok 1-Hour-Ahead Traffic Forecasting & MLOps Control Plane (CSS 342)",
     add_completion=False,
 )
 
 
 @app.command("run-all")
 def cmd_run_all(
-    skip_synthetic_if_exists: bool = typer.Option(
-        False, "--skip-synthetic", help="Skip synthetic data generation if Bronze files already exist."
-    ),
+    force_prepare: bool = typer.Option(False, "--force-prepare", help="Rebuild real iTIC dataset from zips"),
 ) -> None:
-    """Run the complete 8-stage Medallion + MLOps DAG and build the interactive dashboard."""
+    """Execute the full MLOps DAG: train -> explain -> forecast -> registry -> monitor -> charts -> dashboard."""
     orchestrator = PipelineOrchestrator()
-    orchestrator.run_full_pipeline(skip_synthetic_if_exists=skip_synthetic_if_exists)
-    generate_standalone_dashboard_html()
+    result = orchestrator.run_full_pipeline(force_prepare=force_prepare)
+    if result["status"] != "SUCCESS":
+        raise typer.Exit(code=1)
 
 
 @app.command("step")
 def cmd_step(
     step_name: str = typer.Argument(
         ...,
-        help="Step name: synthetic | ingest | features | train | ablation | explain | registry | monitor",
+        help="Stage: prepare | contract | train | ablation | explain | forecast | online-ml | registry | monitor | charts | dashboard | model-card",
     ),
 ) -> None:
-    """Execute a single DAG step."""
+    """Run a single pipeline stage."""
     orchestrator = PipelineOrchestrator()
     orchestrator.run_step(step_name)
 
 
+@app.command("ingest-external")
+def cmd_ingest_external(
+    external_path: str = typer.Argument(..., help="Path to new Data Engineer feature table (.parquet, .csv, or .pkl)"),
+    run_dag: bool = typer.Option(True, "--run-dag/--no-run-dag", help="Automatically run MLOps pipeline after passing Data Contract 4.2"),
+) -> None:
+    """Validate and ingest a new dataset from Data Engineer teammate via Data Contract 4.2 Adapter."""
+    ingest_external_teammate_dataset(external_path)
+    if run_dag:
+        orchestrator = PipelineOrchestrator()
+        orchestrator.run_full_pipeline(force_prepare=False)
+
+
 @app.command("status")
 def cmd_status() -> None:
-    """Display MLOps Control Plane status: Champion Model, Promotion Gates, Drift Health, and Lineage."""
+    """Inspect MLOps Control Plane: Active Champion, Promotion Gates, PSI Drift & Latest Lineage."""
     cfg = load_config()
     champ_path = ROOT_DIR / cfg["paths"]["registry_dir"] / "champion_metadata.json"
     drift_path = ROOT_DIR / cfg["paths"]["monitoring_dir"] / "drift_monitoring_report.json"
-    manifest_path = ROOT_DIR / cfg["paths"]["manifest_path"]
 
     if not champ_path.exists():
-        log_error("ยังไม่มีโมเดลในระบบ กรุณารัน `python run_pipeline.py run-all` ก่อน")
+        log_error("ยังไม่มี Champion Model ใน Registry กรุณารัน `python run_pipeline.py run-all` ก่อน")
         raise typer.Exit(code=1)
 
-    with open(champ_path, "r", encoding="utf-8") as f:
-        champ = json.load(f)
-
+    champ = json.loads(champ_path.read_text(encoding="utf-8"))
     m_test = champ["metrics"]["test"]
     b0_test = champ["metrics"]["baseline_b0_test"]
 
     console.print(
         Panel.fit(
-            f"[bold green]🏆 ACTIVE CHAMPION MODEL: {champ['version']}[/bold green]\n"
-            f"[white]Backend:[/white] {champ['model_backend']} | "
-            f"[white]Optimal Threshold:[/white] {champ['optimal_threshold']} | "
-            f"[white]Features:[/white] {champ['num_features']}\n"
-            f"[white]Model SHA256:[/white] [cyan]{champ['model_sha256'][:24]}...[/cyan]\n"
-            f"[white]Test F1 (All):[/white] [bold yellow]{m_test['f1_all']:.4f}[/bold yellow] (vs B0: {b0_test['f1_all']:.4f}) | "
-            f"[white]Onset Recall:[/white] [bold magenta]{m_test['onset_recall']:.4f}[/bold magenta] (vs B0: {b0_test['onset_recall']:.4f}) | "
-            f"[white]MAE:[/white] {m_test['mae_ratio']:.4f}",
-            title="MLOps Model Registry Status",
+            f"[bold green]ACTIVE CHAMPION: {champ['version']}[/bold green] ({champ['stage']})\n"
+            f"Backend: {champ['model_backend']} | Threshold: {champ['optimal_threshold']} | Features: {champ['num_features']}\n"
+            f"Winning Window: {champ.get('winning_window_strategy')}\n"
+            f"Model SHA-256: [cyan]{champ['model_sha256'][:24]}...[/cyan]\n"
+            f"Test F1: [bold yellow]{m_test['f1_all']:.4f}[/bold yellow] (vs B0: {b0_test['f1_all']:.4f}) | "
+            f"Onset Recall: [bold magenta]{m_test['onset_recall']:.4f}[/bold magenta] | "
+            f"MAE: {m_test['mae']:.4f}",
+            title="Model Registry Status",
             border_style="green",
         )
     )
 
     if drift_path.exists():
-        with open(drift_path, "r", encoding="utf-8") as f:
-            drift = json.load(f)
-        dt_table = Table(title=f"📉 Data Drift Monitoring (Overall: {drift['overall_system_health']})")
-        dt_table.add_column("Feature", style="cyan")
-        dt_table.add_column("Train Mean", justify="right")
-        dt_table.add_column("Test Mean", justify="right")
-        dt_table.add_column("PSI (Current)", justify="right", style="bold")
-        dt_table.add_column("Status", justify="center")
-
-        for item in drift.get("current_window_psi", []):
-            st = item["status"]
-            badge = f"[green]{st}[/green]" if st == "STABLE" else f"[red]{st}[/red]"
-            dt_table.add_row(
-                item["feature"],
-                f"{item['ref_mean']:.4f}",
-                f"{item['cur_mean']:.4f}",
-                f"{item['psi']:.4f}",
-                badge,
+        drift = json.loads(drift_path.read_text(encoding="utf-8"))
+        table = Table(title=f"Drift Monitoring (Overall Health: {drift['overall_system_health']})")
+        table.add_column("Feature", style="cyan")
+        table.add_column("Train Mean", justify="right")
+        table.add_column("Test Mean", justify="right")
+        table.add_column("PSI", justify="right", style="bold")
+        table.add_column("Status", justify="center")
+        for r in drift["current_window_psi"] + [drift["prediction_drift"]]:
+            color = "green" if r["status"] == "STABLE" else ("yellow" if r["status"] == "WARNING" else "red")
+            table.add_row(
+                r["feature"],
+                f"{r['ref_mean']:.4f}",
+                f"{r['cur_mean']:.4f}",
+                f"{r['psi']:.4f}",
+                f"[{color}]{r['status']}[/{color}]",
             )
-        console.print(dt_table)
+        console.print(table)
 
-    if manifest_path.exists():
-        with open(manifest_path, "r", encoding="utf-8") as f:
-            manifest = json.load(f)
-        log_info(f"Data Checksum Manifest: ติดตามไฟล์ข้อมูลทั้งหมด {len(manifest.get('files', {}))} ตาราง (SHA-256 Verified)")
+
+@app.command("rollback")
+def cmd_rollback(
+    target_version: str = typer.Argument(..., help="Registered version ID, e.g. v1.0.0"),
+    reason: str = typer.Option("Manual CLI rollback", "--reason", help="Audit log reason"),
+) -> None:
+    """Roll back Active Champion to a previously registered model version (SHA-256 verified)."""
+    reg = ModelRegistry()
+    reg.rollback_to_version(target_version, reason=reason)
 
 
 @app.command("dashboard")
 def cmd_dashboard(
-    host: str = typer.Option("127.0.0.1", "--host", help="Host address"),
-    port: int = typer.Option(8050, "--port", help="Port number"),
-    build_only: bool = typer.Option(
-        False, "--build-only", help="Only build artifacts/dashboard_index.html without starting HTTP server"
-    ),
+    host: str = typer.Option("127.0.0.1", "--host"),
+    port: int = typer.Option(8050, "--port"),
+    build_only: bool = typer.Option(False, "--build-only", help="Generate HTML without starting HTTP server"),
 ) -> None:
-    """Build and launch the interactive 4-View Bangkok Traffic & MLOps Dashboard + FastAPI Server."""
-    html_file = generate_standalone_dashboard_html()
+    """Build and serve the Interactive 4-Tab Traffic & MLOps Dashboard + FastAPI API."""
+    html_path = generate_standalone_dashboard_html()
     if build_only:
-        log_success(f"สร้างไฟล์ Dashboard เรียบร้อยที่: {html_file}")
+        log_success(f"สร้างไฟล์ Dashboard สำเร็จที่ {html_path}")
         return
     serve_dashboard(host=host, port=port)
 
 
-@app.command("env-check")
-def cmd_env_check() -> None:
-    """Inspect `.env` API keys status (masked safely) and list available FastAPI endpoints."""
-    from src.utils.env_config import get_api_keys_status
-
-    status = get_api_keys_status()
-    table = Table(title=f"🔑 .env API Keys & Endpoints Status ({status['env_file_path']})")
-    table.add_column("Env Variable", style="cyan", no_wrap=True)
-    table.add_column("Provider / Service", style="white")
-    table.add_column("Mode", justify="center")
-    table.add_column("Masked Key", justify="center", style="yellow")
-    table.add_column("Endpoint / Fallback", style="dim")
-
-    for k in status["keys"]:
-        mode_badge = (
-            f"[bold green]{k['mode']}[/bold green]"
-            if k["is_configured"]
-            else f"[cyan]{k['mode']}[/cyan]"
-        )
-        table.add_row(
-            k["key_name"],
-            k["provider"],
-            mode_badge,
-            k["masked_preview"],
-            f"{k['endpoint_url']} (Fallback: {k['fallback_mode']})",
-        )
-    console.print(table)
-
-
 @app.command("test")
 def cmd_test() -> None:
-    """Run all unit tests (Data Contract 4.2, Zero Temporal Leakage, MLOps Registry, PSI Drift & API Endpoints)."""
-    log_step("UNIT_TESTS", "รันชุดทดสอบความถูกต้องของระบบ (Data Contract, Temporal Leakage, MLOps, API & .env)...")
-    from tests.test_data_contract import test_quality_gate_quarantines_outliers
-    from tests.test_mlops_registry import (
-        test_env_and_api_endpoints,
-        test_model_registry_champion_gates,
-        test_psi_drift_mathematics,
+    """Run all automated MLOps, Zero-Leakage, PSI Drift, Registry & FastAPI tests."""
+    log_step("UNIT_TESTS", "รันชุดทดสอบ MLOps (Zero Temporal Leakage, PSI Drift, Registry Gates, Rollback, FastAPI)...")
+    from tests.test_mlops import (
+        test_fastapi_endpoints,
+        test_proposal_acceptance_gates_and_monitoring,
+        test_psi_drift_math,
+        test_registry_gates_and_rollback,
+        test_zero_temporal_leakage_real_data,
     )
-    from tests.test_temporal_leakage import test_zero_temporal_leakage_boundaries
 
-    tests = [
-        ("test_quality_gate_quarantines_outliers (Data Contract 4.2)", test_quality_gate_quarantines_outliers),
-        ("test_zero_temporal_leakage_boundaries (Strict As-Of Cutoff t)", test_zero_temporal_leakage_boundaries),
-        ("test_psi_drift_mathematics (PSI Drift Formula)", test_psi_drift_mathematics),
-        ("test_model_registry_champion_gates (Model Registry & Guardrails)", test_model_registry_champion_gates),
-        ("test_env_and_api_endpoints (.env Masking & FastAPI /api/v1/*)", test_env_and_api_endpoints),
+    suite = [
+        ("Zero Temporal Leakage & Data Contract 4.2 (Real iTIC Split Boundaries)", test_zero_temporal_leakage_real_data),
+        ("PSI Drift Mathematical Accuracy", test_psi_drift_math),
+        ("Model Registry Promotion Gates & Audited Rollback", test_registry_gates_and_rollback),
+        ("FastAPI Serving & MLOps Control Plane Endpoints", test_fastapi_endpoints),
+        ("Proposal Acceptance Gates (3-Fold Robustness, Daytime 06-23h, H1-H5, Layer-1 SLA)", test_proposal_acceptance_gates_and_monitoring),
     ]
-
-    passed = 0
-    for name, fn in tests:
+    for name, fn in suite:
         try:
             fn()
             log_success(f"PASSED: {name}")
-            passed += 1
         except Exception as exc:
             log_error(f"FAILED: {name} -> {exc}")
             sys.exit(1)
-
-    log_success(f"ผ่านการทดสอบทั้งหมด {passed}/{len(tests)} ชุดทดสอบ (100% Pass)")
-
-
-@app.command("de-phase")
-def cmd_de_phase(
-    stage: str = typer.Option("all", "--stage", help="DE-Phase stage: check | calendar | weather | all"),
-) -> None:
-    """Run DE-Phase modules from `origin/DE-Phase` (`src/common.py`, `src/ingest/calendar.py`, `src/ingest/weather.py`)."""
-    from src.common import CFG, ROOT, new_run_id, path, set_seed, verify_manifest
-    from src.ingest.calendar import ingest_calendar
-    from src.ingest.weather import download_weather, stage_weather
-
-    set_seed()
-    run_id = new_run_id()
-    log_step("DE_PHASE", f"รันโมดูลจาก branch DE-Phase (run_id={run_id}, stage={stage})...")
-
-    if stage in ("all", "calendar"):
-        df_cal = ingest_calendar(run_id=run_id)
-        log_success(f"[DE-Phase] สร้างตารางปฏิทิน 2022 สำเร็จ: {len(df_cal)} วัน -> data/processed/calendar_daily.parquet")
-
-    if stage in ("all", "weather"):
-        download_weather()
-        df_wx = stage_weather(run_id=run_id)
-        log_success(f"[DE-Phase] สร้างตารางสภาพอากาศ 3 จุด (central/north/east) สำเร็จ: {len(df_wx)} แถว -> data/processed/weather_hourly.parquet")
-
-    if stage in ("all", "check"):
-        for key in ("raw", "quarantine", "staging", "processed", "features", "audit", "quality"):
-            p = path(key)
-            p.mkdir(parents=True, exist_ok=True)
-        problems = verify_manifest()
-        if problems:
-            for prob in problems:
-                log_error(f"Manifest check note: {prob}")
-        else:
-            log_success("[DE-Phase] ตรวจสอบ logs/manifest.jsonl (SHA-256 Raw Snapshot): OK 100%")
+    log_success(f"ผ่านครบทุกชุดทดสอบ {len(suite)}/{len(suite)} (100% Pass)")
 
 
 if __name__ == "__main__":
-    # Support DE-Phase legacy flag `python run_pipeline.py --stage check` directly
-    if len(sys.argv) >= 2 and sys.argv[1] == "--stage":
-        sys.argv.insert(1, "de-phase")
     app()

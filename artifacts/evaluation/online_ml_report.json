@@ -1,0 +1,106 @@
+{
+  "timestamp_utc": "2026-11-21T13:50:32.932007+00:00",
+  "architecture": "Airflow Micro-Batch + LightGBM Warm-Start Incremental Boosting (init_model)",
+  "online_schedule": "Predict every 15m -> Join actual at t+60m -> Incremental Warm-Start update on 90k sliding window",
+  "mean_update_latency_ms": 2084.9,
+  "initial_trees": 756,
+  "final_trees_after_stream": 828,
+  "static_batch_metrics": {
+    "f1_all": 0.6978,
+    "f1_daytime_06_23": 0.7056,
+    "precision_all": 0.6024,
+    "recall_all": 0.829,
+    "onset_recall": 0.563,
+    "f1_rush_hour": 0.7365,
+    "f1_rainy": 0.7124,
+    "mae": 0.0902,
+    "mae_daytime_06_23": 0.1054,
+    "rmse": 0.1482,
+    "threshold_used": 0.345,
+    "onset_support": 9034
+  },
+  "online_incremental_metrics": {
+    "f1_all": 0.6971,
+    "f1_daytime_06_23": 0.7049,
+    "precision_all": 0.5993,
+    "recall_all": 0.833,
+    "onset_recall": 0.5698,
+    "f1_rush_hour": 0.7354,
+    "f1_rainy": 0.7124,
+    "mae": 0.0904,
+    "mae_daytime_06_23": 0.1055,
+    "rmse": 0.1473,
+    "threshold_used": 0.345,
+    "onset_support": 9034
+  },
+  "f1_delta_online_vs_static": -0.0007,
+  "mae_delta_online_vs_static": 0.0002,
+  "stream_windows": [
+    {
+      "window_id": "W1 (09-07..09-10)",
+      "rows": 42967,
+      "static_f1": 0.7096,
+      "online_f1": 0.7096,
+      "static_mae": 0.1013,
+      "online_mae": 0.1013,
+      "online_onset_recall": 0.5248,
+      "update_latency_ms": 1944.3,
+      "num_trees_total": 768
+    },
+    {
+      "window_id": "W2 (09-11..09-14)",
+      "rows": 41572,
+      "static_f1": 0.6952,
+      "online_f1": 0.6948,
+      "static_mae": 0.092,
+      "online_mae": 0.0922,
+      "online_onset_recall": 0.5332,
+      "update_latency_ms": 1901.2,
+      "num_trees_total": 780
+    },
+    {
+      "window_id": "W3 (09-15..09-18)",
+      "rows": 38011,
+      "static_f1": 0.6856,
+      "online_f1": 0.6828,
+      "static_mae": 0.076,
+      "online_mae": 0.0767,
+      "online_onset_recall": 0.574,
+      "update_latency_ms": 2290.1,
+      "num_trees_total": 792
+    },
+    {
+      "window_id": "W4 (09-19..09-22)",
+      "rows": 37994,
+      "static_f1": 0.7093,
+      "online_f1": 0.7058,
+      "static_mae": 0.0905,
+      "online_mae": 0.0909,
+      "online_onset_recall": 0.6115,
+      "update_latency_ms": 2259.2,
+      "num_trees_total": 804
+    },
+    {
+      "window_id": "W5 (09-23..09-26)",
+      "rows": 42913,
+      "static_f1": 0.6749,
+      "online_f1": 0.6759,
+      "static_mae": 0.0867,
+      "online_mae": 0.087,
+      "online_onset_recall": 0.5381,
+      "update_latency_ms": 2037.5,
+      "num_trees_total": 816
+    },
+    {
+      "window_id": "W6 (09-27..09-30)",
+      "rows": 42994,
+      "static_f1": 0.7029,
+      "online_f1": 0.7035,
+      "static_mae": 0.0931,
+      "online_mae": 0.093,
+      "online_onset_recall": 0.64,
+      "update_latency_ms": 2076.9,
+      "num_trees_total": 828
+    }
+  ]
+}

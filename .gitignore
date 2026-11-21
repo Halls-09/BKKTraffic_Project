@@ -5,7 +5,8 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
-# Data lakehouse large tables (keep checksums_manifest.json)
+# Raw & processed datasets (Proposal Governance: never commit raw data or large binaries)
+data/*.zip
 data/01_bronze/*
 data/02_quarantine/*
 data/03_silver/*
@@ -13,9 +14,15 @@ data/04_gold/*
 !data/**/.gitkeep
 !data/checksums_manifest.json
 
-# Model binaries (keep JSON metadata & reports for git tracking)
+# Generated model binaries, large CSV exports & local HTML with embedded .env API keys
+artifacts/models/*.joblib
+artifacts/models/*.pkl
 artifacts/registry/models/*.joblib
 artifacts/registry/models/*.pkl
+artifacts/dashboard_index.html
+artifacts/evaluation/dashboard_snapshot.json
+artifacts/evaluation/latest_24h_forecasts.csv
+artifacts/_test_script.js
 
 # Virtual environments & Secret Environment Files
 .venv/
