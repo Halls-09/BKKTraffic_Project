@@ -6,7 +6,7 @@ CSS 342 Data Science and Data Engineering 2569
 |---|---|
 | ธนากร การดี | Data Engineer — ingestion, data contract, quality gate, feature table |
 | อภิเชษฐ์ ไชยสัจ | Data Scientist — EDA, hypothesis, baseline, LightGBM, SHAP |
-| สฤษดิ์ ศรีดิษ | ML Engineer — orchestration, registry, monitoring, dashboard |
+| สฤษดิ์ ศรีดิษฐ์ | ML Engineer — orchestration, registry, monitoring, dashboard |
 
 ## Setup
 
