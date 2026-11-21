@@ -296,471 +296,426 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>BKK-TRAFFIC // SPACEX MISSION CONTROL &amp; ML REPORT</title>
+<title>Bangkok Traffic — 1-Hour Forecast &amp; Model Report</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 <style>
   :root {
-    --void: #000000;
-    --surface: #070A10;
-    --elevated: #0E1420;
-    --ink: #F8FAFC;
-    --muted: #8A96A8;
-    --accent: #38BDF8;
-    --line: rgba(255, 255, 255, 0.11);
-    --line-strong: rgba(255, 255, 255, 0.24);
+    --bg: #000000;
+    --surface: #0C0C0D;
+    --surface-2: #141416;
+    --ink: #FFFFFF;
+    --text: #E4E4E7;
+    --muted: #A1A1AA;
+    --line: #27272A;
+    --line-strong: #3F3F46;
     --ok: #22C55E;
     --warn: #F59E0B;
     --danger: #EF4444;
-    --onset: #C084FC;
+    --onset: #A855F7;
   }
+
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
-    background: var(--void);
-    color: var(--ink);
-    font-family: 'IBM Plex Sans Thai', -apple-system, sans-serif;
-    font-size: 13px;
-    line-height: 1.55;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans Thai', 'Inter', -apple-system, sans-serif;
+    font-size: 15.5px;
+    line-height: 1.65;
     -webkit-font-smoothing: antialiased;
   }
-  .display { font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif; letter-spacing: 0.04em; }
   .mono { font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
+  h1, h2, h3, h4 { color: var(--ink); font-weight: 600; margin: 0; }
 
-  /* Subtle SpaceX blueprint grid texture on report pages */
-  .telemetry-bg {
-    background-color: var(--void);
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 40px 40px;
-  }
-
-  @keyframes pulseBeacon {
-    0%, 100% { opacity: 1; box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.55); }
-    50% { opacity: 0.7; box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .brand-mark { animation: none !important; }
-  }
-
-  /* ── TOP MISSION BAR ───────────────────────────────────────────────── */
+  /* ── TOP BAR (Authentic SpaceX Monochrome Navbar) ─────────────────── */
   header {
-    position: sticky; top: 0; z-index: 1000; height: 58px;
-    background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--line-strong);
-    padding: 0 20px;
-    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    position: sticky; top: 0; z-index: 1000; height: 68px;
+    background: rgba(0, 0, 0, 0.94); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+    padding: 0 28px;
+    display: flex; align-items: center; justify-content: space-between; gap: 20px;
   }
-  .brand { display: flex; align-items: center; gap: 12px; }
-  .brand-mark {
-    width: 8px; height: 8px; border-radius: 50%; background: var(--ok);
-    animation: pulseBeacon 2.4s infinite; flex-shrink: 0;
-  }
+  .brand { display: flex; align-items: center; gap: 14px; }
   .brand-title {
-    font-weight: 700; font-size: 14px; letter-spacing: 0.16em;
-    text-transform: uppercase; color: var(--ink);
+    font-family: 'Inter', sans-serif; font-weight: 700; font-size: 16px;
+    letter-spacing: 0.22em; text-transform: uppercase; color: var(--ink);
   }
-  .brand-sub {
-    font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--muted); border-left: 1px solid var(--line-strong); padding-left: 12px;
-    display: none;
+  .brand-status {
+    width: 8px; height: 8px; border-radius: 50%; background: var(--ok); flex-shrink: 0;
   }
-  @media (min-width: 1080px) { .brand-sub { display: inline; } }
 
-  .nav-seg {
-    display: inline-flex; border: 1px solid var(--line-strong);
-    background: var(--surface); border-radius: 2px;
-  }
+  .nav-links { display: flex; align-items: center; gap: 28px; height: 100%; }
   .nav-btn {
-    border: none; border-right: 1px solid var(--line); background: transparent;
-    color: var(--muted); font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif;
-    font-size: 11.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
-    padding: 7px 15px; cursor: pointer; transition: all 0.15s ease; white-space: nowrap;
+    border: none; background: transparent; color: var(--muted);
+    font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+    font-size: 14.5px; font-weight: 500; letter-spacing: 0.04em;
+    height: 100%; padding: 0 4px; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
   }
-  .nav-btn:last-child { border-right: none; }
-  .nav-btn:hover { color: var(--ink); background: rgba(255,255,255,0.04); }
-  .nav-btn.active { background: var(--ink); color: var(--void); font-weight: 700; }
+  .nav-btn:hover { color: var(--ink); }
+  .nav-btn.active { color: var(--ink); font-weight: 600; border-bottom-color: var(--ink); }
 
-  .header-right { display: flex; align-items: center; gap: 8px; }
-  .chip-btn, .scen-sel {
-    display: inline-flex; align-items: center; gap: 6px;
-    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
-    padding: 6px 11px; border-radius: 2px; font-family: 'JetBrains Mono', 'IBM Plex Sans Thai', monospace;
-    font-size: 11.5px; font-weight: 500; cursor: pointer; transition: border-color 0.15s;
+  .header-right { display: flex; align-items: center; gap: 10px; }
+  .ctrl-btn, .scen-sel {
+    border: 1px solid var(--line-strong); background: var(--bg); color: var(--ink);
+    padding: 8px 14px; font-family: 'Noto Sans Thai', 'Inter', sans-serif;
+    font-size: 13.5px; font-weight: 500; cursor: pointer; transition: border-color 0.15s, background 0.15s;
   }
-  .chip-btn:hover, .scen-sel:hover { border-color: var(--accent); color: #fff; }
-  .scen-sel option { background: #0A0E15; color: var(--ink); }
+  .ctrl-btn:hover, .scen-sel:hover { border-color: var(--ink); }
+  .scen-sel option { background: #111113; color: var(--ink); }
 
   /* Popovers */
   .popover {
-    display: none; position: fixed; top: 66px; right: 20px; z-index: 1200;
-    width: 360px; max-width: calc(100vw - 32px);
-    background: var(--surface); border: 1px solid var(--line-strong); border-radius: 2px;
-    padding: 16px; box-shadow: 0 18px 48px rgba(0,0,0,0.85);
+    display: none; position: fixed; top: 76px; right: 28px; z-index: 1200;
+    width: 380px; max-width: calc(100vw - 32px);
+    background: var(--surface); border: 1px solid var(--line-strong);
+    padding: 22px; box-shadow: 0 24px 64px rgba(0,0,0,0.85);
   }
   .popover.open { display: block; }
   .popover h3 {
-    margin: 0 0 12px; font-size: 12px; font-weight: 700; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--ink);
+    font-size: 15px; margin-bottom: 14px; padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
     display: flex; justify-content: space-between; align-items: center;
-    border-bottom: 1px solid var(--line); padding-bottom: 8px;
   }
-  .popover-close { border: none; background: none; cursor: pointer; color: var(--muted); font-size: 18px; }
-  .wx-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+  .popover-close { border: none; background: none; cursor: pointer; color: var(--muted); font-size: 22px; line-height: 1; }
+  .wx-row { display: flex; justify-content: space-between; padding: 9px 0; border-bottom: 1px solid var(--line); font-size: 14px; }
   .wx-row:last-child { border-bottom: none; }
-  .field { margin-bottom: 10px; }
-  .field label { display: block; font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 4px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 13px; color: var(--muted); margin-bottom: 6px; }
   .field input {
-    width: 100%; padding: 8px 10px; background: var(--void); color: var(--ink);
-    border: 1px solid var(--line-strong); border-radius: 2px; font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    width: 100%; padding: 10px 12px; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line-strong); font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
   }
+
+  .btn-outline {
+    border: 1px solid var(--ink); background: transparent; color: var(--ink);
+    font-family: 'Noto Sans Thai', 'Inter', sans-serif; font-size: 13.5px; font-weight: 600;
+    letter-spacing: 0.05em; text-transform: uppercase; padding: 9px 18px; cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .btn-outline:hover { background: var(--ink); color: var(--bg); }
+  .btn-subtle {
+    border: 1px solid var(--line-strong); background: transparent; color: var(--text);
+    font-family: inherit; font-size: 13.5px; font-weight: 500; padding: 8px 14px; cursor: pointer;
+  }
+  .btn-subtle:hover { border-color: var(--ink); color: var(--ink); }
 
   .view { display: none; }
   .view.active { display: block; }
 
-  /* ── VIEW 1: MISSION TELEMETRY MAP ─────────────────────────────────── */
+  /* ── VIEW 1: FULL-SCREEN MAP WORKSPACE ────────────────────────────── */
   .map-layout {
     display: grid;
-    grid-template-columns: 1fr 395px;
-    height: calc(100vh - 58px);
-    min-height: 620px;
+    grid-template-columns: 1fr 430px;
+    height: calc(100vh - 68px);
+    min-height: 640px;
   }
-  @media (max-width: 1020px) {
+  @media (max-width: 1080px) {
     .map-layout { grid-template-columns: 1fr; height: auto; }
-    .map-stage { height: 540px; }
+    .map-stage { height: 560px; }
   }
-  .map-stage { position: relative; background: #0B0F17; border-right: 1px solid var(--line-strong); }
+  .map-stage { position: relative; background: #111113; border-right: 1px solid var(--line); }
   #mapViewport { width: 100%; height: 100%; }
 
   .float-top {
-    position: absolute; top: 14px; left: 50%; transform: translateX(-50%); z-index: 500;
-    display: inline-flex; background: rgba(0, 0, 0, 0.88); backdrop-filter: blur(10px);
-    border: 1px solid var(--line-strong); border-radius: 2px; padding: 3px;
-    box-shadow: 0 8px 28px rgba(0,0,0,0.6);
+    position: absolute; top: 18px; left: 50%; transform: translateX(-50%); z-index: 500;
+    display: inline-flex; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong); padding: 4px;
   }
   .seg-pill {
     border: none; background: transparent; color: var(--muted);
-    font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif; font-size: 11.5px; font-weight: 600;
-    letter-spacing: 0.04em; padding: 6px 13px; border-radius: 1px; cursor: pointer; white-space: nowrap;
+    font-family: inherit; font-size: 13.5px; font-weight: 500;
+    padding: 8px 16px; cursor: pointer; white-space: nowrap;
   }
-  .seg-pill.active { background: var(--ink); color: var(--void); font-weight: 700; }
+  .seg-pill.active { background: var(--ink); color: var(--bg); font-weight: 600; }
 
   .float-bottom {
-    position: absolute; bottom: 14px; left: 14px; right: 14px; z-index: 500;
-    display: flex; justify-content: space-between; align-items: flex-end; gap: 10px; flex-wrap: wrap;
+    position: absolute; bottom: 18px; left: 18px; right: 18px; z-index: 500;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; flex-wrap: wrap;
     pointer-events: none;
   }
   .float-bar {
-    pointer-events: auto; display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap;
-    background: rgba(5, 8, 13, 0.92); backdrop-filter: blur(10px);
-    border: 1px solid var(--line-strong); border-radius: 2px; padding: 7px 12px;
-    font-size: 11.5px; color: var(--ink); box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+    pointer-events: auto; display: inline-flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    background: rgba(0, 0, 0, 0.92); backdrop-filter: blur(8px);
+    border: 1px solid var(--line-strong); padding: 9px 15px;
+    font-size: 13.5px; color: var(--text);
   }
-  .float-bar label { display: inline-flex; align-items: center; gap: 5px; cursor: pointer; color: var(--ink); font-weight: 500; }
-  .float-bar input[type="checkbox"] { accent-color: var(--accent); }
-  .dot-leg { display: inline-flex; align-items: center; gap: 5px; color: var(--muted); font-size: 11px; }
-  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .float-bar label { display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+  .float-bar input[type="checkbox"] { width: 15px; height: 15px; accent-color: var(--ink); }
+  .dot-leg { display: inline-flex; align-items: center; gap: 6px; color: var(--text); font-size: 13px; }
+  .dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; }
   .mode-sel {
-    border: 1px solid var(--accent); background: rgba(56, 189, 248, 0.12); color: var(--accent);
-    border-radius: 2px; padding: 3px 9px; font-size: 11px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; font-family: 'Space Grotesk', sans-serif;
+    border: 1px solid var(--ink); background: transparent; color: var(--ink);
+    padding: 4px 10px; font-size: 12.5px; font-weight: 600; letter-spacing: 0.05em;
+    text-transform: uppercase; cursor: pointer; font-family: 'Inter', sans-serif;
   }
+  .mode-sel:hover { background: var(--ink); color: var(--bg); }
 
-  /* Right Telemetry Rail */
+  /* Right Panel */
   .side-rail { background: var(--surface); display: flex; flex-direction: column; height: 100%; overflow: hidden; }
-  .rail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line-strong); background: var(--void); }
-  .rm-cell { padding: 12px 13px; border-right: 1px solid var(--line); }
+  .rail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); background: var(--bg); }
+  .rm-cell { padding: 16px 16px; border-right: 1px solid var(--line); }
   .rm-cell:last-child { border-right: none; }
-  .rm-lbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.07em; color: var(--muted); }
-  .rm-val { font-size: 18px; font-weight: 700; margin-top: 3px; }
+  .rm-lbl { font-size: 12px; color: var(--muted); }
+  .rm-val { font-size: 22px; font-weight: 700; margin-top: 4px; color: var(--ink); }
 
-  .rail-search { padding: 10px 14px 0; }
+  .rail-search { padding: 14px 16px 0; }
   .rail-search input {
-    width: 100%; padding: 7px 10px; background: var(--void); color: var(--ink);
-    border: 1px solid var(--line-strong); border-radius: 2px; font-family: inherit; font-size: 12px;
+    width: 100%; padding: 10px 12px; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line-strong); font-family: inherit; font-size: 14px;
   }
-  .rail-search input:focus { outline: none; border-color: var(--accent); }
-  .rail-filters { padding: 8px 14px 10px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .rail-search input:focus { outline: none; border-color: var(--ink); }
+  .rail-filters { padding: 10px 16px 14px; border-bottom: 1px solid var(--line); display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .rail-filters select {
-    width: 100%; padding: 6px 8px; background: var(--void); color: var(--ink);
-    border: 1px solid var(--line-strong); border-radius: 2px; font-family: inherit; font-size: 11.5px;
+    width: 100%; padding: 9px 10px; background: var(--bg); color: var(--ink);
+    border: 1px solid var(--line-strong); font-family: inherit; font-size: 13.5px;
   }
 
   .rail-head {
-    padding: 8px 14px; font-size: 10.5px; font-weight: 600; letter-spacing: 0.08em;
-    text-transform: uppercase; color: var(--muted); background: rgba(255,255,255,0.02);
+    padding: 10px 16px; font-size: 12.5px; font-weight: 600; color: var(--muted);
     border-bottom: 1px solid var(--line);
     display: flex; justify-content: space-between; align-items: center;
   }
-  .road-list { flex: 1; overflow-y: auto; padding: 0 14px; }
+  .road-list { flex: 1; overflow-y: auto; padding: 0 16px; }
   .road-item {
-    display: flex; justify-content: space-between; align-items: center; gap: 10px;
-    padding: 9px 0; border-bottom: 1px solid var(--line); cursor: pointer; transition: background 0.12s;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    padding: 12px 0; border-bottom: 1px solid var(--line); cursor: pointer;
   }
-  .road-item:hover { background: rgba(56, 189, 248, 0.06); margin: 0 -14px; padding: 9px 14px; }
-  .road-name { font-weight: 600; font-size: 12px; color: var(--ink); line-height: 1.35; }
-  .road-sub { font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .road-item:hover { background: var(--surface-2); margin: 0 -16px; padding: 12px 16px; }
+  .road-name { font-weight: 600; font-size: 14px; color: var(--ink); line-height: 1.4; }
+  .road-sub { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
   .road-stat { text-align: right; flex-shrink: 0; }
-  .road-pct { font-size: 12px; font-weight: 600; }
+  .road-pct { font-size: 14px; font-weight: 600; color: var(--ink); }
 
-  /* Telemetry Status Tags */
-  .tag {
-    display: inline-block; font-family: 'JetBrains Mono', monospace;
-    font-size: 9.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    padding: 2px 6px; border-radius: 2px; border: 1px solid transparent;
+  /* Restrained Status Badges */
+  .badge {
+    display: inline-block; font-family: 'Inter', 'Noto Sans Thai', sans-serif;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 2px 8px; border: 1px solid var(--line-strong); color: var(--text);
   }
-  .t-danger { background: rgba(239, 68, 68, 0.15); color: #FCA5A5; border-color: rgba(239, 68, 68, 0.45); }
-  .t-onset { background: rgba(192, 132, 252, 0.16); color: #E9D5FF; border-color: rgba(192, 132, 252, 0.5); }
-  .t-warn { background: rgba(245, 158, 11, 0.15); color: #FCD34D; border-color: rgba(245, 158, 11, 0.45); }
-  .t-ok { background: rgba(34, 197, 94, 0.15); color: #86EFAC; border-color: rgba(34, 197, 94, 0.45); }
-  .t-info { background: rgba(56, 189, 248, 0.15); color: #7DD3FC; border-color: rgba(56, 189, 248, 0.45); }
+  .b-ok { border-color: rgba(34,197,94,0.55); color: #86EFAC; }
+  .b-warn { border-color: rgba(245,158,11,0.55); color: #FCD34D; }
+  .b-danger { border-color: rgba(239,68,68,0.55); color: #FCA5A5; }
+  .b-onset { border-color: rgba(168,85,247,0.6); color: #D8B4FE; }
 
-  .whatif-box { border-top: 1px solid var(--line-strong); padding: 10px 14px; background: var(--void); }
+  .whatif-box { border-top: 1px solid var(--line); padding: 14px 16px; background: var(--bg); }
   .whatif-toggle {
     width: 100%; border: none; background: none; padding: 2px 0; cursor: pointer;
     display: flex; justify-content: space-between; align-items: center;
-    font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif;
-    font-size: 11.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent);
+    font-family: inherit; font-size: 14px; font-weight: 600; color: var(--ink);
   }
-  .whatif-body { display: none; margin-top: 10px; }
+  .whatif-body { display: none; margin-top: 12px; }
   .whatif-body.open { display: block; }
   .whatif-body select {
-    width: 100%; padding: 6px 8px; background: var(--surface); color: var(--ink);
-    border: 1px solid var(--line-strong); border-radius: 2px; font-family: inherit; font-size: 11.5px; margin-bottom: 8px;
+    width: 100%; padding: 9px 10px; background: var(--surface); color: var(--ink);
+    border: 1px solid var(--line-strong); font-family: inherit; font-size: 13.5px; margin-bottom: 10px;
   }
-  .slider-row { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
-  .whatif-body input[type="range"] { width: 100%; accent-color: var(--accent); }
-  .btn-primary {
-    border: 1px solid var(--ink); background: var(--ink); color: var(--void);
-    font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif; font-size: 11.5px; font-weight: 700;
-    letter-spacing: 0.06em; text-transform: uppercase; padding: 7px 12px; border-radius: 2px; cursor: pointer;
-  }
-  .btn-primary:hover { background: var(--accent); border-color: var(--accent); }
-  .btn-ghost {
-    border: 1px solid var(--line-strong); background: transparent; color: var(--ink);
-    font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 0.05em; text-transform: uppercase; padding: 6px 10px; border-radius: 2px; cursor: pointer;
-  }
-  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+  .slider-row { display: flex; justify-content: space-between; font-size: 13.5px; color: var(--muted); margin-top: 6px; }
+  .whatif-body input[type="range"] { width: 100%; accent-color: var(--ink); }
 
-  /* ── VIEWS 2 & 3: EXECUTIVE FLIGHT / ML REPORT ─────────────────────── */
-  .container { max-width: 1280px; margin: 0 auto; padding: 28px 24px 60px; }
+  /* ── VIEWS 2 & 3: EDITORIAL TECHNICAL REPORT (Real SpaceX Layout) ─── */
+  .container { max-width: 1260px; margin: 0 auto; padding: 40px 28px 80px; }
 
-  .report-banner {
-    position: relative;
-    background: var(--surface);
-    border: 1px solid var(--line-strong);
-    padding: 22px 26px;
-    margin-bottom: 20px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 18px; flex-wrap: wrap;
+  .report-header {
+    padding-bottom: 28px; border-bottom: 1px solid var(--line-strong); margin-bottom: 32px;
+    display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap;
   }
-  .report-banner::before {
-    content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 2px;
-    background: linear-gradient(90deg, var(--accent), rgba(255,255,255,0.2) 55%, transparent);
+  .report-kicker {
+    font-family: 'Inter', sans-serif; font-size: 12.5px; font-weight: 600;
+    letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px;
   }
-  .eyebrow {
-    font-family: 'JetBrains Mono', monospace; font-size: 10.5px; font-weight: 600;
-    letter-spacing: 0.16em; text-transform: uppercase; color: var(--accent); margin-bottom: 6px;
+  .report-header h1 {
+    font-size: 32px; line-height: 1.25; font-weight: 700; letter-spacing: -0.01em; max-width: 820px;
   }
-  .report-banner h2 { margin: 0; font-size: 22px; font-weight: 700; letter-spacing: 0.02em; color: var(--ink); }
-  .report-banner p { margin: 6px 0 0; font-size: 12.5px; color: var(--muted); max-width: 780px; }
-  .banner-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
-  .meta-pill {
-    font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--muted);
-    border: 1px solid var(--line); padding: 4px 10px; background: var(--void);
-  }
+  .report-header p { margin: 12px 0 0; font-size: 15.5px; color: var(--muted); max-width: 780px; }
+  .report-actions { display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+  .meta-line { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--muted); }
 
-  .stat-strip {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    background: var(--surface); border: 1px solid var(--line-strong); margin-bottom: 22px;
+  /* Hero KPI Strip */
+  .kpi-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    margin-bottom: 44px;
   }
-  .stat-cell {
-    position: relative; padding: 16px 18px; border-right: 1px solid var(--line);
-  }
-  .stat-cell:last-child { border-right: none; }
-  .stat-lbl { font-family: 'Space Grotesk', sans-serif; font-size: 10.5px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); }
-  .stat-val { font-size: 25px; font-weight: 700; margin-top: 5px; letter-spacing: -0.02em; color: var(--ink); }
-  .stat-sub { font-size: 11.5px; color: var(--muted); margin-top: 4px; }
+  .kpi-cell { padding: 24px 22px; border-right: 1px solid var(--line); }
+  .kpi-cell:last-child { border-right: none; }
+  .kpi-lbl { font-size: 13px; font-weight: 500; color: var(--muted); }
+  .kpi-val { font-size: 34px; font-weight: 700; color: var(--ink); margin-top: 8px; line-height: 1.1; }
+  .kpi-sub { font-size: 13px; color: var(--muted); margin-top: 8px; }
 
-  .section-bar {
-    display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-    border-bottom: 1px solid var(--line-strong); padding-bottom: 8px; margin: 30px 0 14px;
+  /* Section Headings */
+  .sec-head {
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 12px;
+    margin: 52px 0 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line);
   }
-  .section-title {
-    font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif;
-    font-size: 12.5px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase; color: var(--ink);
-  }
-  .section-code { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); }
+  .sec-head h2 { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; }
+  .sec-sub { font-size: 13.5px; color: var(--muted); }
 
-  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(490px, 1fr)); gap: 16px; margin-bottom: 16px; }
-  @media (max-width: 600px) { .grid-2 { grid-template-columns: 1fr; } }
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(520px, 1fr)); gap: 24px; margin-bottom: 24px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
 
-  .pane {
-    background: var(--surface); border: 1px solid var(--line); padding: 18px 20px;
+  .panel {
+    background: var(--surface); border: 1px solid var(--line); padding: 24px 26px;
+    margin-bottom: 24px;
   }
-  .pane h3 {
-    margin: 0 0 14px; font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif;
-    font-size: 13px; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase;
-    color: var(--ink); display: flex; justify-content: space-between; align-items: center; gap: 8px;
-    border-bottom: 1px solid var(--line); padding-bottom: 9px;
+  .grid-2 .panel { margin-bottom: 0; }
+  .panel-title {
+    font-size: 16.5px; font-weight: 600; color: var(--ink); margin-bottom: 16px;
+    display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap;
   }
-  .pane h3 span { font-family: 'JetBrains Mono', monospace; font-size: 11px; font-weight: 400; color: var(--muted); text-transform: none; }
+  .panel-title span { font-size: 13px; font-weight: 400; color: var(--muted); }
 
-  table { width: 100%; border-collapse: collapse; font-size: 12px; }
-  th, td { padding: 8px 8px; text-align: left; border-bottom: 1px solid var(--line); }
+  /* Clean Large Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  th, td { padding: 12px 12px; text-align: left; border-bottom: 1px solid var(--line); }
   th {
-    font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--muted);
-    font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; background: rgba(255,255,255,0.02);
+    font-size: 12.5px; font-weight: 600; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 0.04em;
   }
   tr:last-child td { border-bottom: none; }
-  tr.win-row td { background: rgba(56, 189, 248, 0.07); font-weight: 600; }
+  tr.win-row td { background: var(--surface-2); color: var(--ink); font-weight: 600; }
   .num { text-align: right; font-family: 'JetBrains Mono', monospace; font-variant-numeric: tabular-nums; }
 
-  .chart-wrap { position: relative; height: 270px; }
-  .chart-wrap-tall { position: relative; height: 310px; }
+  .chart-wrap { position: relative; height: 320px; }
+  .chart-wrap-tall { position: relative; height: 360px; }
 
-  /* Defense Q&A Callout Note */
-  .note-box {
-    margin-top: 12px; padding: 11px 14px;
-    background: var(--elevated); border-left: 3px solid var(--accent);
-    border-top: 1px solid var(--line); border-right: 1px solid var(--line); border-bottom: 1px solid var(--line);
-    font-size: 12px; color: #CBD5E1; line-height: 1.6;
+  /* Clean Editorial Notes (Natural, Readable, Non-AI) */
+  .explain-note {
+    margin-top: 18px; padding: 16px 20px;
+    background: var(--surface-2); border-left: 3px solid var(--ink);
+    font-size: 14.5px; color: var(--text); line-height: 1.7;
   }
-  .note-box strong { color: var(--ink); }
-  .note-box ul { margin: 5px 0 0; padding-left: 18px; }
-  .note-box li { margin-bottom: 3px; }
+  .explain-note strong { color: var(--ink); }
+  .explain-note ul { margin: 8px 0 0; padding-left: 20px; }
+  .explain-note li { margin-bottom: 6px; }
 
-  /* Data Sources, Split Bar, DAG, Hypotheses */
-  .source-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(310px, 1fr)); gap: 10px; margin-bottom: 14px; }
+  /* Sources & Split */
+  .source-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 14px; margin-bottom: 20px; }
   .src-item {
-    background: var(--surface); border: 1px solid var(--line); padding: 12px 14px;
-    display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;
+    background: var(--surface); border: 1px solid var(--line); padding: 16px 18px;
+    display: flex; justify-content: space-between; align-items: flex-start; gap: 12px;
   }
-  .src-name { font-weight: 700; font-size: 12.5px; color: var(--ink); }
-  .src-desc { font-size: 11.5px; color: var(--muted); margin-top: 3px; }
+  .src-name { font-weight: 600; font-size: 15px; color: var(--ink); }
+  .src-desc { font-size: 13.5px; color: var(--muted); margin-top: 4px; }
 
-  .split-bar-wrap { background: var(--surface); border: 1px solid var(--line); padding: 14px 18px; margin-bottom: 16px; }
-  .split-track { display: flex; height: 9px; overflow: hidden; background: var(--elevated); margin: 10px 0; }
-  .split-seg-tr { background: #E2E8F0; }
-  .split-seg-va { background: var(--accent); }
-  .split-seg-te { background: var(--ok); }
-  .split-legend { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 12px; font-size: 11.5px; color: var(--muted); }
+  .split-track { display: flex; height: 10px; background: var(--surface-2); margin: 14px 0; }
+  .split-seg-tr { background: #FFFFFF; }
+  .split-seg-va { background: #71717A; }
+  .split-seg-te { background: #22C55E; }
+  .split-legend { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; font-size: 14px; color: var(--muted); }
 
-  .dag-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(115px, 1fr)); gap: 8px; margin-bottom: 16px; }
-  .dag-node { background: var(--surface); border: 1px solid var(--line); padding: 10px 11px; }
-  .dag-step-num { font-size: 10px; color: var(--accent); font-family: 'JetBrains Mono', monospace; letter-spacing: 0.08em; }
-  .dag-step-name { font-size: 12px; font-weight: 600; margin: 3px 0 6px; color: var(--ink); }
-  .dag-step-meta { font-size: 10.5px; display: flex; justify-content: space-between; align-items: center; }
+  .dag-flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 24px; }
+  .dag-node { background: var(--surface); border: 1px solid var(--line); padding: 14px 14px; }
+  .dag-step-num { font-size: 12px; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+  .dag-step-name { font-size: 14.5px; font-weight: 600; margin: 4px 0 8px; color: var(--ink); }
+  .dag-step-meta { font-size: 12.5px; display: flex; justify-content: space-between; align-items: center; }
 
-  .hyp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin-top: 14px; }
-  .hyp-pill { border: 1px solid var(--line); padding: 11px 13px; background: var(--elevated); font-size: 11.5px; }
+  .hyp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 14px; margin-top: 20px; }
+  .hyp-card { border: 1px solid var(--line); padding: 16px 18px; background: var(--bg); }
+  .hyp-card-title { font-weight: 600; font-size: 14.5px; color: var(--ink); margin: 6px 0 6px; }
+  .hyp-card-desc { font-size: 13.5px; color: var(--muted); line-height: 1.6; }
 
-  /* Feature Catalog Grid */
-  details.catalog-box {
-    background: var(--surface); border: 1px solid var(--line); margin-bottom: 16px;
-  }
+  details.catalog-box { background: var(--surface); border: 1px solid var(--line); margin-bottom: 24px; }
   details.catalog-box summary {
-    padding: 13px 18px; cursor: pointer; font-family: 'Space Grotesk', 'IBM Plex Sans Thai', sans-serif;
-    font-size: 12.5px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
-    color: var(--accent); list-style: none; display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 22px; cursor: pointer; font-size: 15px; font-weight: 600; color: var(--ink);
+    list-style: none; display: flex; justify-content: space-between; align-items: center;
   }
   details.catalog-box[open] summary { border-bottom: 1px solid var(--line); }
-  .catalog-inner { padding: 12px 18px 16px; max-height: 440px; overflow-y: auto; }
+  .catalog-inner { padding: 8px 22px 18px; max-height: 480px; overflow-y: auto; }
 
   footer {
-    border-top: 1px solid var(--line); padding: 14px 24px;
-    font-family: 'JetBrains Mono', 'IBM Plex Sans Thai', monospace; font-size: 11px; color: var(--muted);
-    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px; background: var(--void);
+    border-top: 1px solid var(--line); padding: 20px 28px;
+    font-size: 13px; color: var(--muted);
+    display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; background: var(--bg);
   }
 
-  /* Print-friendly technical report mode */
   @media print {
     header, .no-print { display: none !important; }
-    body, .telemetry-bg, .pane, .report-banner, .stat-strip { background: #fff !important; color: #000 !important; border-color: #ccc !important; }
-    .muted, .stat-lbl, .stat-sub, .note-box { color: #333 !important; }
+    body, .panel, .src-item, .hyp-card { background: #fff !important; color: #000 !important; border-color: #ccc !important; }
+    .muted, .kpi-lbl, .kpi-sub, .explain-note { color: #222 !important; }
   }
 </style>
 </head>
-<body class="telemetry-bg">
+<body>
 
 <header>
   <div class="brand">
-    <span class="brand-mark" id="healthDot"></span>
-    <span class="brand-title display">BKK-TRAFFIC // MISSION CONTROL</span>
-    <span class="brand-sub mono">T+60M FORECAST &middot; 448 LINKS &middot; 21 CORE FEATURES</span>
+    <span class="brand-status" id="healthDot"></span>
+    <span class="brand-title">BKK TRAFFIC</span>
   </div>
 
-  <div class="nav-seg" role="tablist">
-    <button class="nav-btn active" id="nav-map" onclick="showView('map')">01 Telemetry Map</button>
-    <button class="nav-btn" id="nav-mlops" onclick="showView('mlops')">02 Model Report</button>
-    <button class="nav-btn" id="nav-monitor" onclick="showView('monitor')">03 3-Layer Monitoring</button>
-  </div>
+  <nav class="nav-links" role="tablist">
+    <button class="nav-btn active" id="nav-map" onclick="showView('map')">แผนที่พยากรณ์</button>
+    <button class="nav-btn" id="nav-mlops" onclick="showView('mlops')">รายงานผลโมเดล</button>
+    <button class="nav-btn" id="nav-monitor" onclick="showView('monitor')">ระบบเฝ้าระวัง 3 ชั้น</button>
+  </nav>
 
   <div class="header-right">
-    <select class="scen-sel" id="scenarioSel" onchange="switchScenario(this.value)" title="เลือกช่วงเวลาจำลองจากชุดข้อมูล Test 2022">
-      <option value="evening_rush">SCENARIO: EVENING RUSH (18:00)</option>
-      <option value="heavy_rain">SCENARIO: MONSOON PEAK (RAIN)</option>
-      <option value="morning_rush">SCENARIO: MORNING RUSH (08:00)</option>
+    <select class="scen-sel" id="scenarioSel" onchange="switchScenario(this.value)" title="เลือกช่วงเวลาในชุด Test 2022">
+      <option value="evening_rush">ช่วงเร่งด่วนเย็น (18:00)</option>
+      <option value="heavy_rain">ช่วงฝนตกหนักมรสุม</option>
+      <option value="morning_rush">ช่วงเร่งด่วนเช้า (08:00)</option>
     </select>
-    <button class="chip-btn" id="wxChip" onclick="togglePopover('wxPop')">WX --°C</button>
-    <button class="chip-btn" onclick="togglePopover('keyPop')">MAP API</button>
+    <button class="ctrl-btn mono" id="wxChip" onclick="togglePopover('wxPop')">--°C</button>
+    <button class="ctrl-btn" onclick="togglePopover('keyPop')">ตั้งค่าแผนที่</button>
   </div>
 </header>
 
-<!-- Weather Telemetry Popover -->
+<!-- Weather Popover -->
 <div class="popover" id="wxPop">
-  <h3>Weather Telemetry (Open-Meteo 2022) <button class="popover-close" onclick="togglePopover('wxPop')">&times;</button></h3>
+  <h3>สภาพอากาศรอบพยากรณ์ (Open-Meteo 2022) <button class="popover-close" onclick="togglePopover('wxPop')">&times;</button></h3>
   <div id="wxPopBody"></div>
 </div>
 
-<!-- Map Engine Config Popover -->
+<!-- Map API Key Popover -->
 <div class="popover" id="keyPop">
-  <h3>Map Engine Configuration <button class="popover-close" onclick="togglePopover('keyPop')">&times;</button></h3>
-  <p style="margin:0 0 10px;font-size:11.5px;color:var(--muted);">ค่าเริ่มต้นใช้ <b style="color:var(--ink)">Longdo Map SDK</b> (วาดเส้นถนน 448 ช่วงพร้อม Traffic / เหตุการณ์ / CCTV) หรือสลับเป็น Google Maps SDK:</p>
+  <h3>ตั้งค่าแผนที่ (Map Engine) <button class="popover-close" onclick="togglePopover('keyPop')">&times;</button></h3>
+  <p style="margin:0 0 14px;font-size:13.5px;color:var(--muted);">ค่าเริ่มต้นใช้ Longdo Map SDK (แสดง 448 ช่วงถนนพร้อม Traffic / เหตุการณ์ / CCTV) หรือสลับเป็น Google Maps SDK</p>
   <div class="field">
     <label>Longdo Map API Key</label>
-    <input type="password" id="longdoKeyIn" placeholder="Longdo API Key..." />
+    <input type="password" id="longdoKeyIn" placeholder="ใส่ Longdo API Key..." />
   </div>
   <div class="field">
     <label>Google Maps JS API Key</label>
     <input type="password" id="googleKeyIn" placeholder="AIza..." />
   </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;">
-    <span id="keySaveMsg" class="mono" style="font-size:11px;color:var(--ok);"></span>
-    <button class="btn-primary" onclick="saveMapKeys()">Save Keys</button>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:16px;">
+    <span id="keySaveMsg" class="mono" style="font-size:13px;color:var(--ok);"></span>
+    <button class="btn-outline" onclick="saveMapKeys()">บันทึกคีย์</button>
   </div>
 </div>
 
 <!-- ════════════════════════════════════════════════════════════════════ -->
-<!-- VIEW 1: 01 TELEMETRY MAP                                            -->
+<!-- VIEW 1: MAP                                                         -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section id="view-map" class="view active">
   <div class="map-layout">
     <div class="map-stage">
       <div class="float-top">
-        <button id="btnViewForecast" class="seg-pill active" onclick="setTimeView('forecast')">T+60M FORECAST (ML)</button>
-        <button id="btnViewActual" class="seg-pill" onclick="setTimeView('actual')">T+60M ACTUAL</button>
-        <button id="btnViewNow" class="seg-pill" onclick="setTimeView('now')">T+00M CURRENT</button>
+        <button id="btnViewForecast" class="seg-pill active" onclick="setTimeView('forecast')">พยากรณ์ +1 ชม. (ML)</button>
+        <button id="btnViewActual" class="seg-pill" onclick="setTimeView('actual')">ค่าจริง +1 ชม. (Actual)</button>
+        <button id="btnViewNow" class="seg-pill" onclick="setTimeView('now')">สภาพปัจจุบัน (t0)</button>
       </div>
 
       <div id="mapViewport"></div>
 
       <div class="float-bottom">
         <div class="float-bar">
-          <button class="mode-sel" id="providerSwitchBtn" onclick="toggleMapProvider()">LONGDO MAP</button>
+          <button class="mode-sel" id="providerSwitchBtn" onclick="toggleMapProvider()">Longdo Map</button>
           <label><input type="checkbox" id="chkLines" checked onchange="refreshMap()" /> เส้นถนน ML</label>
           <label><input type="checkbox" id="chkForecast" checked onchange="refreshMap()" /> หมุด 448 จุด</label>
-          <label><input type="checkbox" id="chkTraffic" checked onchange="toggleLayers()" /> Traffic</label>
+          <label><input type="checkbox" id="chkTraffic" checked onchange="toggleLayers()" /> จราจรสด</label>
           <label id="lblEvents"><input type="checkbox" id="chkEvents" checked onchange="toggleLayers()" /> เหตุการณ์</label>
-          <label id="lblCameras"><input type="checkbox" id="chkCameras" onchange="toggleLayers()" /> CCTV</label>
+          <label id="lblCameras"><input type="checkbox" id="chkCameras" onchange="toggleLayers()" /> กล้อง CCTV</label>
         </div>
         <div class="float-bar">
-          <span class="dot-leg"><span class="dot" style="background:var(--ok)"></span>NOMINAL</span>
-          <span class="dot-leg"><span class="dot" style="background:var(--warn)"></span>MODERATE</span>
-          <span class="dot-leg"><span class="dot" style="background:var(--danger)"></span>CONGESTED</span>
-          <span class="dot-leg"><span class="dot" style="background:var(--onset)"></span>ONSET ALERT</span>
+          <span class="dot-leg"><span class="dot" style="background:var(--ok)"></span>คล่องตัว</span>
+          <span class="dot-leg"><span class="dot" style="background:var(--warn)"></span>ชะลอตัว</span>
+          <span class="dot-leg"><span class="dot" style="background:var(--danger)"></span>ติดขัด</span>
+          <span class="dot-leg"><span class="dot" style="background:var(--onset)"></span>เริ่มติดใหม่</span>
         </div>
       </div>
     </div>
@@ -769,22 +724,22 @@ HTML_TEMPLATE = """<!DOCTYPE html>
       <div class="rail-metrics" id="railMetrics"></div>
 
       <div class="rail-search">
-        <input type="search" id="roadSearchIn" placeholder="ค้นหาชื่อถนน/แยก เช่น พหลโยธิน, สุขุมวิท, สาทร..." oninput="refreshMap()" />
+        <input type="search" id="roadSearchIn" placeholder="ค้นหาชื่อถนนหรือแยก เช่น พหลโยธิน, สุขุมวิท, สาทร..." oninput="refreshMap()" />
       </div>
       <div class="rail-filters">
-        <select id="distSel" onchange="refreshMap()"><option value="ALL">ทุกเขต กทม. (50 เขต)</option></select>
+        <select id="distSel" onchange="refreshMap()"><option value="ALL">ทุกเขต กทม.</option></select>
         <select id="riskSel" onchange="refreshMap()">
           <option value="ALL">ทุกระดับความเสี่ยง</option>
-          <option value="ONSET">เริ่มติดใหม่ (ONSET)</option>
+          <option value="ONSET">เริ่มติดใหม่ (Onset)</option>
           <option value="RAINY">พื้นที่ฝนตก (&gt;0.5mm)</option>
-          <option value="SEVERE">ติดหนัก (SEVERE)</option>
-          <option value="HIGH">รถติด (HIGH)</option>
-          <option value="LOW">คล่องตัว (LOW)</option>
+          <option value="SEVERE">ติดหนัก (Severe)</option>
+          <option value="HIGH">รถติด (High)</option>
+          <option value="LOW">คล่องตัว (Low)</option>
         </select>
       </div>
 
       <div class="rail-head">
-        <span>ROAD SEGMENTS (ORIGIN &rarr; DEST)</span>
+        <span>รายการช่วงถนน (ต้นทาง &rarr; ปลายทาง)</span>
         <span class="mono" id="railCount">--</span>
       </div>
 
@@ -792,20 +747,20 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 
       <div class="whatif-box">
         <button class="whatif-toggle" onclick="toggleWhatIf()">
-          <span>WHAT-IF TELEMETRY SIMULATOR (API)</span>
+          <span>จำลองสถานการณ์ (What-If API)</span>
           <span id="whatifArrow" class="mono">+</span>
         </button>
         <div class="whatif-body" id="whatifBody">
           <select id="simLink"></select>
           <div class="slider-row"><span>ฝนสะสม 3 ชม.</span><span class="mono"><b id="rainLbl">0</b> mm</span></div>
           <input type="range" id="simRain" min="0" max="60" step="5" value="0" oninput="document.getElementById('rainLbl').textContent=this.value" />
-          <div class="slider-row"><span>ถนนข้างหน้าติดขัด (Downstream)</span><span class="mono"><b id="downLbl">30</b>%</span></div>
+          <div class="slider-row"><span>ถนนข้างหน้าติดขัด</span><span class="mono"><b id="downLbl">30</b>%</span></div>
           <input type="range" id="simDown" min="0" max="100" step="10" value="30" oninput="document.getElementById('downLbl').textContent=this.value" />
-          <div style="display:flex;gap:6px;margin-top:8px;">
-            <button class="btn-ghost" onclick="syncScenarioRain()" style="flex:1;">Sync Rain</button>
-            <button class="btn-primary" onclick="runPredict()" style="flex:1;">Run T+60M</button>
+          <div style="display:flex;gap:8px;margin-top:12px;">
+            <button class="btn-subtle" onclick="syncScenarioRain()" style="flex:1;">ใช้ฝนรอบนี้</button>
+            <button class="btn-outline" onclick="runPredict()" style="flex:1;">พยากรณ์ +1 ชม.</button>
           </div>
-          <div id="simOut" class="mono" style="margin-top:8px;font-size:12px;font-weight:700;"></div>
+          <div id="simOut" class="mono" style="margin-top:10px;font-size:13.5px;font-weight:600;"></div>
         </div>
       </div>
     </aside>
@@ -813,296 +768,298 @@ HTML_TEMPLATE = """<!DOCTYPE html>
 </section>
 
 <!-- ════════════════════════════════════════════════════════════════════ -->
-<!-- VIEW 2: 02 MODEL EVALUATION & MLOPS EXECUTIVE REPORT                -->
+<!-- VIEW 2: MODEL EVALUATION REPORT                                     -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section id="view-mlops" class="view">
   <div class="container">
-    <div class="report-banner">
+    <div class="report-header">
       <div>
-        <div class="eyebrow">TECHNICAL EVALUATION &amp; FLIGHT READINESS REPORT // CSS 342 KMUTT</div>
-        <h2 class="display">BANGKOK 1-HOUR TRAFFIC CONGESTION FORECASTING MODEL REPORT</h2>
-        <p>รายงานผลการประเมินโมเดล LightGBM Regressor (21 Core Features) บนข้อมูลจริง กทม. (iTIC + Open-Meteo + Traffy Fondue + BOT Calendar) เปรียบเทียบ Baseline B0/B1, กราฟวิเคราะห์ความคลาดเคลื่อน 24 ชม., TreeSHAP, B3 Ablation, Online Incremental ML และ Apache Airflow DAGs</p>
+        <div class="report-kicker">CSS 342 DATA SCIENCE &amp; DATA ENGINEERING · KMUTT</div>
+        <h1>รายงานผลโมเดลพยากรณ์รถติดล่วงหน้า 1 ชั่วโมง</h1>
+        <p>สรุปผลการประเมิน LightGBM Regressor (21 Core Features) บนข้อมูลจราจรจริงในกรุงเทพมหานคร 122 วัน เทียบ Baseline, กราฟวิเคราะห์ความคลาดเคลื่อนรายชั่วโมง, TreeSHAP, B3 Ablation, Online ML และ Apache Airflow</p>
       </div>
-      <div class="banner-meta">
-        <div class="meta-pill" id="reportBannerMeta">CHAMPION --</div>
-        <button class="btn-ghost no-print" onclick="window.print()">Print / Export PDF Report</button>
+      <div class="report-actions">
+        <div class="meta-line" id="reportBannerMeta">Champion --</div>
+        <button class="btn-outline no-print" onclick="window.print()">พิมพ์ / บันทึกรายงาน PDF</button>
       </div>
     </div>
 
-    <div class="stat-strip" id="regStrip"></div>
+    <div class="kpi-grid" id="regStrip"></div>
 
-    <!-- SECTION 01: DATA SOURCES & 21 CORE FEATURES -->
-    <div class="section-bar">
-      <span class="section-title">01 // REAL DATA SOURCES, OUT-OF-TIME SPLIT &amp; 21 CORE FEATURES</span>
-      <span class="section-code">DATA CONTRACT 4.2 · 100% JOIN COVERAGE</span>
+    <!-- SECTION 1 -->
+    <div class="sec-head">
+      <h2>1. ผลเปรียบเทียบโมเดลและกราฟพยากรณ์ราย 24 ชั่วโมง</h2>
+      <span class="sec-sub">ประเมินบนชุด Test จริง (7–30 ก.ย. 2022 · 246,451 แถว · 448 ช่วงถนน)</span>
     </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">กราฟเทียบความแม่นยำ B0 vs B1 vs LightGBM (%) <span id="modelSpecTag">LightGBM</span></div>
+        <div class="chart-wrap"><canvas id="benchChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">ตารางผลประเมินหลัก (Section 9.2 Benchmark) <span>Threshold 0.345 จูนเฉพาะ Val</span></div>
+        <table>
+          <thead>
+            <tr>
+              <th>โมเดล</th>
+              <th class="num">F1 (24h)</th>
+              <th class="num">06–23h</th>
+              <th class="num">Onset</th>
+              <th class="num">เร่งด่วน</th>
+              <th class="num">ฝนตก</th>
+              <th class="num">MAE</th>
+            </tr>
+          </thead>
+          <tbody id="benchTable"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="modelSummaryNote"></div>
+
+    <div class="grid-2" style="margin-top:24px;">
+      <div class="panel">
+        <div class="panel-title">กราฟค่าจริงเทียบค่าพยากรณ์ล่วงหน้า 1 ชม. ตลอด 24 ชั่วโมง <span>Actual vs ML Forecast (%)</span></div>
+        <div class="chart-wrap"><canvas id="hourlyProfileChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">กราฟความคลาดเคลื่อนรายชั่วโมง (Hourly MAE Error Analysis) <span>LightGBM vs B0 Persistence</span></div>
+        <div class="chart-wrap"><canvas id="hourlyMaeChart"></canvas></div>
+      </div>
+    </div>
+
+    <!-- SECTION 2 -->
+    <div class="sec-head">
+      <h2>2. ปัจจัยที่มีผลต่อรถติด (TreeSHAP), การตัดกลุ่มฟีเจอร์ (B3 Ablation) และสมมติฐาน H1–H5</h2>
+      <span class="sec-sub" id="shapMethodLbl">Exact TreeSHAP</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="panel">
+        <div class="panel-title">Top 12 ปัจจัยสำคัญสูงสุดจาก TreeSHAP (%) <span>จากทั้งหมด 21 Core Features</span></div>
+        <div class="chart-wrap-tall"><canvas id="shapChart"></canvas></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">ผลกระทบเมื่อตัดแต่ละกลุ่มฟีเจอร์ (B3 Ablation) <span>&Delta;F1 และ &Delta;Onset Recall (%)</span></div>
+        <div class="chart-wrap-tall"><canvas id="ablationChart"></canvas></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">ตารางสรุป B3 Factor Ablation และ Feature Gate 9.3 <span>ตัดทีละกลุ่มจาก 7 กลุ่มหลัก</span></div>
+      <table>
+        <thead>
+          <tr>
+            <th>กลุ่มฟีเจอร์ที่ตัดออก</th>
+            <th class="num">Ablated F1</th>
+            <th class="num">&Delta;F1</th>
+            <th class="num">&Delta;Onset</th>
+            <th class="num">&Delta;ฝนตก</th>
+            <th class="num">&Delta;เร่งด่วน</th>
+            <th class="num">สถานะ Gate</th>
+          </tr>
+        </thead>
+        <tbody id="ablationTable"></tbody>
+      </table>
+      <div class="explain-note">
+        <strong>หมายเหตุอธิบายผล Ablation (สำหรับตอบคำถาม):</strong>
+        ใน 1 เดือน ชั่วโมงที่ฝนตกหนักหรือเป็นเย็นวันศุกร์มีเพียง 10–15% ของชั่วโมงทั้งหมด ค่า F1 เฉลี่ยทั้งเดือนจึงถูกชั่วโมงปกติกลบ แต่เมื่อตัดกลุ่มปฏิทินหรือกลุ่มฝนออก <strong>Onset Recall จะตกลงทันที (-2.51% และ -0.25%)</strong> จึงต้องเก็บไว้ตามเกณฑ์ Feature Gate 9.3 ส่วน <span class="mono">Historical Profile (54.3%)</span> ทำหน้าที่เป็นฐานคอขวดหลักของแต่ละถนน
+      </div>
+      <div class="hyp-grid" id="hypMiniGrid"></div>
+    </div>
+
+    <!-- SECTION 3 -->
+    <div class="sec-head">
+      <h2>3. แหล่งข้อมูลจริง, การแบ่งข้อมูลตามเวลา และรายการ 21 Core Features</h2>
+      <span class="sec-sub">Data Contract 4.2 · 100% Location Table Join Coverage</span>
+    </div>
+
     <div class="source-grid">
       <div class="src-item">
         <div>
           <div class="src-name">iTIC Historical Traffic Status</div>
-          <div class="src-desc">122 วัน (มิ.ย.–ก.ย. 2022) &middot; 448 ช่วงถนนที่มีทิศทาง (ต้นทาง&rarr;ปลายทาง) ครบ 100%</div>
+          <div class="src-desc">122 วัน (มิ.ย.–ก.ย. 2022) คัด 448 ช่วงถนนที่มีพิกัดต้นทาง–ปลายทางครบ 100%</div>
         </div>
-        <span class="tag t-info">TARGET + LAGS</span>
+        <span class="badge">Target + Lags</span>
       </div>
       <div class="src-item">
         <div>
           <div class="src-name">iTIC Location Table</div>
           <div class="src-desc">พิกัดแยกต้นทาง (from_loc) &rarr; ปลายทาง (to_loc) และกราฟถนนข้างเคียง</div>
         </div>
-        <span class="tag t-ok">CC-BY-SA 4.0</span>
+        <span class="badge b-ok">CC-BY-SA 4.0</span>
       </div>
       <div class="src-item">
         <div>
           <div class="src-name">Open-Meteo Weather Archive</div>
-          <div class="src-desc">ปริมาณฝนรายชั่วโมง + ฝนสะสม 3 ชม. ครอบคลุม 3 โซน กทม. (กลาง/เหนือ/ตะวันออก)</div>
+          <div class="src-desc">ปริมาณฝนรายชั่วโมงและฝนสะสม 3 ชม. ครอบคลุม 3 โซน กทม. (กลาง/เหนือ/ตะวันออก)</div>
         </div>
-        <span class="tag t-ok">CC-BY 4.0</span>
+        <span class="badge b-ok">CC-BY 4.0</span>
       </div>
       <div class="src-item">
         <div>
           <div class="src-name">Traffy Fondue (Train-Only Static)</div>
-          <div class="src-desc">ความหนาแน่นจุดร้องเรียนน้ำท่วมต่อ ตร.กม. คำนวณเฉพาะชุด Train กัน Leakage</div>
+          <div class="src-desc">ความหนาแน่นจุดร้องเรียนน้ำท่วมต่อ ตร.กม. คำนวณเฉพาะช่วง Train เพื่อกัน Data Leakage</div>
         </div>
-        <span class="tag t-onset">FLOOD RISK</span>
+        <span class="badge b-onset">Flood Risk</span>
       </div>
       <div class="src-item">
         <div>
           <div class="src-name">BOT Holiday Calendar 2022</div>
-          <div class="src-desc">วันหยุดนักขัตฤกษ์, วันในสัปดาห์, เย็นวันศุกร์ และช่วงวันเงินเดือนออก</div>
+          <div class="src-desc">วันหยุดธนาคาร, วันในสัปดาห์, เย็นวันศุกร์ และช่วงวันเงินเดือนออก</div>
         </div>
-        <span class="tag t-info">CALENDAR</span>
+        <span class="badge">Calendar</span>
       </div>
       <div class="src-item">
         <div>
-          <div class="src-name">HDX Bangkok 50 Districts (adm2)</div>
-          <div class="src-desc">รหัสเขตมาตรฐาน adm2_pcode เชื่อม iTIC + Traffy + Open-Meteo ครบ 100%</div>
+          <div class="src-name">HDX Bangkok 50 Districts</div>
+          <div class="src-desc">รหัสเขตมาตรฐาน adm2_pcode สำหรับเชื่อมข้อมูล iTIC + Traffy + Open-Meteo</div>
         </div>
-        <span class="tag t-ok">SPATIAL JOIN</span>
+        <span class="badge b-ok">Spatial Join</span>
       </div>
     </div>
 
-    <div class="split-bar-wrap" id="splitBarBox"></div>
+    <div class="panel" id="splitBarBox"></div>
 
-    <details class="catalog-box" open>
+    <details class="catalog-box">
       <summary>
-        <span>21 CORE FEATURES INVENTORY (คัดเฉพาะตัวหลัก 7 กลุ่มตาม Proposal · ตัดตัวซ้ำซ้อนจาก 44 เหลือ 21 ตัว)</span>
-        <span class="mono" style="font-size:11px;color:var(--muted);">คลิกเพื่อพับ/กางตาราง</span>
+        <span>ดูรายการตัวแปรทั้งหมด 21 Core Features (ลดจาก 44 ตัวที่ซ้ำซ้อน เหลือเฉพาะตัวหลักครบ 7 กลุ่ม)</span>
+        <span class="mono" style="font-size:13px;color:var(--muted);">คลิกเพื่อกาง/พับ</span>
       </summary>
       <div class="catalog-inner">
         <table>
-          <thead><tr><th>Group</th><th>Feature Column</th><th class="num">TreeSHAP %</th><th>คำอธิบายความหมาย (ไทย)</th></tr></thead>
+          <thead><tr><th>กลุ่ม</th><th>ชื่อฟีเจอร์</th><th class="num">SHAP %</th><th>คำอธิบายความหมาย</th></tr></thead>
           <tbody id="featureCatalogTable"></tbody>
         </table>
       </div>
     </details>
 
-    <!-- SECTION 02: MODEL BENCHMARK & 24H FORECAST CHARTS -->
-    <div class="section-bar">
-      <span class="section-title">02 // MODEL BENCHMARK &amp; 24-HOUR FORECAST ERROR REPORT</span>
-      <span class="section-code">SECTION 9.2 BENCHMARK &amp; SECTION 13 DAYTIME PROBE</span>
+    <!-- SECTION 4 -->
+    <div class="sec-head">
+      <h2>4. Pipeline Orchestration, Apache Airflow และ Online Incremental ML</h2>
+      <span class="sec-sub mono" id="runIdLbl">Lineage</span>
     </div>
 
-    <div class="grid-2">
-      <div class="pane">
-        <h3>Chart 1: Baseline vs LightGBM Champion (%) <span id="modelSpecTag">LightGBM</span></h3>
-        <div class="chart-wrap"><canvas id="benchChart"></canvas></div>
-      </div>
-      <div class="pane">
-        <h3>Performance Comparison Table (Real Test Set) <span>246,451 Rows</span></h3>
-        <table>
-          <thead>
-            <tr>
-              <th>Model</th>
-              <th class="num">F1 (24h)</th>
-              <th class="num">F1 (06–23h)</th>
-              <th class="num">Onset</th>
-              <th class="num">Rush F1</th>
-              <th class="num">Rainy F1</th>
-              <th class="num">MAE</th>
-            </tr>
-          </thead>
-          <tbody id="benchTable"></tbody>
-        </table>
-        <div id="modelSummaryNote"></div>
-      </div>
-    </div>
-
-    <div class="grid-2">
-      <div class="pane">
-        <h3>Chart 2: 24-Hour Congestion Profile (Actual vs ML +1h Forecast) <span>00:00 – 23:00</span></h3>
-        <div class="chart-wrap"><canvas id="hourlyProfileChart"></canvas></div>
-      </div>
-      <div class="pane">
-        <h3>Chart 3: Hourly MAE Error Analysis (24 Hours) <span>LightGBM vs B0 Persistence</span></h3>
-        <div class="chart-wrap"><canvas id="hourlyMaeChart"></canvas></div>
-      </div>
-    </div>
-
-    <!-- SECTION 03: EXPLAINABILITY (SHAP), ABLATION & HYPOTHESES -->
-    <div class="section-bar">
-      <span class="section-title">03 // EXPLAINABILITY (EXACT TREESHAP), B3 FACTOR ABLATION &amp; HYPOTHESES H1–H5</span>
-      <span class="section-code">SECTION 5 &amp; SECTION 9.3 FEATURE GATE</span>
-    </div>
-
-    <div class="grid-2">
-      <div class="pane">
-        <h3>Chart 4: Top 12 Features by Mean |TreeSHAP| (%) <span id="shapMethodLbl">TreeSHAP</span></h3>
-        <div class="chart-wrap-tall"><canvas id="shapChart"></canvas></div>
-      </div>
-      <div class="pane">
-        <h3>Chart 5: B3 Feature-Group Ablation (&Delta;F1 &amp; &Delta;Onset Gain) <span>Remove 1 Group at a Time</span></h3>
-        <div class="chart-wrap-tall"><canvas id="ablationChart"></canvas></div>
-      </div>
-    </div>
-
-    <div class="pane" style="margin-bottom:16px;">
-      <h3>B3 Feature-Group Ablation Summary &amp; Feature Gate 9.3 <span>Full vs Group Removed</span></h3>
-      <table>
-        <thead>
-          <tr>
-            <th>Removed Feature Group</th>
-            <th class="num">Ablated F1</th>
-            <th class="num">&Delta;F1 Gain</th>
-            <th class="num">&Delta;Onset Gain</th>
-            <th class="num">&Delta;Rainy Gain</th>
-            <th class="num">&Delta;Rush Gain</th>
-            <th class="num">Gate 9.3</th>
-          </tr>
-        </thead>
-        <tbody id="ablationTable"></tbody>
-      </table>
-      <div class="note-box">
-        <strong>💡 โน้ตตอบอาจารย์ (ทำไมตัดกลุ่มฝน/ปฏิทินแล้ว F1 เฉลี่ยทั้งเดือนแทบไม่ลด แต่ยังเก็บไว้?):</strong>
-        ใน 1 เดือน ชั่วโมงที่ฝนตกหนักหรือศุกร์เย็นมีเพียง ~10–15% ของเวลาทั้งหมด ค่า F1 เฉลี่ยทั้งเดือนจึงถูกชั่วโมงปกติกลบ แต่พอตัดออก <strong>Onset Recall ตกลงทันที -2.51% (ปฏิทิน) และ -0.25% (ฝน)</strong> จึงผ่านเกณฑ์ <strong>Feature Gate ข้อ 9.3</strong> ส่วน <span class="mono">Historical Profile (54.3%)</span> ทำหน้าที่เป็นฐานคอขวดหลัก (Base Anchor)
-      </div>
-      <div class="hyp-grid" id="hypMiniGrid"></div>
-    </div>
-
-    <!-- SECTION 04: ORCHESTRATION, AIRFLOW & ONLINE ML -->
-    <div class="section-bar">
-      <span class="section-title">04 // PIPELINE ORCHESTRATION, APACHE AIRFLOW DAGS &amp; ONLINE INCREMENTAL ML</span>
-      <span class="section-code" id="runIdLbl">LINEAGE</span>
-    </div>
     <div class="dag-flow" id="dagFlow"></div>
 
     <div class="grid-2">
-      <div class="pane">
-        <h3>Chart 6: Online Incremental ML vs Static Batch (6 Stream Windows) <span id="onlineMetaTag"></span></h3>
+      <div class="panel">
+        <div class="panel-title">กราฟ Online Incremental ML เทียบ Static Batch <span id="onlineMetaTag"></span></div>
         <div class="chart-wrap"><canvas id="onlineStreamChart"></canvas></div>
-        <div id="onlineNoteBox" class="note-box"></div>
+        <div id="onlineNoteBox" class="explain-note"></div>
       </div>
-      <div class="pane">
-        <h3>Apache Airflow Schedules &amp; Data Contract 4.2 Adapter <span>dags/bkk_traffic_mlops_dag.py</span></h3>
+      <div class="panel">
+        <div class="panel-title">Apache Airflow Schedules &amp; Data Contract 4.2 Adapter <span>dags/bkk_traffic_mlops_dag.py</span></div>
         <table>
-          <thead><tr><th>Airflow DAG / Data Contract Gate</th><th>Schedule / Rule</th><th class="num">Status</th></tr></thead>
+          <thead><tr><th>DAG / Data Contract Gate</th><th>รอบการทำงาน / เงื่อนไข</th><th class="num">สถานะ</th></tr></thead>
           <tbody id="airflowContractTable"></tbody>
         </table>
-        <div class="note-box">
-          <strong>💡 Plug-and-Play รับ Data ชุดใหม่จากเพื่อน (Data Engineer):</strong>
-          รัน <span class="mono">python run_pipeline.py ingest-external &lt;file.parquet/.csv&gt;</span> ระบบตรวจ Data Contract 4.2 ครบทั้ง 5 ด่าน รองรับทั้งราย <strong>15 นาที (horizon=4)</strong> และราย <strong>1 ชม. (horizon=1)</strong> พร้อมแปลง <span class="mono">congestion_ratio &leftrightarrow; red_rate</span> อัตโนมัติ
+        <div class="explain-note">
+          <strong>รองรับข้อมูลชุดใหม่จาก Data Engineer:</strong> รันคำสั่ง <span class="mono">python run_pipeline.py ingest-external &lt;path&gt;</span> ระบบจะตรวจ Data Contract 4.2 ครบ 5 ด่าน รองรับทั้งข้อมูลราย 15 นาที (horizon=4) และราย 1 ชม. (horizon=1) พร้อมแปลง <span class="mono">congestion_ratio &leftrightarrow; red_rate</span> อัตโนมัติ
         </div>
       </div>
     </div>
 
-    <!-- SECTION 05: MODEL REGISTRY, PROMOTION GATES & 3-FOLD ROBUSTNESS -->
-    <div class="section-bar">
-      <span class="section-title">05 // MODEL REGISTRY, 4 PROMOTION GATES, 3-FOLD ROBUSTNESS &amp; ROLLBACK</span>
-      <span class="section-code" id="champSha">SHA-256</span>
+    <!-- SECTION 5 -->
+    <div class="sec-head">
+      <h2>5. Model Registry, Promotion Gates, 3-Fold Robustness และ Rollback</h2>
+      <span class="sec-sub mono" id="champSha">SHA-256</span>
     </div>
 
     <div class="grid-2">
-      <div class="pane">
-        <h3>4 Automated Promotion Gates <span>Proposal Section 10 Page 11</span></h3>
+      <div class="panel">
+        <div class="panel-title">4 Promotion Gates <span>Proposal Section 10 หน้า 11</span></div>
         <table>
-          <thead><tr><th>Promotion Gate</th><th class="num">Actual</th><th class="num">Rule</th><th class="num">Status</th></tr></thead>
+          <thead><tr><th>เงื่อนไขเลื่อนขั้นเป็น Champion</th><th class="num">ผลที่ได้</th><th class="num">เกณฑ์</th><th class="num">สถานะ</th></tr></thead>
           <tbody id="gatesTable"></tbody>
         </table>
       </div>
-      <div class="pane">
-        <h3>3-Strategy Retraining Challenger Tournament <span>Selected on Val</span></h3>
+      <div class="panel">
+        <div class="panel-title">Challenger Tournament 3 กลยุทธ์หน้าต่างเวลา <span>คัดเลือกบน Validation</span></div>
         <table>
-          <thead><tr><th>Strategy</th><th class="num">Val F1</th><th class="num">Test F1</th><th class="num">Onset</th><th class="num">MAE</th></tr></thead>
+          <thead><tr><th>กลยุทธ์</th><th class="num">Val F1</th><th class="num">Test F1</th><th class="num">Onset</th><th class="num">MAE</th></tr></thead>
           <tbody id="tourneyTable"></tbody>
         </table>
       </div>
     </div>
 
     <div class="grid-2">
-      <div class="pane">
-        <h3>Rolling-Origin 3-Fold Temporal Robustness <span id="robustTag"></span></h3>
+      <div class="panel">
+        <div class="panel-title">Rolling-Origin 3-Fold Temporal Robustness <span id="robustTag"></span></div>
         <table>
-          <thead><tr><th>Out-of-Time Fold</th><th class="num">Rows</th><th class="num">F1 (24h)</th><th class="num">F1 (06–23h)</th><th class="num">MAE</th></tr></thead>
+          <thead><tr><th>ช่วงเวลาทดสอบ (Fold)</th><th class="num">จำนวนแถว</th><th class="num">F1 (24h)</th><th class="num">06–23h</th><th class="num">MAE</th></tr></thead>
           <tbody id="robustTable"></tbody>
         </table>
       </div>
-      <div class="pane">
-        <h3>Registered Versions &amp; Audited SHA-256 Rollback <span id="rbMsg"></span></h3>
+      <div class="panel">
+        <div class="panel-title">ประวัติเวอร์ชันและระบบ Rollback (SHA-256) <span id="rbMsg"></span></div>
         <table>
-          <thead><tr><th>Version</th><th>Stage</th><th class="num">Test F1</th><th class="num">Onset</th><th class="num">SHA-256</th><th class="num">Action</th></tr></thead>
+          <thead><tr><th>Version</th><th>สถานะ</th><th class="num">Test F1</th><th class="num">Onset</th><th class="num">SHA-256</th><th class="num">จัดการ</th></tr></thead>
           <tbody id="verTable"></tbody>
         </table>
       </div>
     </div>
   </div>
   <footer>
-    <span>BKK-TRAFFIC // SPACEX MISSION CONTROL TELEMETRY (CSS 342 KMUTT)</span>
-    <span>ATTRIBUTION: iTIC (CC-BY 4.0 / CC-BY-SA 4.0) &middot; OPEN-METEO (CC-BY 4.0) &middot; TRAFFY FONDUE &middot; BOT 2022</span>
+    <span>Bangkok 1-Hour Traffic Congestion Forecasting &amp; MLOps · CSS 342 KMUTT</span>
+    <span>Data Attribution: iTIC (CC-BY 4.0 / CC-BY-SA 4.0) · Open-Meteo (CC-BY 4.0) · Traffy Fondue · BOT 2022</span>
   </footer>
 </section>
 
 <!-- ════════════════════════════════════════════════════════════════════ -->
-<!-- VIEW 3: 03 3-LAYER MLOPS MONITORING                                 -->
+<!-- VIEW 3: 3-LAYER MONITORING                                          -->
 <!-- ════════════════════════════════════════════════════════════════════ -->
 <section id="view-monitor" class="view">
   <div class="container">
-    <div class="report-banner">
+    <div class="report-header">
       <div>
-        <div class="eyebrow">PRODUCTION OBSERVABILITY // PROPOSAL SECTION 10</div>
-        <h2 class="display">3-LAYER MLOPS DRIFT &amp; HEALTH MONITORING</h2>
-        <p>Layer 1: Data Quality &amp; Segment Circuit-Breaker (5 SLA Gates) &middot; Layer 2: Feature &amp; Prediction PSI Drift + Monsoon Stress Test &middot; Layer 3: Stratified Daily &amp; Rolling 7-Day F1 / MAE</p>
+        <div class="report-kicker">PRODUCTION OBSERVABILITY · PROPOSAL SECTION 10</div>
+        <h1>ระบบเฝ้าระวังโมเดลและข้อมูล 3 ชั้น (3-Layer Monitoring)</h1>
+        <p>Layer 1 ตรวจคุณภาพข้อมูลและตัดวงจรถนนที่ข้อมูลหาย · Layer 2 ตรวจการเปลี่ยนกระจายตัวของข้อมูล (PSI) · Layer 3 ติดตามค่า F1 และ MAE รายวันแบบ Rolling 7 วัน</p>
       </div>
-      <div class="banner-meta">
-        <div class="meta-pill" id="monBannerPill">STATUS: NOMINAL</div>
+      <div class="report-actions">
+        <div class="meta-line" id="monBannerPill">Health: --</div>
       </div>
     </div>
 
-    <div class="stat-strip" id="monStrip"></div>
+    <div class="kpi-grid" id="monStrip"></div>
 
-    <div class="pane" style="margin-bottom:16px;">
-      <h3>Layer 1: Data Quality, Freshness SLA &amp; Segment Circuit-Breaker <span>Pause segment if 24h missing &gt; 20%</span></h3>
-      <div id="dqSummary" style="font-size:12px;color:var(--muted);margin-bottom:10px;"></div>
+    <div class="panel">
+      <div class="panel-title">Layer 1: คุณภาพข้อมูล, Freshness SLA และ Segment Circuit-Breaker <span>หยุดพยากรณ์ทันทีถ้าข้อมูล 24 ชม. หายเกิน 20%</span></div>
+      <div id="dqSummary" style="font-size:14px;color:var(--muted);margin-bottom:14px;"></div>
       <table>
-        <thead><tr><th>Check / Telemetry Metric</th><th class="num">Value</th><th class="num">SLA Rule</th><th class="num">Status</th></tr></thead>
+        <thead><tr><th>รายการตรวจสอบ</th><th class="num">ค่าที่วัดได้</th><th class="num">เกณฑ์มาตรฐาน</th><th class="num">สถานะ</th></tr></thead>
         <tbody id="dqTable"></tbody>
       </table>
     </div>
 
     <div class="grid-2">
-      <div class="pane">
-        <h3>Layer 2: Feature &amp; Prediction Drift (PSI Chart) <span>Normal Test vs Monsoon Stress</span></h3>
+      <div class="panel">
+        <div class="panel-title">Layer 2: กราฟ Feature Drift (PSI) เทียบช่วงฝนตกหนักมรสุม <span>Train Reference vs Sep 2022 Test</span></div>
         <div class="chart-wrap"><canvas id="psiChart"></canvas></div>
-        <div class="note-box">
-          <strong>💡 โน้ตตอบอาจารย์ (ทำไม PSI ฝนขึ้น 0.228 WARNING แต่ไม่สั่ง Retrain ทันที?):</strong>
-          ตาม <strong>Proposal ข้อ 10 (หน้า 11)</strong> กำหนดกฎว่า <em>"Feature Drift (PSI) &rarr; ตรวจสอบสาเหตุ; ห้าม Retrain จาก PSI อย่างเดียว"</em> เพราะ ก.ย. เป็นพีคฤดูมรสุม ฝนตกหนักกว่า มิ.ย.–ก.ค. ตามธรรมชาติ แต่เอาต์พุตโมเดลยังนิ่ง (<span class="mono">Prediction PSI = 0.0009</span>) และ <span class="mono">Test F1 = 69.78%</span> ไม่ได้ตกเกิน <span class="mono">0.05</span>
+        <div class="explain-note">
+          <strong>ทำไม PSI ของฝนขึ้น 0.228 (WARNING) แต่ระบบไม่สั่ง Retrain ทันที?</strong><br/>
+          ตาม Proposal ข้อ 10 หน้า 11 กำหนดให้ <em>"ตรวจสอบสาเหตุ แต่ห้ามสั่ง Retrain จาก PSI อย่างเดียว"</em> เพราะเดือน ก.ย. เป็นช่วงพีคของฤดูมรสุม ฝนตกหนักกว่า มิ.ย.–ก.ค. ตามธรรมชาติ ขณะที่เอาต์พุตโมเดลยังนิ่ง (<span class="mono">Prediction PSI = 0.0009</span>) และค่า <span class="mono">Test F1 = 69.78%</span> ไม่ได้ตกลงเกินเกณฑ์ <span class="mono">0.05</span>
         </div>
       </div>
-      <div class="pane">
-        <h3>Layer 3: Rolling 7-Day F1, Daily F1 &amp; Daily MAE <span>Test: 7–30 Sep 2022</span></h3>
+      <div class="panel">
+        <div class="panel-title">Layer 3: กราฟ Rolling 7-Day F1, Daily F1 และ Daily MAE <span>ตลอด 24 วันของชุด Test (7–30 ก.ย. 2022)</span></div>
         <div class="chart-wrap"><canvas id="rollingChart"></canvas></div>
       </div>
     </div>
 
-    <div class="pane">
-      <h3>Layer 2 Detailed PSI Telemetry Table (Train Reference vs Sep 2022 Test &amp; Monsoon)</h3>
+    <div class="panel" style="margin-top:24px;">
+      <div class="panel-title">ตารางรายละเอียด Feature PSI (Train vs Test และ Monsoon Stress Test)</div>
       <table>
-        <thead><tr><th>Feature</th><th class="num">Train Mean</th><th class="num">Test Mean</th><th class="num">Test PSI</th><th class="num">Monsoon PSI</th><th class="num">Status</th></tr></thead>
+        <thead><tr><th>ฟีเจอร์ที่เฝ้าระวัง</th><th class="num">ค่าเฉลี่ย Train</th><th class="num">ค่าเฉลี่ย Test</th><th class="num">Test PSI</th><th class="num">Monsoon PSI</th><th class="num">สถานะ</th></tr></thead>
         <tbody id="psiTable"></tbody>
       </table>
     </div>
   </div>
   <footer>
-    <span>BKK-TRAFFIC // 3-LAYER OBSERVABILITY CONSOLE (CSS 342 KMUTT)</span>
-    <span>ATTRIBUTION: iTIC (CC-BY 4.0 / CC-BY-SA 4.0) &middot; OPEN-METEO (CC-BY 4.0) &middot; TRAFFY FONDUE</span>
+    <span>Bangkok 1-Hour Traffic Congestion Forecasting &amp; MLOps · CSS 342 KMUTT</span>
+    <span>Data Attribution: iTIC (CC-BY 4.0 / CC-BY-SA 4.0) · Open-Meteo (CC-BY 4.0) · Traffy Fondue</span>
   </footer>
 </section>
 
@@ -1116,12 +1073,11 @@ let googleMap = null, googleTraffic = null, googleOverlays = [], googleInfo = nu
 let mlopsChartsInit = false;
 let monChartsInit = false;
 
-// Global Chart.js SpaceX Dark Telemetry Theme
 if (window.Chart) {
-  Chart.defaults.color = '#8A96A8';
-  Chart.defaults.borderColor = 'rgba(255,255,255,0.08)';
-  Chart.defaults.font.family = "'JetBrains Mono', 'IBM Plex Sans Thai', monospace";
-  Chart.defaults.font.size = 10.5;
+  Chart.defaults.color = '#A1A1AA';
+  Chart.defaults.borderColor = '#27272A';
+  Chart.defaults.font.family = "'Noto Sans Thai', 'Inter', sans-serif";
+  Chart.defaults.font.size = 13;
 }
 
 function activeLinks() {
@@ -1178,7 +1134,7 @@ function saveMapKeys() {
   fetch('/api/v1/config/map-keys', {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body)
   }).catch(() => {});
-  document.getElementById('keySaveMsg').textContent = 'SAVED';
+  document.getElementById('keySaveMsg').textContent = 'บันทึกแล้ว';
   setTimeout(() => {
     togglePopover('keyPop');
     switchProvider(lk ? 'longdo' : (gk ? 'google' : mapProvider));
@@ -1191,7 +1147,7 @@ function toggleMapProvider() {
 
 function switchProvider(provider) {
   mapProvider = provider;
-  document.getElementById('providerSwitchBtn').textContent = provider === 'longdo' ? 'LONGDO MAP' : 'GOOGLE MAPS';
+  document.getElementById('providerSwitchBtn').textContent = provider === 'longdo' ? 'Longdo Map' : 'Google Maps';
   document.getElementById('lblEvents').style.display = provider === 'longdo' ? 'inline-flex' : 'none';
   document.getElementById('lblCameras').style.display = provider === 'longdo' ? 'inline-flex' : 'none';
 
@@ -1293,15 +1249,15 @@ function markerColor(l) {
 }
 
 function popupHtml(l) {
-  return `<div style="font-family:'IBM Plex Sans Thai',sans-serif;font-size:12px;line-height:1.5;min-width:220px;color:#0F172A;">
+  return `<div style="font-family:'Noto Sans Thai',sans-serif;font-size:13.5px;line-height:1.55;min-width:230px;color:#111;">
     <strong>${l.road_name}</strong><br/>
-    <span style="color:#475569">เขต${l.district} (${l.district_en}) &middot; ${l.length_km} กม. &middot; ID: ${l.link_id}</span>
-    <hr style="border:none;border-top:1px solid #E2E8F0;margin:6px 0"/>
-    T+00m ปัจจุบัน: <b>${(l.red_rate_t0*100).toFixed(0)}%</b><br/>
-    T+60m พยากรณ์ (ML): <b style="color:${l.is_congested?'#DC2626':'#16A34A'}">${(l.pred_t1h*100).toFixed(0)}% (${l.risk})</b><br/>
-    T+60m ค่าจริง (Actual): <b>${(l.actual_t1h*100).toFixed(0)}%</b><br/>
-    Temp: ${l.temp_c}°C &middot; Rain 3h: <b>${l.rain_3h} mm</b>
-    ${l.is_onset ? '<br/><span style="color:#7C3AED;font-weight:700">ONSET ALERT (เริ่มติดใหม่ในอีก 1 ชม.)</span>' : ''}
+    <span style="color:#555">เขต${l.district} (${l.district_en}) · ${l.length_km} กม.</span>
+    <hr style="border:none;border-top:1px solid #ddd;margin:6px 0"/>
+    ปัจจุบัน (t0): <b>${(l.red_rate_t0*100).toFixed(0)}%</b><br/>
+    พยากรณ์ +1 ชม. (ML): <b style="color:${l.is_congested?'#DC2626':'#16A34A'}">${(l.pred_t1h*100).toFixed(0)}% (${l.risk})</b><br/>
+    ค่าจริง +1 ชม. (Actual): <b>${(l.actual_t1h*100).toFixed(0)}%</b><br/>
+    อุณหภูมิ ${l.temp_c}°C · ฝน 3 ชม. <b>${l.rain_3h} mm</b>
+    ${l.is_onset ? '<br/><span style="color:#7C3AED;font-weight:700">แจ้งเตือนรถเพิ่งเริ่มติดใหม่ (ONSET)</span>' : ''}
   </div>`;
 }
 
@@ -1324,9 +1280,9 @@ function refreshMap() {
   const maxRain = byDist.reduce((m, l) => Math.max(m, l.rain_3h || 0), 0);
 
   document.getElementById('railMetrics').innerHTML = `
-    <div class="rm-cell"><div class="rm-lbl">CONGESTED +1H</div><div class="rm-val mono" style="color:var(--danger)">${congPred} <span style="font-size:12px;color:var(--muted)">/ ${congAct}</span></div></div>
-    <div class="rm-cell"><div class="rm-lbl">ONSET ALERTS</div><div class="rm-val mono" style="color:var(--onset)">${onset}</div></div>
-    <div class="rm-cell"><div class="rm-lbl">PEAK RAIN 3H</div><div class="rm-val mono" style="color:var(--accent)">${maxRain.toFixed(1)}<span style="font-size:10px;color:var(--muted)">mm</span></div></div>
+    <div class="rm-cell"><div class="rm-lbl">ติด +1 ชม. (ML/จริง)</div><div class="rm-val mono" style="color:var(--danger)">${congPred} <span style="font-size:14px;color:var(--muted)">/ ${congAct}</span></div></div>
+    <div class="rm-cell"><div class="rm-lbl">เริ่มติดใหม่</div><div class="rm-val mono" style="color:var(--onset)">${onset}</div></div>
+    <div class="rm-cell"><div class="rm-lbl">ฝนสูงสุด 3 ชม.</div><div class="rm-val mono">${maxRain.toFixed(1)}<span style="font-size:12px;color:var(--muted)"> mm</span></div></div>
   `;
 
   let list = byDist;
@@ -1334,22 +1290,22 @@ function refreshMap() {
   else if (risk === 'RAINY') list = list.filter(l => (l.rain_3h || 0) > 0.5);
   else if (risk !== 'ALL') list = list.filter(l => l.risk === risk);
 
-  document.getElementById('railCount').textContent = `${list.length} / ${byDist.length}`;
+  document.getElementById('railCount').textContent = `${list.length} / ${byDist.length} ช่วงถนน`;
   const scoreFn = (l) => timeView === 'now' ? l.red_rate_t0 : (timeView === 'actual' ? l.actual_t1h : l.pred_t1h);
   const sorted = [...list].sort((a, b) => scoreFn(b) - scoreFn(a)).slice(0, 30);
 
   document.getElementById('roadList').innerHTML = sorted.map(l => {
-    const cls = l.is_onset ? 't-onset' : (l.is_congested ? 't-danger' : (l.risk === 'MODERATE' ? 't-warn' : 't-ok'));
+    const cls = l.is_onset ? 'b-onset' : (l.is_congested ? 'b-danger' : (l.risk === 'MODERATE' ? 'b-warn' : 'b-ok'));
     const lbl = l.is_onset ? 'ONSET' : l.risk;
-    const rainNote = (l.rain_3h || 0) > 0 ? ` · ${l.rain_3h.toFixed(1)}mm` : '';
+    const rainNote = (l.rain_3h || 0) > 0 ? ` · ฝน ${l.rain_3h.toFixed(1)}mm` : '';
     return `<div class="road-item" onclick="focusLink(${l.lat},${l.lon})">
       <div>
         <div class="road-name">${l.road_name}</div>
-        <div class="road-sub">เขต${l.district} &middot; ${l.length_km} กม.${rainNote}</div>
+        <div class="road-sub">เขต${l.district} · ${l.length_km} กม.${rainNote}</div>
       </div>
       <div class="road-stat">
         <div class="road-pct mono">${(l.red_rate_t0*100).toFixed(0)}% &rarr; ${(l.pred_t1h*100).toFixed(0)}% <span style="color:var(--muted);font-weight:400">(${(l.actual_t1h*100).toFixed(0)}%)</span></div>
-        <span class="tag ${cls}">${lbl}</span>
+        <span class="badge ${cls}">${lbl}</span>
       </div>
     </div>`;
   }).join('');
@@ -1376,7 +1332,7 @@ function refreshMap() {
           const mk = new longdo.Marker({ lon: l.lon, lat: l.lat }, {
             title: `${l.road_name} (${l.district})`,
             detail: popupHtml(l),
-            icon: { html: `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:1.5px solid #000;box-shadow:0 0 6px ${col};"></div>`, offset: { x: sz/2, y: sz/2 } }
+            icon: { html: `<div style="width:${sz}px;height:${sz}px;border-radius:50%;background:${col};border:1.5px solid #fff;"></div>`, offset: { x: sz/2, y: sz/2 } }
           });
           longdoMap.Overlays.add(mk);
           longdoOverlays.push(mk);
@@ -1400,7 +1356,7 @@ function refreshMap() {
       if (showDots) {
         const mk = new google.maps.Marker({
           position: { lat: l.lat, lng: l.lon }, map: googleMap,
-          icon: { path: google.maps.SymbolPath.CIRCLE, scale: l.is_onset && timeView === 'forecast' ? 6 : 4.2, fillColor: col, fillOpacity: 0.95, strokeColor: '#000', strokeWeight: 1.2 },
+          icon: { path: google.maps.SymbolPath.CIRCLE, scale: l.is_onset && timeView === 'forecast' ? 6 : 4.2, fillColor: col, fillOpacity: 0.95, strokeColor: '#fff', strokeWeight: 1.2 },
           title: l.road_name
         });
         mk.addListener('click', () => { googleInfo.setContent(popupHtml(l)); googleInfo.open(googleMap, mk); });
@@ -1425,13 +1381,13 @@ function renderWeatherHeader() {
   const w = activeWeather();
   const sc = (DATA.scenarios || {})[currentScenario] || {};
   const r3 = w.max_rain_3h_mm || 0;
-  document.getElementById('wxChip').textContent = `WX ${w.avg_temp_c ?? '--'}°C · ${r3.toFixed(1)}MM`;
+  document.getElementById('wxChip').textContent = `${w.avg_temp_c ?? '--'}°C · ฝน ${r3.toFixed(1)}mm`;
   document.getElementById('wxPopBody').innerHTML = `
-    <div class="wx-row"><span>Test Snapshot (2022)</span><strong class="mono">${sc.snapshot_ts || DATA.snapshot_ts}</strong></div>
-    <div class="wx-row"><span>Mean Temp (BKK)</span><strong class="mono">${w.avg_temp_c ?? '-'}°C</strong></div>
-    <div class="wx-row"><span>Rain 3h (Avg / Peak)</span><strong class="mono">${w.avg_rain_3h_mm ?? 0} / ${w.max_rain_3h_mm ?? 0} mm</strong></div>
-    <div class="wx-row"><span>Rainy Segments (&gt;0.5mm)</span><strong class="mono">${w.rainy_links_count ?? 0}</strong></div>
-    <div class="wx-row"><span>Heavy Rain (&gt;5.0mm)</span><strong class="mono">${w.heavy_rain_links_count ?? 0}</strong></div>
+    <div class="wx-row"><span>รอบพยากรณ์ (Test 2022)</span><strong class="mono">${sc.snapshot_ts || DATA.snapshot_ts}</strong></div>
+    <div class="wx-row"><span>อุณหภูมิเฉลี่ย กทม.</span><strong class="mono">${w.avg_temp_c ?? '-'}°C</strong></div>
+    <div class="wx-row"><span>ฝนสะสม 3 ชม. (เฉลี่ย / สูงสุด)</span><strong class="mono">${w.avg_rain_3h_mm ?? 0} / ${w.max_rain_3h_mm ?? 0} mm</strong></div>
+    <div class="wx-row"><span>ช่วงถนนที่มีฝน (&gt;0.5mm)</span><strong class="mono">${w.rainy_links_count ?? 0} ช่วงถนน</strong></div>
+    <div class="wx-row"><span>ช่วงถนนฝนตกหนัก (&gt;5.0mm)</span><strong class="mono">${w.heavy_rain_links_count ?? 0} ช่วงถนน</strong></div>
   `;
 }
 
@@ -1454,15 +1410,15 @@ async function runPredict() {
       body: JSON.stringify({ link_id, precip_3h_mm_t0, downstream_red_rate_t0 })
     });
     const d = await r.json();
-    out.textContent = `T+60M PREDICTION: ${(d.pred_red_rate_t1h*100).toFixed(1)}% [${d.congestion_risk_level}]`;
+    out.textContent = `พยากรณ์ +1 ชม.: ${(d.pred_red_rate_t1h*100).toFixed(1)}% (${d.congestion_risk_level})`;
     out.style.color = d.pred_is_congested_t1h ? 'var(--danger)' : 'var(--ok)';
   } catch (e) {
-    out.textContent = 'START SERVER: python run_pipeline.py dashboard';
+    out.textContent = 'รัน python run_pipeline.py dashboard เพื่อเรียก API สด';
     out.style.color = 'var(--warn)';
   }
 }
 
-/* ── RENDER VIEW 2 TABLES & DATA ─────────────────────────────────────── */
+/* ── VIEW 2 DATA ─────────────────────────────────────────────────────── */
 function renderMlops() {
   const c = DATA.champion || {}, m = (c.metrics || {}).test || {}, lin = DATA.lineage_latest || {};
   const ev = DATA.evaluation || {}, mods = ev.models || {};
@@ -1476,25 +1432,25 @@ function renderMlops() {
   const vaPct = (sc.val / totalRows * 100).toFixed(1);
   const tePct = (sc.test / totalRows * 100).toFixed(1);
 
-  document.getElementById('reportBannerMeta').textContent = `CHAMPION ${c.version || 'v1.0.0'} // ${ev.num_features || 21} CORE FEATURES // SHA ${(c.model_sha256 || '').slice(0, 10)}`;
+  document.getElementById('reportBannerMeta').textContent = `Champion ${c.version || 'v1.0.0'} · ${ev.num_features || 21} Features · SHA ${(c.model_sha256 || '').slice(0, 10)}`;
   document.getElementById('champSha').textContent = `SHA-256: ${(c.model_sha256 || '').slice(0, 16)}`;
-  document.getElementById('runIdLbl').textContent = `${lin.run_id || '-'} · TOTAL ${(lin.total_duration_sec||0).toFixed(1)}S`;
+  document.getElementById('runIdLbl').textContent = `${lin.run_id || '-'} · รวม ${(lin.total_duration_sec||0).toFixed(1)}s`;
   document.getElementById('modelSpecTag').textContent = c.model_backend || 'LightGBM Regressor';
 
   const maeDropPct = b0.mae ? ((1 - b2.mae / b0.mae) * 100).toFixed(1) : '0.0';
   const dayF1 = ((b2.f1_daytime_06_23 || b2.f1_all || 0) * 100).toFixed(2);
   document.getElementById('regStrip').innerHTML = `
-    <div class="stat-cell"><div class="stat-lbl">Test F1-Score (24h)</div><div class="stat-val mono" style="color:var(--ok)">${(b2.f1_all*100).toFixed(2)}%</div><div class="stat-sub">+${((b2.f1_all - (b0.f1_all||0))*100).toFixed(2)}% vs Persistence (${(b0.f1_all*100).toFixed(1)}%)</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Daytime F1 (06:00–23:00)</div><div class="stat-val mono" style="color:var(--accent)">${dayF1}%</div><div class="stat-sub">Active GPS Probe Window (Sec 13)</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Onset Recall (&ge; 55%)</div><div class="stat-val mono" style="color:var(--onset)">${(b2.onset_recall*100).toFixed(2)}%</div><div class="stat-sub">Persistence = 0.0% · Threshold ${c.optimal_threshold || 0.345}</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Rush / Rainy F1</div><div class="stat-val mono">${(b2.f1_rush_hour*100).toFixed(1)}% <span style="font-size:15px;color:var(--muted)">/ ${(b2.f1_rainy*100).toFixed(1)}%</span></div><div class="stat-sub">High-Stress Situations (Sec 9.2)</div></div>
-    <div class="stat-cell"><div class="stat-lbl">1-Hour Forecast MAE</div><div class="stat-val mono">${(b2.mae*100).toFixed(2)}%</div><div class="stat-sub">-${maeDropPct}% Error Reduction vs B0</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Test F1 รวม (24 ชม.)</div><div class="kpi-val mono">${(b2.f1_all*100).toFixed(2)}%</div><div class="kpi-sub">สูงกว่า Persistence +${((b2.f1_all - (b0.f1_all||0))*100).toFixed(2)}%</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Test F1 กลางวัน (06–23 น.)</div><div class="kpi-val mono">${dayF1}%</div><div class="kpi-sub">ช่วงที่ GPS Probe หนาแน่น (ข้อ 13)</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Onset Recall (เริ่มติดใหม่)</div><div class="kpi-val mono">${(b2.onset_recall*100).toFixed(2)}%</div><div class="kpi-sub">เกณฑ์ &ge; 55% (Persistence = 0.0%)</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">F1 เร่งด่วน / ฝนตก</div><div class="kpi-val mono">${(b2.f1_rush_hour*100).toFixed(1)}% <span style="font-size:18px;color:var(--muted)">/ ${(b2.f1_rainy*100).toFixed(1)}%</span></div><div class="kpi-sub">ช่วงสถานการณ์ความเสี่ยงสูง</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">ความคลาดเคลื่อน (MAE)</div><div class="kpi-val mono">${(b2.mae*100).toFixed(2)}%</div><div class="kpi-sub">ลด Error ลง ${maeDropPct}% จาก B0</div></div>
   `;
 
   document.getElementById('splitBarBox').innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:12px;">
-      <strong>OUT-OF-TIME TEMPORAL SPLIT (ZERO DATA LEAKAGE)</strong>
-      <span class="mono" style="color:var(--accent)">${totalRows.toLocaleString()} ROWS &middot; ${ev.num_links || 448} LINKS &middot; ${ev.num_features || 21} CORE FEATURES</span>
+    <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;font-size:15px;">
+      <strong>การแบ่งข้อมูลตามลำดับเวลา (Out-of-Time Temporal Split)</strong>
+      <span class="mono" style="font-size:13.5px;color:var(--muted)">${totalRows.toLocaleString()} แถว · ${ev.num_links || 448} ช่วงถนน · ${ev.num_features || 21} Features</span>
     </div>
     <div class="split-track">
       <div class="split-seg-tr" style="width:${trPct}%"></div>
@@ -1502,9 +1458,9 @@ function renderMlops() {
       <div class="split-seg-te" style="width:${tePct}%"></div>
     </div>
     <div class="split-legend">
-      <span><span class="dot" style="background:#E2E8F0;margin-right:6px;"></span><b>TRAIN (${trPct}%)</b> · ${sc.train.toLocaleString()} rows (1 มิ.ย.–23 ส.ค.)</span>
-      <span><span class="dot" style="background:var(--accent);margin-right:6px;"></span><b>VALIDATION (${vaPct}%)</b> · ${sc.val.toLocaleString()} rows (24 ส.ค.–6 ก.ย.)</span>
-      <span><span class="dot" style="background:var(--ok);margin-right:6px;"></span><b>TEST (${tePct}%)</b> · ${sc.test.toLocaleString()} rows (7–30 ก.ย.)</span>
+      <span><span class="dot" style="background:#FFFFFF;margin-right:7px;"></span><b>Train (${trPct}%)</b> · ${sc.train.toLocaleString()} แถว (1 มิ.ย.–23 ส.ค.)</span>
+      <span><span class="dot" style="background:#71717A;margin-right:7px;"></span><b>Validation (${vaPct}%)</b> · ${sc.val.toLocaleString()} แถว (24 ส.ค.–6 ก.ย.)</span>
+      <span><span class="dot" style="background:#22C55E;margin-right:7px;"></span><b>Test (${tePct}%)</b> · ${sc.test.toLocaleString()} แถว (7–30 ก.ย.)</span>
     </div>
   `;
 
@@ -1512,9 +1468,9 @@ function renderMlops() {
   const cat = DATA.feature_catalog || [];
   document.getElementById('featureCatalogTable').innerHTML = cat.map(f => `
     <tr>
-      <td><span class="tag t-info">${f.group}</span></td>
-      <td class="mono" style="color:var(--ink);font-weight:600;">${f.feature}</td>
-      <td class="num" style="color:${f.shap_pct >= 5 ? 'var(--accent)' : 'var(--muted)'}">${f.shap_pct.toFixed(2)}%</td>
+      <td><span class="badge">${f.group}</span></td>
+      <td class="mono" style="color:var(--ink);font-weight:500;">${f.feature}</td>
+      <td class="num">${f.shap_pct.toFixed(2)}%</td>
       <td style="color:var(--muted)">${f.description_th}</td>
     </tr>
   `).join('');
@@ -1528,7 +1484,7 @@ function renderMlops() {
   ];
   document.getElementById('benchTable').innerHTML = bRows.map(([name, r, isWin]) => `
     <tr class="${isWin ? 'win-row' : ''}">
-      <td>${name} ${isWin ? '<span class="tag t-ok">CHAMPION</span>' : ''}</td>
+      <td>${name} ${isWin ? '<span class="badge b-ok" style="margin-left:6px;">Champion</span>' : ''}</td>
       <td class="num">${((r.f1_all||0)*100).toFixed(2)}%</td>
       <td class="num">${((r.f1_daytime_06_23||r.f1_all||0)*100).toFixed(2)}%</td>
       <td class="num">${((r.onset_recall||0)*100).toFixed(2)}%</td>
@@ -1539,12 +1495,12 @@ function renderMlops() {
   `).join('');
 
   document.getElementById('modelSummaryNote').innerHTML = `
-    <div class="note-box">
-      <strong>💡 โน้ตอธิบายค่าโมเดลสั้นๆ (เผื่ออาจารย์ถาม: ค่านี้มาจากไหน ขึ้นอยู่กับอะไร?):</strong>
+    <div class="explain-note">
+      <strong>สรุปที่มาของตัวเลขสำคัญ (สำหรับอธิบายและตอบคำถาม):</strong>
       <ul>
-        <li><strong>ทำไม Threshold = <span class="mono">${c.optimal_threshold || 0.345}</span> (ไม่ใช่ 0.50)?</strong> — จูนบนชุด Validation โดยบังคับ Guardrail <span class="mono">Onset Recall &ge; 55%</span> ตาม Error Tradeoff หน้า 9 ของ Proposal (พลาดจุดที่จะติด False Negative แย่กว่าเตือนเกิน)</li>
-        <li><strong>ทำไมลดจาก 44 เหลือ 21 Core Features แล้วแม่นขึ้น?</strong> — ตัดตัวแปรซ้ำซ้อนออกครึ่งหนึ่ง ลด Noise และ Overfitting ทำให้ Test F1 ขยับจาก 69.71% &rarr; <strong>${(b2.f1_all*100).toFixed(2)}%</strong> และกลางวัน 06–23 น. <strong>${dayF1}%</strong></li>
-        <li><strong>ทำไม B0 Persistence ได้ Onset Recall = 0.0% แต่ LightGBM ได้ ${(b2.onset_recall*100).toFixed(1)}%?</strong> — Persistence ทายว่าอีก 1 ชม. เหมือนตอนนี้ ถ้ารถตอนนี้โล่งจึงทายว่าโล่งเสมอ ส่วน LightGBM ดู 3 ตัวแปรหลัก: <span class="mono">hist_avg_red_target_slot</span>, <span class="mono">current_diff_from_hist</span> และ <span class="mono">downstream_red_rate_t0</span></li>
+        <li><strong>ทำไม Threshold อยู่ที่ <span class="mono">${c.optimal_threshold || 0.345}</span> (ไม่ใช่ 0.50):</strong> จูนบนชุด Validation โดยตั้ง Guardrail ให้จับเหตุการณ์รถเริ่มติดใหม่ (<span class="mono">Onset Recall</span>) ได้อย่างน้อย 55% ตาม Error Tradeoff หน้า 9 ของ Proposal ที่ระบุว่าการพลาดจุดที่จะติดแย่กว่าการเตือนเกิน</li>
+        <li><strong>ทำไมลดจาก 44 เหลือ 21 Core Features แล้วแม่นขึ้น:</strong> เมื่อตัดตัวแปรซ้ำซ้อนออก โมเดลลด Noise และ Overfitting ทำให้ Test F1 เพิ่มเป็น <strong>${(b2.f1_all*100).toFixed(2)}%</strong> และช่วงกลางวัน 06–23 น. อยู่ที่ <strong>${dayF1}%</strong></li>
+        <li><strong>ทำไม Persistence ได้ Onset Recall = 0.0% แต่ LightGBM ได้ ${(b2.onset_recall*100).toFixed(1)}%:</strong> เพราะ Persistence ทายว่าอีก 1 ชม. จะเหมือนตอนนี้ ถ้ารถตอนนี้โล่งจึงทายว่าโล่งเสมอ ส่วน LightGBM จับจุดเริ่มติดใหม่ได้จากค่าเฉลี่ยในอดีต (<span class="mono">hist_avg_red_target_slot</span>), ความผิดปกติเทียบอดีต (<span class="mono">current_diff_from_hist</span>) และสภาพถนนข้างหน้า (<span class="mono">downstream_red_rate_t0</span>)</li>
       </ul>
     </div>
   `;
@@ -1555,86 +1511,86 @@ function renderMlops() {
     <tr>
       <td>${r.group_label}</td>
       <td class="num">${(r.ablated_f1_all*100).toFixed(2)}%</td>
-      <td class="num" style="color:${r.marginal_f1_gain>0?'var(--ok)':'var(--muted)'}">${(r.marginal_f1_gain>=0?'+':'') + (r.marginal_f1_gain*100).toFixed(2)}%</td>
-      <td class="num" style="color:${r.marginal_onset_recall_gain>0?'var(--onset)':'var(--muted)'}">${(r.marginal_onset_recall_gain>=0?'+':'') + (r.marginal_onset_recall_gain*100).toFixed(2)}%</td>
+      <td class="num">${(r.marginal_f1_gain>=0?'+':'') + (r.marginal_f1_gain*100).toFixed(2)}%</td>
+      <td class="num">${(r.marginal_onset_recall_gain>=0?'+':'') + (r.marginal_onset_recall_gain*100).toFixed(2)}%</td>
       <td class="num">${(r.marginal_rainy_f1_gain>=0?'+':'') + (r.marginal_rainy_f1_gain*100).toFixed(2)}%</td>
       <td class="num">${((r.marginal_rush_f1_gain||0)>=0?'+':'') + ((r.marginal_rush_f1_gain||0)*100).toFixed(2)}%</td>
-      <td class="num"><span class="tag ${r.retained_by_feature_gate?'t-ok':'t-warn'}">${r.retained_by_feature_gate?'KEEP':'OPT'}</span></td>
+      <td class="num"><span class="badge ${r.retained_by_feature_gate?'b-ok':'b-warn'}">${r.retained_by_feature_gate?'KEEP':'OPT'}</span></td>
     </tr>
   `).join('');
 
   // Hypotheses H1-H5
   const shap = DATA.shap || {};
-  document.getElementById('shapMethodLbl').textContent = shap.attribution_method || 'TreeSHAP';
+  document.getElementById('shapMethodLbl').textContent = shap.attribution_method || 'Exact TreeSHAP';
   document.getElementById('hypMiniGrid').innerHTML = (shap.hypotheses_verification || []).map(h => `
-    <div class="hyp-pill">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;">
-        <strong class="mono" style="color:var(--accent)">${h.id}</strong>
-        <span class="tag ${h.supported?'t-ok':'t-danger'}">${h.supported?'SUPPORTED':'FAILED'}</span>
+    <div class="hyp-card">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <strong class="mono" style="font-size:14px;color:var(--ink)">${h.id}</strong>
+        <span class="badge ${h.supported?'b-ok':'b-danger'}">${h.supported?'ผ่านเกณฑ์':'ไม่ผ่าน'}</span>
       </div>
-      <div style="font-weight:600;color:var(--ink);margin-bottom:3px;">${h.title.split('(')[0].trim()}</div>
-      <div style="color:var(--muted);line-height:1.5;">${h.evidence}</div>
+      <div class="hyp-card-title">${h.title.split('(')[0].trim()}</div>
+      <div class="hyp-card-desc">${h.evidence}</div>
     </div>
   `).join('');
 
   // DAG Flow
-  const stepLabels = { 'upgrade-geom':'Geometry 4.2', prepare:'Prepare Data', contract:'Contract 4.2', train:'Train LGBM', ablation:'B3 Ablation', explain:'TreeSHAP', forecast:'1h Forecast', 'online-ml':'Online ML', registry:'Registry', monitor:'3L Monitor', charts:'Charts', dashboard:'Dashboard', 'model-card':'Model Card' };
+  const stepLabels = { 'upgrade-geom':'Geometry 4.2', prepare:'Prepare Data', contract:'Contract 4.2', train:'Train LightGBM', ablation:'B3 Ablation', explain:'TreeSHAP', forecast:'1h Forecast', 'online-ml':'Online ML', registry:'Model Registry', monitor:'3-Layer Monitor', charts:'Charts', dashboard:'Dashboard', 'model-card':'Model Card' };
   document.getElementById('dagFlow').innerHTML = (lin.steps || []).map((s, idx) => `
     <div class="dag-node">
-      <div class="dag-step-num">STAGE ${String(idx+1).padStart(2,'0')}</div>
+      <div class="dag-step-num">ขั้นที่ ${idx+1}</div>
       <div class="dag-step-name">${stepLabels[s.step] || s.step}</div>
       <div class="dag-step-meta">
-        <span class="tag ${s.status==='SUCCESS'?'t-ok':'t-danger'}">${s.status}</span>
+        <span class="badge ${s.status==='SUCCESS'?'b-ok':'b-danger'}">${s.status}</span>
         <span class="mono" style="color:var(--muted)">${s.duration_sec.toFixed(1)}s</span>
       </div>
     </div>
   `).join('');
 
-  // Airflow + Data Contract 4.2
+  // Airflow + Data Contract
   const dc = DATA.data_contract || {};
-  const dcGates = (dc.gates || []).map(g => [g.gate, g.actual, g.passed ? 'CONTRACT OK' : 'CHECK', g.passed]);
+  const dcGates = (dc.gates || []).map(g => [g.gate, g.actual, g.passed ? 'ผ่านเกณฑ์' : 'ตรวจสอบ', g.passed]);
   const afRows = [
-    ['Airflow DAG 1: bkk_traffic_15m_online_inference', '*/15 * * * * (ทุก 15 นาที · Predict t+60m)', 'READY', true],
-    ['Airflow DAG 2: bkk_traffic_daily_monitoring_and_online_warmstart', '0 1 * * * (รายวัน · 3-Layer Monitor + Warm-Start)', 'READY', true],
-    ['Airflow DAG 3: bkk_traffic_weekly_challenger_tournament', '0 2 * * 0 (รายสัปดาห์ / Trigger F1 drop > 0.05)', 'READY', true],
+    ['Airflow DAG 1: bkk_traffic_15m_online_inference', 'ทุก 15 นาที (*/15 * * * *) · พยากรณ์ t+60m', 'พร้อมรัน', true],
+    ['Airflow DAG 2: bkk_traffic_daily_monitoring_and_online_warmstart', 'รายวัน 01:00 น. · 3-Layer Monitor + Warm-Start', 'พร้อมรัน', true],
+    ['Airflow DAG 3: bkk_traffic_weekly_challenger_tournament', 'รายสัปดาห์ หรือเมื่อ F1 ตกเกิน 0.05', 'พร้อมรัน', true],
     ...dcGates
   ];
   document.getElementById('airflowContractTable').innerHTML = afRows.map(r => `
     <tr>
-      <td style="font-weight:500;color:var(--ink)">${r[0]}</td>
-      <td style="color:var(--muted);font-size:11px;">${r[1]}</td>
-      <td class="num"><span class="tag ${r[3]?'t-ok':'t-warn'}">${r[2]}</span></td>
+      <td style="color:var(--ink);font-weight:500;">${r[0]}</td>
+      <td style="color:var(--muted);font-size:13.5px;">${r[1]}</td>
+      <td class="num"><span class="badge ${r[3]?'b-ok':'b-warn'}">${r[2]}</span></td>
     </tr>
   `).join('');
 
-  // Online ML Summary Note
+  // Online ML Note
   const oml = DATA.online_ml || {};
   const omStatic = oml.static_batch_metrics || b2;
   const omOnline = oml.online_incremental_metrics || b2;
-  document.getElementById('onlineMetaTag').textContent = `Avg Update: ${oml.mean_update_latency_ms || 1500} ms · Trees: ${oml.initial_trees || 756} → ${oml.final_trees_after_stream || 828}`;
+  document.getElementById('onlineMetaTag').textContent = `อัปเดตเฉลี่ย ${oml.mean_update_latency_ms || 1500} ms · ต้นไม้ ${oml.initial_trees || 756} → ${oml.final_trees_after_stream || 828}`;
   document.getElementById('onlineNoteBox').innerHTML = `
-    <strong>💡 Online Incremental Learning (LightGBM Warm-Start <span class="mono">init_model</span>):</strong>
-    เมื่อค่าจริงชั่วโมงถัดไป (<span class="mono">t+60m</span>) เข้ามา ระบบเติมต้นไม้ใหม่รอบละ 12 ต้นจาก Sliding Window ล่าสุด ได้ <strong>Online F1 = ${((omOnline.f1_all||0)*100).toFixed(2)}%</strong> (Static = ${((omStatic.f1_all||0)*100).toFixed(2)}%) และ <strong>Onset Recall เพิ่มขึ้นเป็น ${((omOnline.onset_recall||0)*100).toFixed(2)}%</strong>
+    <strong>การทำงานของ Online Incremental ML (LightGBM Warm-Start):</strong>
+    เมื่อความเร็วจริงของชั่วโมงถัดไป (<span class="mono">t+60m</span>) เข้ามา ระบบจะเติมต้นไม้ใหม่รอบละ 12 ต้นจาก Sliding Window ล่าสุด ได้ค่า <strong>Online F1 = ${((omOnline.f1_all||0)*100).toFixed(2)}%</strong> (Static = ${((omStatic.f1_all||0)*100).toFixed(2)}%) และ <strong>Onset Recall เพิ่มเป็น ${((omOnline.onset_recall||0)*100).toFixed(2)}%</strong>
   `;
 
   // Promotion Gates
   const g = (c.promotion_decision || {}).gates || {};
   const gList = [
-    ['Gate 1: F1 Gain vs Best Baseline', '+' + ((g.gate_1_f1_gain_over_baseline?.f1_gain ?? 0)*100).toFixed(2) + '%', '>= +1.0%', g.gate_1_f1_gain_over_baseline?.passed],
-    ['Gate 2: Onset Recall & Non-Drop', ((g.gate_2_onset_recall_guardrail?.challenger_onset_recall ?? 0)*100).toFixed(2) + '%', '>= 55% (Drop <= 2%)', g.gate_2_onset_recall_guardrail?.passed],
-    ['Gate 3: Rainy F1 Non-Degradation', ((g.gate_3_rainy_f1_non_degradation?.challenger_f1_rainy ?? 0)*100).toFixed(2) + '%', '>= B0 (' + ((b0.f1_rainy||0)*100).toFixed(1) + '%)', g.gate_3_rainy_f1_non_degradation?.passed],
+    ['Gate 1: F1 ชนะ Baseline', '+' + ((g.gate_1_f1_gain_over_baseline?.f1_gain ?? 0)*100).toFixed(2) + '%', '>= +1.0%', g.gate_1_f1_gain_over_baseline?.passed],
+    ['Gate 2: Onset Recall & Non-Drop', ((g.gate_2_onset_recall_guardrail?.challenger_onset_recall ?? 0)*100).toFixed(2) + '%', '>= 55% (ตก <= 2%)', g.gate_2_onset_recall_guardrail?.passed],
+    ['Gate 3: Rainy F1 ไม่ลดลง', ((g.gate_3_rainy_f1_non_degradation?.challenger_f1_rainy ?? 0)*100).toFixed(2) + '%', '>= B0 (' + ((b0.f1_rainy||0)*100).toFixed(1) + '%)', g.gate_3_rainy_f1_non_degradation?.passed],
     ['Gate 4: MAE & Non-Regression', ((g.gate_4_mae_and_non_regression?.challenger_mae ?? 0)*100).toFixed(2) + '%', '<= 15.0%', g.gate_4_mae_and_non_regression?.passed],
   ];
   document.getElementById('gatesTable').innerHTML = gList.map(r => `
     <tr><td>${r[0]}</td><td class="num">${r[1]}</td><td class="num" style="color:var(--muted)">${r[2]}</td>
-    <td class="num"><span class="tag ${r[3]?'t-ok':'t-danger'}">${r[3]?'PASS':'FAIL'}</span></td></tr>
+    <td class="num"><span class="badge ${r[3]?'b-ok':'b-danger'}">${r[3]?'ผ่าน':'ไม่ผ่าน'}</span></td></tr>
   `).join('');
 
   // Challenger Tournament
   const win = (DATA.tournament || {}).winning_strategy;
   document.getElementById('tourneyTable').innerHTML = ((DATA.tournament || {}).challengers || []).map(x => `
     <tr class="${x.strategy_id===win?'win-row':''}">
-      <td>${x.strategy_name_th} ${x.strategy_id===win?'<span class="tag t-ok">WIN</span>':''}</td>
+      <td>${x.strategy_name_th} ${x.strategy_id===win?'<span class="badge b-ok" style="margin-left:6px;">ผู้ชนะ</span>':''}</td>
       <td class="num">${(x.metrics_val.f1_all*100).toFixed(2)}%</td>
       <td class="num">${(x.metrics_test.f1_all*100).toFixed(2)}%</td>
       <td class="num">${(x.metrics_test.onset_recall*100).toFixed(2)}%</td>
@@ -1645,7 +1601,7 @@ function renderMlops() {
   // 3-Fold Robustness
   const rob = ev.robustness_3fold || {};
   const robDev = ((rob.max_abs_deviation || 0) * 100).toFixed(2);
-  document.getElementById('robustTag').innerHTML = `Max Dev = <b>&plusmn;${robDev}%</b> (&le; &plusmn;5.0%) <span class="tag ${rob.passed!==false?'t-ok':'t-danger'}">${rob.passed!==false?'PASS':'FAIL'}</span>`;
+  document.getElementById('robustTag').innerHTML = `แกว่งสูงสุด <b>&plusmn;${robDev}%</b> (เกณฑ์ &le; &plusmn;5.0%) <span class="badge ${rob.passed!==false?'b-ok':'b-danger'}" style="margin-left:6px;">${rob.passed!==false?'ผ่านเกณฑ์':'ไม่ผ่าน'}</span>`;
   document.getElementById('robustTable').innerHTML = (rob.folds || []).map(f => `
     <tr>
       <td class="mono">${f.fold}</td>
@@ -1656,150 +1612,149 @@ function renderMlops() {
     </tr>
   `).join('');
 
-  // Versions & Rollback
+  // Registry Versions
   const act = (DATA.registry_index || {}).active_champion;
   document.getElementById('verTable').innerHTML = ((DATA.registry_index || {}).versions || []).map(v => `
     <tr>
-      <td class="mono" style="color:var(--accent)">${v.version}</td>
+      <td class="mono" style="color:var(--ink);font-weight:600;">${v.version}</td>
       <td>${v.stage}</td>
       <td class="num">${(v.test_f1*100).toFixed(2)}%</td>
       <td class="num">${((v.test_onset_recall||0)*100).toFixed(2)}%</td>
       <td class="num" style="color:var(--muted)">${v.model_sha256.slice(0,10)}</td>
-      <td class="num">${v.version===act?'<span class="tag t-ok">ACTIVE</span>':`<button class="btn-ghost" onclick="doRollback('${v.version}')">Rollback</button>`}</td>
+      <td class="num">${v.version===act?'<span class="badge b-ok">Active</span>':`<button class="btn-subtle" onclick="doRollback('${v.version}')">Rollback</button>`}</td>
     </tr>
   `).join('');
 }
 
-/* ── RENDER ALL 6 INTERACTIVE CHARTS IN VIEW 2 ───────────────────────── */
+/* ── 6 REPORT CHARTS (Monochrome High-Contrast SpaceX Style) ─────────── */
 function renderAllMlopsCharts() {
   const ev = DATA.evaluation || {}, mods = ev.models || {};
   const b0 = (mods.B0_Persistence || {}).test || {};
   const b1 = (mods.B1_Historical_Average || {}).test || {};
   const b2 = (mods.B2_LightGBM || {}).test || {};
 
-  // Chart 1: Benchmark Grouped Bar Chart
+  // Chart 1: Model Benchmark
   new Chart(document.getElementById('benchChart'), {
     type: 'bar',
     data: {
-      labels: ['Overall F1 (24h)', 'Daytime F1 (06-23h)', 'Onset Recall', 'Rush-Hour F1', 'Rainy F1'],
+      labels: ['F1 รวม (24h)', 'กลางวัน (06-23h)', 'Onset Recall', 'เร่งด่วน F1', 'ฝนตก F1'],
       datasets: [
-        { label: 'B0: Persistence', data: [b0.f1_all, b0.f1_daytime_06_23, b0.onset_recall, b0.f1_rush_hour, b0.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: 'rgba(138, 150, 168, 0.45)', borderColor: '#8A96A8', borderWidth: 1 },
-        { label: 'B1: Historical Avg', data: [b1.f1_all, b1.f1_daytime_06_23, b1.onset_recall, b1.f1_rush_hour, b1.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: 'rgba(56, 189, 248, 0.35)', borderColor: '#38BDF8', borderWidth: 1 },
-        { label: 'B2: LightGBM Champion', data: [b2.f1_all, b2.f1_daytime_06_23, b2.onset_recall, b2.f1_rush_hour, b2.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: 'rgba(34, 197, 94, 0.78)', borderColor: '#22C55E', borderWidth: 1 }
+        { label: 'B0 Persistence', data: [b0.f1_all, b0.f1_daytime_06_23, b0.onset_recall, b0.f1_rush_hour, b0.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: '#3F3F46' },
+        { label: 'B1 Historical Avg', data: [b1.f1_all, b1.f1_daytime_06_23, b1.onset_recall, b1.f1_rush_hour, b1.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: '#71717A' },
+        { label: 'B2 LightGBM (Champion)', data: [b2.f1_all, b2.f1_daytime_06_23, b2.onset_recall, b2.f1_rush_hour, b2.f1_rainy].map(v => +((v||0)*100).toFixed(2)), backgroundColor: '#FFFFFF' }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { min: 0, max: 90, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { min: 0, max: 90, ticks: { callback: v => v + '%' }, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
   });
 
-  // Chart 2: 24-Hour Congestion Profile (Actual vs ML Forecast)
+  // Chart 2: 24-Hour Congestion Profile
   const hourly = (DATA.forecast || {}).hourly_forecast_analysis || [];
   new Chart(document.getElementById('hourlyProfileChart'), {
     type: 'line',
     data: {
       labels: hourly.map(x => x.hour_label),
       datasets: [
-        { label: 'Actual Congestion (%)', data: hourly.map(x => +(x.actual_red_rate*100).toFixed(2)), borderColor: '#F8FAFC', backgroundColor: 'rgba(248,250,252,0.08)', fill: true, tension: 0.3, borderWidth: 2, pointRadius: 2 },
-        { label: 'LightGBM +1h Forecast (%)', data: hourly.map(x => +(x.pred_red_rate*100).toFixed(2)), borderColor: '#38BDF8', borderDash: [5,3], tension: 0.3, borderWidth: 2.2, pointRadius: 2 }
+        { label: 'ค่าจริง Actual (%)', data: hourly.map(x => +(x.actual_red_rate*100).toFixed(2)), borderColor: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.08)', fill: true, tension: 0.3, borderWidth: 2.5, pointRadius: 2.5 },
+        { label: 'พยากรณ์ +1 ชม. LightGBM (%)', data: hourly.map(x => +(x.pred_red_rate*100).toFixed(2)), borderColor: '#22C55E', borderDash: [6,4], tension: 0.3, borderWidth: 2.5, pointRadius: 2.5 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { ticks: { callback: v => v + '%' }, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
   });
 
-  // Chart 3: Hourly MAE Error Analysis
+  // Chart 3: Hourly MAE Error
   new Chart(document.getElementById('hourlyMaeChart'), {
     type: 'line',
     data: {
       labels: hourly.map(x => x.hour_label),
       datasets: [
-        { label: 'B0 Persistence MAE (%)', data: hourly.map(x => +(x.mae_b0*100).toFixed(2)), borderColor: '#EF4444', borderDash: [4,3], tension: 0.25, borderWidth: 1.8, pointRadius: 0 },
-        { label: 'B2 LightGBM MAE (%)', data: hourly.map(x => +(x.mae_lgbm*100).toFixed(2)), borderColor: '#22C55E', backgroundColor: 'rgba(34,197,94,0.12)', fill: true, tension: 0.25, borderWidth: 2.2, pointRadius: 2 }
+        { label: 'B0 Persistence MAE (%)', data: hourly.map(x => +(x.mae_b0*100).toFixed(2)), borderColor: '#71717A', borderDash: [5,4], tension: 0.25, borderWidth: 2, pointRadius: 0 },
+        { label: 'B2 LightGBM MAE (%)', data: hourly.map(x => +(x.mae_lgbm*100).toFixed(2)), borderColor: '#FFFFFF', backgroundColor: 'rgba(255,255,255,0.08)', fill: true, tension: 0.25, borderWidth: 2.5, pointRadius: 2.5 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { ticks: { callback: v => v + '%' }, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
   });
 
-  // Chart 4: Top 12 TreeSHAP Horizontal Bar Chart
+  // Chart 4: Top 12 TreeSHAP
   const top12 = ((DATA.shap || {}).top_features || []).slice(0, 12);
   new Chart(document.getElementById('shapChart'), {
     type: 'bar',
     data: {
       labels: top12.map(f => f.feature),
       datasets: [{
-        label: 'Mean |TreeSHAP| Share (%)',
+        label: 'สัดส่วนอิทธิพล TreeSHAP (%)',
         data: top12.map(f => f.share_pct),
-        backgroundColor: top12.map((_, i) => i === 0 ? '#38BDF8' : (i < 3 ? 'rgba(56,189,248,0.7)' : 'rgba(248,250,252,0.45)')),
-        borderWidth: 0
+        backgroundColor: top12.map((_, i) => i === 0 ? '#FFFFFF' : (i < 3 ? '#A1A1AA' : '#52525B'))
       }]
     },
     options: {
       indexAxis: 'y', responsive: true, maintainAspectRatio: false,
       plugins: { legend: { display: false } },
       scales: {
-        x: { ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
-        y: { grid: { display: false }, ticks: { color: '#E2E8F0' } }
+        x: { ticks: { callback: v => v + '%' }, grid: { color: '#27272A' } },
+        y: { grid: { display: false }, ticks: { color: '#E4E4E7', font: { family: 'JetBrains Mono', size: 12 } } }
       }
     }
   });
 
-  // Chart 5: B3 Factor Ablation Grouped Bar Chart
+  // Chart 5: B3 Ablation
   const ab = (DATA.ablation || {}).ablation_experiments || [];
   new Chart(document.getElementById('ablationChart'), {
     type: 'bar',
     data: {
       labels: ab.map(r => r.group_label.split(':')[0]),
       datasets: [
-        { label: 'ΔF1 Gain (%)', data: ab.map(r => +(r.marginal_f1_gain*100).toFixed(2)), backgroundColor: 'rgba(56, 189, 248, 0.78)' },
-        { label: 'ΔOnset Recall Gain (%)', data: ab.map(r => +(r.marginal_onset_recall_gain*100).toFixed(2)), backgroundColor: 'rgba(192, 132, 252, 0.85)' }
+        { label: 'ΔF1 Gain (%)', data: ab.map(r => +(r.marginal_f1_gain*100).toFixed(2)), backgroundColor: '#FFFFFF' },
+        { label: 'ΔOnset Recall Gain (%)', data: ab.map(r => +(r.marginal_onset_recall_gain*100).toFixed(2)), backgroundColor: '#A855F7' }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { ticks: { callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { ticks: { callback: v => (v > 0 ? '+' : '') + v + '%' }, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
   });
 
-  // Chart 6: Online Incremental ML Stream Chart
+  // Chart 6: Online Incremental ML Stream
   const wins = (DATA.online_ml || {}).stream_windows || [];
   new Chart(document.getElementById('onlineStreamChart'), {
     type: 'line',
     data: {
       labels: wins.map(w => w.window_id),
       datasets: [
-        { label: 'Static Batch F1 (%)', data: wins.map(w => +(w.static_f1*100).toFixed(2)), borderColor: '#8A96A8', borderDash: [4,3], tension: 0.25, borderWidth: 1.8, pointRadius: 2 },
-        { label: 'Online Warm-Start F1 (%)', data: wins.map(w => +(w.online_f1*100).toFixed(2)), borderColor: '#38BDF8', tension: 0.25, borderWidth: 2.3, pointRadius: 3 },
-        { label: 'Online Onset Recall (%)', data: wins.map(w => +(w.online_onset_recall*100).toFixed(2)), borderColor: '#C084FC', tension: 0.25, borderWidth: 2.0, pointRadius: 2.5 }
+        { label: 'Static Batch F1 (%)', data: wins.map(w => +(w.static_f1*100).toFixed(2)), borderColor: '#71717A', borderDash: [5,4], tension: 0.25, borderWidth: 2, pointRadius: 2.5 },
+        { label: 'Online Warm-Start F1 (%)', data: wins.map(w => +(w.online_f1*100).toFixed(2)), borderColor: '#FFFFFF', tension: 0.25, borderWidth: 2.5, pointRadius: 3.5 },
+        { label: 'Online Onset Recall (%)', data: wins.map(w => +(w.online_onset_recall*100).toFixed(2)), borderColor: '#A855F7', tension: 0.25, borderWidth: 2.2, pointRadius: 3 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { min: 45, max: 80, ticks: { callback: v => v + '%' }, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { min: 45, max: 80, ticks: { callback: v => v + '%' }, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
@@ -1810,25 +1765,25 @@ async function doRollback(ver) {
   try {
     const r = await fetch('/api/v1/mlops/rollback', {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ target_version: ver, reason: 'Mission Control Rollback' })
+      body: JSON.stringify({ target_version: ver, reason: 'Dashboard Rollback' })
     });
     if (r.ok) location.reload();
-  } catch (e) { document.getElementById('rbMsg').textContent = 'START FASTAPI TO ROLLBACK'; }
+  } catch (e) { document.getElementById('rbMsg').textContent = 'รันผ่าน FastAPI เพื่อกด Rollback'; }
 }
 
-/* ── RENDER VIEW 3: 3-LAYER MONITORING ───────────────────────────────── */
+/* ── VIEW 3: 3-LAYER MONITORING ──────────────────────────────────────── */
 function renderMonitor() {
   const mon = DATA.monitoring || {};
   const dq = mon.data_quality_layer || {};
   const health = mon.overall_system_health || 'HEALTHY';
   document.getElementById('healthDot').style.background = health === 'HEALTHY' ? 'var(--ok)' : (health === 'WARNING_WATCH' ? 'var(--warn)' : 'var(--danger)');
-  document.getElementById('monBannerPill').textContent = `HEALTH: ${health} // RETRAIN: ${mon.retrain_recommended?'TRIGGERED':'STANDBY'}`;
+  document.getElementById('monBannerPill').textContent = `System Health: ${health} · Retrain Trigger: ${mon.retrain_recommended?'YES':'NO'}`;
 
   document.getElementById('monStrip').innerHTML = `
-    <div class="stat-cell"><div class="stat-lbl">System Health</div><div class="stat-val mono" style="color:${health==='HEALTHY'?'var(--ok)':'var(--warn)'}">${health}</div><div class="stat-sub">Retrain Trigger: ${mon.retrain_recommended?'YES':'NO (PSI-Only Guard)'}</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Location Join Coverage</div><div class="stat-val mono" style="color:var(--ok)">${(dq.location_table_join_coverage_pct||100).toFixed(1)}%</div><div class="stat-sub">Circuit-Breaker Tripped: ${dq.circuit_breaker_tripped_count||0}</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Prediction Output PSI</div><div class="stat-val mono" style="color:var(--accent)">${((mon.prediction_drift||{}).psi||0).toFixed(4)}</div><div class="stat-sub">Status: ${(mon.prediction_drift||{}).status||'STABLE'}</div></div>
-    <div class="stat-cell"><div class="stat-lbl">Test Overall F1</div><div class="stat-val mono">${((mon.test_overall_f1||0)*100).toFixed(2)}%</div><div class="stat-sub">Stratified Alert Days: ${mon.alert_days_count||0} / ${mon.total_test_days||24}</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">สถานะระบบโดยรวม</div><div class="kpi-val mono" style="font-size:26px;color:${health==='HEALTHY'?'var(--ok)':'var(--warn)'}">${health}</div><div class="kpi-sub">Retrain Trigger: ${mon.retrain_recommended?'YES':'NO'}</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Location Join Coverage</div><div class="kpi-val mono">${(dq.location_table_join_coverage_pct||100).toFixed(1)}%</div><div class="kpi-sub">ถนนที่ถูก Circuit-Breaker: ${dq.circuit_breaker_tripped_count||0}</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Prediction Output PSI</div><div class="kpi-val mono">${((mon.prediction_drift||{}).psi||0).toFixed(4)}</div><div class="kpi-sub">สถานะ: ${(mon.prediction_drift||{}).status||'STABLE'}</div></div>
+    <div class="kpi-cell"><div class="kpi-lbl">Test Overall F1</div><div class="kpi-val mono">${((mon.test_overall_f1||0)*100).toFixed(2)}%</div><div class="kpi-sub">วันแจ้งเตือน: ${mon.alert_days_count||0} / ${mon.total_test_days||24} วัน</div></div>
   `;
 
   document.getElementById('dqSummary').textContent = mon.retrain_policy_note || '';
@@ -1837,19 +1792,19 @@ function renderMonitor() {
   const reqRows = dq.min_required_daily_rows || 8000;
   const minOk = dq.minimum_sample_check_passed !== false;
   document.getElementById('dqTable').innerHTML = `
-    <tr><td>Location Table Join Coverage (Data Contract 4.2)</td><td class="num">${(dq.location_table_join_coverage_pct||100).toFixed(1)}%</td><td class="num">100.0%</td><td class="num"><span class="tag t-ok">VERIFIED</span></td></tr>
-    <tr><td>Open-Meteo Weather Feed Completeness</td><td class="num">${(dq.weather_feed_completeness_pct||100).toFixed(1)}%</td><td class="num">100.0%</td><td class="num"><span class="tag t-ok">VERIFIED</span></td></tr>
-    <tr><td>Traffic &amp; Weather Feed Freshness SLA (Section 10)</td><td class="num">${dq.feed_freshness_lag_minutes ?? 0} min lag</td><td class="num">&le; ${dq.feed_freshness_sla_minutes ?? 15} min</td><td class="num"><span class="tag t-ok">${dq.feed_freshness_status || 'FRESH'}</span></td></tr>
-    <tr><td>Minimum Daily Sample Check (Section 7 Monitor &amp; Serve)</td><td class="num">${minRows.toLocaleString()} rows/day</td><td class="num">&ge; ${reqRows.toLocaleString()} rows/day</td><td class="num"><span class="tag ${minOk?'t-ok':'t-danger'}">${minOk?'PASSED':'LOW SAMPLE'}</span></td></tr>
-    <tr><td>Segment 24h Missing Rate Circuit-Breaker (${dq.monitored_segments_count||448} segments)</td><td class="num">${trippedCnt} paused</td><td class="num">&le; 20% missing</td><td class="num"><span class="tag ${trippedCnt===0?'t-ok':'t-warn'}">${trippedCnt===0?'ALL ACTIVE':'CIRCUIT-BREAKER'}</span></td></tr>
+    <tr><td>Location Table Join Coverage (Data Contract 4.2)</td><td class="num">${(dq.location_table_join_coverage_pct||100).toFixed(1)}%</td><td class="num">100.0%</td><td class="num"><span class="badge b-ok">ผ่านเกณฑ์</span></td></tr>
+    <tr><td>ความครบถ้วนของข้อมูลฝน Open-Meteo</td><td class="num">${(dq.weather_feed_completeness_pct||100).toFixed(1)}%</td><td class="num">100.0%</td><td class="num"><span class="badge b-ok">ผ่านเกณฑ์</span></td></tr>
+    <tr><td>ความสดของข้อมูล (Feed Freshness SLA)</td><td class="num">${dq.feed_freshness_lag_minutes ?? 0} นาที</td><td class="num">&le; ${dq.feed_freshness_sla_minutes ?? 15} นาที</td><td class="num"><span class="badge b-ok">${dq.feed_freshness_status || 'FRESH'}</span></td></tr>
+    <tr><td>จำนวนตัวอย่างขั้นต่ำรายวัน (Minimum Sample Check)</td><td class="num">${minRows.toLocaleString()} แถว/วัน</td><td class="num">&ge; ${reqRows.toLocaleString()} แถว/วัน</td><td class="num"><span class="badge ${minOk?'b-ok':'b-danger'}">${minOk?'ผ่านเกณฑ์':'ต่ำกว่าเกณฑ์'}</span></td></tr>
+    <tr><td>Segment 24h Missing Rate Circuit-Breaker (${dq.monitored_segments_count||448} ช่วงถนน)</td><td class="num">หยุด ${trippedCnt} เส้น</td><td class="num">&le; 20% missing</td><td class="num"><span class="badge ${trippedCnt===0?'b-ok':'b-warn'}">${trippedCnt===0?'ปกติทุกเส้น':'ตัดวงจรบางเส้น'}</span></td></tr>
   `;
 
   const mMap = Object.fromEntries((mon.monsoon_stress_test_psi || []).map(x => [x.feature, x]));
   document.getElementById('psiTable').innerHTML = (mon.current_window_psi || []).map(p => {
-    const cls = p.status==='STABLE'?'t-ok':(p.status==='WARNING'?'t-warn':'t-danger');
+    const cls = p.status==='STABLE'?'b-ok':(p.status==='WARNING'?'b-warn':'b-danger');
     return `<tr><td class="mono" style="color:var(--ink)">${p.feature}</td><td class="num">${p.ref_mean.toFixed(3)}</td><td class="num">${p.cur_mean.toFixed(3)}</td>
-      <td class="num"><b>${p.psi.toFixed(4)}</b></td><td class="num" style="color:var(--accent)">${((mMap[p.feature]||{}).psi||0).toFixed(3)}</td>
-      <td class="num"><span class="tag ${cls}">${p.status}</span></td></tr>`;
+      <td class="num"><b>${p.psi.toFixed(4)}</b></td><td class="num">${((mMap[p.feature]||{}).psi||0).toFixed(3)}</td>
+      <td class="num"><span class="badge ${cls}">${p.status}</span></td></tr>`;
   }).join('');
 }
 
@@ -1863,16 +1818,16 @@ function renderAllMonitorCharts() {
     data: {
       labels: curPsi.map(p => p.feature),
       datasets: [
-        { label: 'Test Window PSI (Sep 2022)', data: curPsi.map(p => p.psi), backgroundColor: curPsi.map(p => p.psi >= 0.25 ? '#EF4444' : (p.psi >= 0.10 ? '#F59E0B' : '#22C55E')) },
-        { label: 'Monsoon Heavy-Rain Stress PSI', data: curPsi.map(p => (mMap[p.feature]||{}).psi || 0), backgroundColor: 'rgba(56, 189, 248, 0.45)', borderColor: '#38BDF8', borderWidth: 1 }
+        { label: 'Test Window PSI (ก.ย. 2022)', data: curPsi.map(p => p.psi), backgroundColor: curPsi.map(p => p.psi >= 0.25 ? '#EF4444' : (p.psi >= 0.10 ? '#F59E0B' : '#FFFFFF')) },
+        { label: 'Monsoon Heavy-Rain PSI', data: curPsi.map(p => (mMap[p.feature]||{}).psi || 0), backgroundColor: '#52525B' }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { grid: { color: 'rgba(255,255,255,0.06)' } },
-        x: { grid: { display: false }, ticks: { maxRotation: 25, minRotation: 15 } }
+        y: { grid: { color: '#27272A' } },
+        x: { grid: { display: false }, ticks: { maxRotation: 25, minRotation: 15, font: { family: 'JetBrains Mono', size: 11.5 } } }
       }
     }
   });
@@ -1883,16 +1838,16 @@ function renderAllMonitorCharts() {
     data: {
       labels: daily.map(d => d.date.slice(5)),
       datasets: [
-        { label: 'Rolling 7-Day F1', data: daily.map(d => d.rolling_7d_f1 ?? d.f1_all), borderColor: '#38BDF8', tension: 0.25, borderWidth: 2.3, pointRadius: 2.5 },
-        { label: 'Daily F1', data: daily.map(d => d.f1_all), borderColor: '#8A96A8', borderDash: [4,3], tension: 0.25, borderWidth: 1.5, pointRadius: 0 },
-        { label: 'Daily MAE', data: daily.map(d => d.mae), borderColor: '#F59E0B', tension: 0.25, borderWidth: 1.8, pointRadius: 0 }
+        { label: 'Rolling 7-Day F1', data: daily.map(d => d.rolling_7d_f1 ?? d.f1_all), borderColor: '#FFFFFF', tension: 0.25, borderWidth: 2.5, pointRadius: 2.5 },
+        { label: 'Daily F1', data: daily.map(d => d.f1_all), borderColor: '#71717A', borderDash: [5,4], tension: 0.25, borderWidth: 1.8, pointRadius: 0 },
+        { label: 'Daily MAE', data: daily.map(d => d.mae), borderColor: '#F59E0B', tension: 0.25, borderWidth: 2, pointRadius: 0 }
       ]
     },
     options: {
       responsive: true, maintainAspectRatio: false,
-      plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, color: '#CBD5E1' } } },
+      plugins: { legend: { position: 'bottom', labels: { boxWidth: 12, padding: 16, color: '#E4E4E7' } } },
       scales: {
-        y: { min: 0, max: 0.85, grid: { color: 'rgba(255,255,255,0.06)' } },
+        y: { min: 0, max: 0.85, grid: { color: '#27272A' } },
         x: { grid: { display: false } }
       }
     }
@@ -1922,7 +1877,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
 
 def generate_standalone_dashboard_html() -> Path:
-    log_step("DASHBOARD", "สร้าง SpaceX Mission Control & ML Report UI (Longdo Map + 6 Interactive Charts)...")
+    log_step("DASHBOARD", "สร้าง Dashboard (Monochrome SpaceX Style, Large Readable Typography + 8 Charts)...")
     cfg = load_config()
     payload = build_dashboard_payload(use_cached_snapshot=False)
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
@@ -1932,5 +1887,5 @@ def generate_standalone_dashboard_html() -> Path:
     out_path.parent.mkdir(parents=True, exist_ok=True)
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(html)
-    log_success(f"สร้าง SpaceX Mission Control Dashboard เรียบร้อยที่ {out_path.relative_to(ROOT_DIR)}")
+    log_success(f"สร้าง Dashboard เรียบร้อยที่ {out_path.relative_to(ROOT_DIR)}")
     return out_path
