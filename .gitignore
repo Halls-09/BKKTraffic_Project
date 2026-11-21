@@ -5,8 +5,13 @@ __pycache__/
 .pytest_cache/
 .ruff_cache/
 
+# Generated font cache
+src/eda/fonts/*.ttf
+
 # Raw & processed datasets (Proposal Governance: never commit raw data or large binaries)
 data/*.zip
+data/*.duckdb
+data/*.duckdb.wal
 data/01_bronze/*
 data/02_quarantine/*
 data/03_silver/*

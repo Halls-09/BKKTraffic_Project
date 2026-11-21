@@ -1,0 +1,352 @@
+{
+  "source_db": "bkk_traffic.duckdb",
+  "overview": {
+    "total_rows": 23840561,
+    "n_segments": 4068,
+    "n_districts": 50,
+    "avg_speed_kmh": 37.97,
+    "pct_congested": 23.09
+  },
+  "map_baseline": {
+    "n_segments": 4068,
+    "pct_worse_in_rain": 84.81,
+    "median_rain_delta_pp": 4.55,
+    "p90_rain_delta_pp": 13.09
+  },
+  "map_rush_comparison": {
+    "workday_morning_07_09_mean_pct": 34.24,
+    "workday_evening_17_19_mean_pct": 40.88,
+    "evening_minus_morning_pp": 6.64
+  },
+  "temporal": {
+    "heatmap_peak_non_holiday": {
+      "dow": "ศุกร์",
+      "hour": 18,
+      "pct": 47.09
+    },
+    "friday_1745_pct": 48.98,
+    "mon_thu_1745_pct": 46.14
+  },
+  "tidal_flow": {
+    "am_inbound_pct": 32.72,
+    "am_outbound_pct": 37.99,
+    "pm_inbound_pct": 46.53,
+    "pm_outbound_pct": 40.46
+  },
+  "worst_days": [
+    {
+      "date": "2022-08-11",
+      "pct_cong": 25.74,
+      "precip_mm": 20.55,
+      "flood_reports": 41
+    },
+    {
+      "date": "2022-09-08",
+      "pct_cong": 25.52,
+      "precip_mm": 21.81,
+      "flood_reports": 382
+    },
+    {
+      "date": "2022-08-26",
+      "pct_cong": 24.65,
+      "precip_mm": 14.16,
+      "flood_reports": 91
+    },
+    {
+      "date": "2022-09-06",
+      "pct_cong": 24.4,
+      "precip_mm": 22.66,
+      "flood_reports": 200
+    },
+    {
+      "date": "2022-09-02",
+      "pct_cong": 24.29,
+      "precip_mm": 11.47,
+      "flood_reports": 28
+    }
+  ],
+  "top_districts": [
+    {
+      "district": "คลองเตย",
+      "pct_cong": 32.03,
+      "avg_speed": 36.52,
+      "total_floods": 191.0
+    },
+    {
+      "district": "ราชเทวี",
+      "pct_cong": 31.28,
+      "avg_speed": 40.01,
+      "total_floods": 124.0
+    },
+    {
+      "district": "บางรัก",
+      "pct_cong": 28.89,
+      "avg_speed": 27.99,
+      "total_floods": 65.0
+    },
+    {
+      "district": "สัมพันธวงศ์",
+      "pct_cong": 28.0,
+      "avg_speed": 20.86,
+      "total_floods": 17.0
+    },
+    {
+      "district": "วัฒนา",
+      "pct_cong": 27.55,
+      "avg_speed": 31.99,
+      "total_floods": 361.0
+    }
+  ],
+  "top_bottlenecks_clean": [
+    {
+      "seg_id": "47965_47964",
+      "road": "ถนนรางน้ำ",
+      "district": "ราชเทวี",
+      "pct_cong": 80.86,
+      "avg_speed": 34.74
+    },
+    {
+      "seg_id": "20141_13030",
+      "road": "ทางพิเศษศรีรัช",
+      "district": "บางซื่อ",
+      "pct_cong": 80.22,
+      "avg_speed": 33.43
+    },
+    {
+      "seg_id": "52945_52946",
+      "road": "อรุณอมรินทร์ 49",
+      "district": "บางพลัด",
+      "pct_cong": 77.21,
+      "avg_speed": 41.38
+    },
+    {
+      "seg_id": "52948_52949",
+      "road": "จรัญสนิทวงศ์ 40",
+      "district": "บางพลัด",
+      "pct_cong": 74.56,
+      "avg_speed": 44.7
+    },
+    {
+      "seg_id": "47611_47610",
+      "road": "ถนนอาจณรงค์",
+      "district": "คลองเตย",
+      "pct_cong": 73.64,
+      "avg_speed": 30.93
+    },
+    {
+      "seg_id": "47706_47705",
+      "road": "ถนนหอวัง",
+      "district": "จตุจักร",
+      "pct_cong": 72.02,
+      "avg_speed": 28.57
+    },
+    {
+      "seg_id": "47279_47280",
+      "road": "ซอยรามคำแหง 24",
+      "district": "บางกะปิ",
+      "pct_cong": 69.9,
+      "avg_speed": 27.55
+    },
+    {
+      "seg_id": "20040_11090",
+      "road": "ทางพิเศษเฉลิมมหานคร",
+      "district": "ราษฎร์บูรณะ",
+      "pct_cong": 69.04,
+      "avg_speed": 25.18
+    },
+    {
+      "seg_id": "23008_23007",
+      "road": "ถนนพญาไท",
+      "district": "ราชเทวี",
+      "pct_cong": 68.53,
+      "avg_speed": 37.4
+    },
+    {
+      "seg_id": "26008_26009",
+      "road": "ถนนพระรามที่ 4",
+      "district": "คลองเตย",
+      "pct_cong": 67.21,
+      "avg_speed": 22.43
+    }
+  ],
+  "weather_tests": {
+    "rain_vs_dry": {
+      "mean_a_pct": 25.3,
+      "mean_b_pct": 18.64,
+      "lift_pct": 35.73,
+      "t_stat": 82.29,
+      "p_value": 0.0
+    },
+    "traffy_flood_gt0_vs_0": {
+      "mean_a_pct": 28.22,
+      "mean_b_pct": 19.07,
+      "lift_pct": 47.96,
+      "t_stat": 54.11,
+      "p_value": 0.0
+    }
+  },
+  "calendar_evening_ranking": [
+    {
+      "scenario": "เย็นศุกร์ ในสัปดาห์เงินเดือนออก (จ.-พฤ. Payday)",
+      "pct_cong": 44.82
+    },
+    {
+      "scenario": "เย็นวันทำงานสิ้นเดือน (Month-End)",
+      "pct_cong": 41.82
+    },
+    {
+      "scenario": "เย็นวันศุกร์ทั้งหมด (รวมทุกศุกร์ทำงาน)",
+      "pct_cong": 41.02
+    },
+    {
+      "scenario": "เย็นวันทำงานอื่นที่เป็น Payday (จ.–พฤ.)",
+      "pct_cong": 38.31
+    },
+    {
+      "scenario": "เย็นวันทำงานปกติ (จ.–พฤ. ไม่ใช่ Payday)",
+      "pct_cong": 37.41
+    },
+    {
+      "scenario": "เย็นวันเสาร์–อาทิตย์",
+      "pct_cong": 25.13
+    },
+    {
+      "scenario": "เย็นวันหยุดนักขัตฤกษ์",
+      "pct_cong": 20.59
+    }
+  ],
+  "top_correlations": {
+    "ความเร็วเฉลี่ย": -0.7193,
+    "ชั่วโมงเร่งด่วน": 0.4666,
+    "จราจรหนาแน่น (เขต)": 0.2675,
+    "เสี่ยงน้ำท่วม (เขต)": 0.1662,
+    "ฝนสะสม 3 ชม.": 0.1694,
+    "ฝนชั่วโมงปัจจุบัน": 0.1257,
+    "แจ้งน้ำท่วมสด 15น.": 0.0834,
+    "เสาร์–อาทิตย์": -0.1389,
+    "วันหยุดนักขัตฤกษ์": -0.0847
+  },
+  "individual_feature_distributions": [
+    {
+      "feature": "1. ความเร็วรถจริง (speed_kmh)",
+      "is_log1p": false,
+      "mean": 38.006,
+      "median": 36.0,
+      "skewness": 0.878,
+      "raw_skewness": 0.878
+    },
+    {
+      "feature": "2. ความเร็วรถโล่ง (free_flow_kmh)",
+      "is_log1p": false,
+      "mean": 55.021,
+      "median": 54.0,
+      "skewness": 0.65,
+      "raw_skewness": 0.65
+    },
+    {
+      "feature": "3. สัดส่วนความเร็ว (Speed Ratio)",
+      "is_log1p": false,
+      "mean": 0.68,
+      "median": 0.684,
+      "skewness": 0.245,
+      "raw_skewness": 0.245
+    },
+    {
+      "feature": "4. สัดส่วนรถติดระดับเขต (% Congested)",
+      "is_log1p": false,
+      "mean": 19.244,
+      "median": 15.79,
+      "skewness": 0.952,
+      "raw_skewness": 0.952
+    },
+    {
+      "feature": "5. ความเร็วเฉลี่ยระดับเขต (dist_speed)",
+      "is_log1p": false,
+      "mean": 40.116,
+      "median": 39.4,
+      "skewness": 0.358,
+      "raw_skewness": 0.358
+    },
+    {
+      "feature": "6. อุณหภูมิรายชั่วโมง (temp_c)",
+      "is_log1p": false,
+      "mean": 27.556,
+      "median": 27.0,
+      "skewness": 0.723,
+      "raw_skewness": 0.723
+    },
+    {
+      "feature": "7. ความยาวช่วงถนน [Log Transform]",
+      "is_log1p": true,
+      "mean": 6.371,
+      "median": 6.317,
+      "skewness": 0.126,
+      "raw_skewness": 3.651
+    },
+    {
+      "feature": "8. ขนาดพื้นที่เขต [Log Transform]",
+      "is_log1p": true,
+      "mean": 3.02,
+      "median": 2.999,
+      "skewness": 0.308,
+      "raw_skewness": 3.34
+    },
+    {
+      "feature": "9. ความหนาแน่นน้ำท่วมเขต [Log Transform]",
+      "is_log1p": true,
+      "mean": 2.127,
+      "median": 2.21,
+      "skewness": -0.205,
+      "raw_skewness": 1.034
+    },
+    {
+      "feature": "10. ความหนาแน่นจราจรเขต [Log Transform]",
+      "is_log1p": true,
+      "mean": 1.756,
+      "median": 1.657,
+      "skewness": 0.346,
+      "raw_skewness": 1.977
+    },
+    {
+      "feature": "11. ฝนสะสม 3 ชม. เมื่อมีฝน [Log Transform]",
+      "is_log1p": true,
+      "mean": 0.848,
+      "median": 0.588,
+      "skewness": 0.92,
+      "raw_skewness": 2.466
+    },
+    {
+      "feature": "12. ฝนสะสม 6 ชม. เมื่อมีฝน [Log Transform]",
+      "is_log1p": true,
+      "mean": 1.118,
+      "median": 0.916,
+      "skewness": 0.524,
+      "raw_skewness": 2.04
+    }
+  ],
+  "flood_factor_correlations": {
+    "road_complaints_vs_total_flood_r": 0.667,
+    "area_vs_flood_per_sqkm_r": -0.332,
+    "area_vs_flood_per_road_km_r": 0.023
+  },
+  "split_shift": [
+    {
+      "split_lbl": "1. Train\n(มิ.ย.–23 ส.ค.)",
+      "cong_pct": 18.55,
+      "rainy_pct": 7.61,
+      "flood_rate": 2.56
+    },
+    {
+      "split_lbl": "2. Valid\n(24 ส.ค.–6 ก.ย.)",
+      "cong_pct": 21.09,
+      "rainy_pct": 10.69,
+      "flood_rate": 1.5
+    },
+    {
+      "split_lbl": "3. Test\n(7–30 ก.ย.)",
+      "cong_pct": 20.61,
+      "rainy_pct": 13.34,
+      "flood_rate": 3.22
+    }
+  ]
+}

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bangkok Traffic EDA — Visual Insights Gallery</title>
+  <style>
+    :root { --navy: #0F2942; --teal: #0D9488; --bg: #F8FAFC; --card: #FFFFFF; --muted: #334155; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: 'Tahoma', 'Leelawadee UI', sans-serif; background: var(--bg); color: #0F172A; line-height: 1.6; }
+    header { background: var(--navy); color: white; padding: 28px 24px; text-align: center; }
+    header h1 { margin: 0 0 8px; font-size: 1.8rem; }
+    header p { margin: 0; opacity: 0.92; font-size: 1rem; }
+    .kpis { max-width: 1280px; margin: 20px auto 8px; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
+    .kpi { background: var(--card); border-radius: 12px; padding: 16px 18px; border: 1px solid #CBD5E1; text-align: center; box-shadow: 0 1px 3px rgba(15,41,66,0.06); }
+    .kpi .val { font-size: 1.55rem; font-weight: 800; color: var(--navy); }
+    .kpi .lbl { font-size: 0.9rem; color: var(--muted); margin-top: 4px; font-weight: 600; }
+    main { max-width: 1280px; margin: 16px auto 48px; padding: 0 20px; display: flex; flex-direction: column; gap: 24px; }
+    .card { background: var(--card); border-radius: 14px; padding: 22px 24px; border: 1px solid #CBD5E1; box-shadow: 0 2px 8px rgba(15,41,66,0.05); }
+    .card h2 { margin: 0 0 8px; color: var(--navy); font-size: 1.25rem; }
+    .insight { margin: 0 0 16px; padding: 10px 14px; background: #F0FDFA; border-left: 4px solid var(--teal); border-radius: 6px; color: #0F172A; font-size: 0.98rem; }
+    .card img { width: 100%; height: auto; border-radius: 8px; border: 1px solid #CBD5E1; display: block; }
+    footer { text-align: center; color: var(--muted); font-size: 0.88rem; padding: 0 20px 32px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>🚦 Bangkok Traffic Congestion — Seaborn EDA Gallery</h1>
+    <p>ฐานข้อมูลหลัก: bkk_traffic.duckdb (1 มิ.ย. – 30 ก.ย. 2022 | คลิกที่กราฟเพื่อเปิดดูขนาดเต็ม)</p>
+  </header>
+  <div class="kpis">
+    <div class="kpi"><div class="val">23,840,561</div><div class="lbl">ระเบียนจราจร (15 นาที)</div></div>
+    <div class="kpi"><div class="val">4,068 ช่วง / 50 เขต</div><div class="lbl">ความครอบคลุม กทม.</div></div>
+    <div class="kpi"><div class="val">38.0 km/h</div><div class="lbl">ความเร็วเฉลี่ยรวม</div></div>
+    <div class="kpi"><div class="val">23.1%</div><div class="lbl">สัดส่วนเวลารถติดเฉลี่ย</div></div>
+  </div>
+  <main>
+    
+        <section class="card">
+          <h2>01. แผนที่ฐาน กทม. (Baseline): จุดรถติดสะสม & ผลกระทบฝนตก</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> กทม. ชั้นใน (21.6%) ติดหนักกว่าชั้นนอก (13.2%) ถึง +63.1% และ 84.8% ของถนนทั้ง 4,068 ช่วงแย่ลงเมื่อฝนตก (ค่ากลาง +4.55 pp, p90 สูงถึง +13.09 pp)</p>
+          <a href="charts/01_bkk_map_baseline.png" target="_blank">
+            <img src="charts/01_bkk_map_baseline.png" alt="01. แผนที่ฐาน กทม. (Baseline): จุดรถติดสะสม & ผลกระทบฝนตก" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>02. แผนที่ชั่วโมงเร่งด่วนวันทำงาน: เช้า vs เย็น</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> ช่วงเย็น 17:00–19:00 น. (40.9%) รถติดแผ่วงกว้างกว่าช่วงเช้า (34.2%) ถึง +6.6 pp โดยเฉพาะแนวสุขุมวิท–รัชดา–พหลโยธิน–ลาดพร้าว</p>
+          <a href="charts/02_bkk_map_morning_vs_evening.png" target="_blank">
+            <img src="charts/02_bkk_map_morning_vs_evening.png" alt="02. แผนที่ชั่วโมงเร่งด่วนวันทำงาน: เช้า vs เย็น" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>03. จังหวะเวลารถติดรายชั่วโมง & ละเอียดทุก 15 นาที</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> เมื่อแยกวันหยุดนักขัตฤกษ์ออก เห็นชัดเจนว่า 'ศุกร์ 18:00 น.' (47.1%) คือช่วงที่รถติดหนักที่สุดในสัปดาห์ และพีคสุดที่ 17:45 น. (49.0%)</p>
+          <a href="charts/03_temporal_heatmap_and_15m.png" target="_blank">
+            <img src="charts/03_temporal_heatmap_and_15m.png" alt="03. จังหวะเวลารถติดรายชั่วโมง & ละเอียดทุก 15 นาที" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>04. ทิศทางรถติดวันทำงาน: ขาเข้า vs ขาออกเมือง</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> ความไม่สมมาตรระหว่างทิศทางสูงถึง 5–6 pp ในชั่วโมงเร่งด่วน ทำให้ตัวแปรทิศทาง (inbound/outbound) มีความสำคัญต่อการวางแผนเส้นทาง</p>
+          <a href="charts/04_inbound_outbound_tidal.png" target="_blank">
+            <img src="charts/04_inbound_outbound_tidal.png" alt="04. ทิศทางรถติดวันทำงาน: ขาเข้า vs ขาออกเมือง" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>05. แนวโน้มรายวัน 122 วัน: รถติด vs ฝน vs น้ำท่วม Traffy</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> หลังแก้บั๊กสล็อตเซ็นเซอร์ล่ม (itic_active_segments = 0) วันน้ำท่วมสูงสุด 21 ก.ค. (1,333 เรื่อง, พายุถล่มตอนดึก) รถติดพุ่งขึ้นมาที่ 22.2% และสูงสุดของปีคือ 8 ก.ย. (25.5%)</p>
+          <a href="charts/05_monsoon_timeline_122d.png" target="_blank">
+            <img src="charts/05_monsoon_timeline_122d.png" alt="05. แนวโน้มรายวัน 122 วัน: รถติด vs ฝน vs น้ำท่วม Traffy" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>06. อันดับเขตและจุดคอขวดวิกฤตของกรุงเทพฯ</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> กทม. ชั้นในติดหนักกว่าชั้นนอกถึง 3.7 เท่า (คลองเตย 31.3% vs หนองจอก 8.5%) โดยมีจุดคอขวดอันดับ 1 คือ ถนนรางน้ำ (80.9%) และทางพิเศษศรีรัช ด่านประชาชื่น (80.2%)</p>
+          <a href="charts/06_top_districts_and_bottlenecks.png" target="_blank">
+            <img src="charts/06_top_districts_and_bottlenecks.png" alt="06. อันดับเขตและจุดคอขวดวิกฤตของกรุงเทพฯ" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>07. ห่วงโซ่ผลกระทบ: ความแรงฝน -> เขตเสี่ยงน้ำท่วม -> น้ำท่วมขังสด Traffy</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> เมื่อแยกชั่วโมงเร่งด่วนกับนอกเร่งด่วน ยิ่งฝนตกแรงรถยิ่งติดเพิ่มขึ้นแบบทางเดียว (พีค 39.2% ที่ฝน 10–20 mm/ชม.) และเมื่อเกิดน้ำท่วมขังจนมีแจ้ง Traffy >=2 เรื่อง/15น. รถติดพุ่งถึง 33.7%</p>
+          <a href="charts/07_rain_and_traffy_flood_impact.png" target="_blank">
+            <img src="charts/07_rain_and_traffy_flood_impact.png" alt="07. ห่วงโซ่ผลกระทบ: ความแรงฝน -> เขตเสี่ยงน้ำท่วม -> น้ำท่วมขังสด Traffy" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>08. อิทธิพลศุกร์สัปดาห์เงินเดือนออก วันหยุด และสหสัมพันธ์ 10 ปัจจัยหลัก</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> เย็นวันศุกร์ในสัปดาห์ที่เงินเดือนออกพุ่งสูงสุดถึง 44.8% ตามด้วยวันทำงานสิ้นเดือน (41.8%) และศุกร์ทั่วไป (41.0%) สูงกว่าเย็นวันทำงานปกติ (37.4%) ชัดเจน</p>
+          <a href="charts/08_calendar_payday_and_correlation.png" target="_blank">
+            <img src="charts/08_calendar_payday_and_correlation.png" alt="08. อิทธิพลศุกร์สัปดาห์เงินเดือนออก วันหยุด และสหสัมพันธ์ 10 ปัจจัยหลัก" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>09. การกระจายตัวของแต่ละฟีเจอร์ (12 Features) & การทำ Log Transform</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> การแปลง log(1+x) ช่วยลดความเบ้ขวา (Skewness) ของตัวแปรพื้นที่ ถนน น้ำท่วม และฝนสะสมลงอย่างชัดเจน เช่น area_sq_km (+3.24 -> +0.31), flood_per_sq_km (+1.00 -> -0.20), precip_6h (+2.04 -> +0.52)</p>
+          <a href="charts/09_statistical_distributions_and_skewness.png" target="_blank">
+            <img src="charts/09_statistical_distributions_and_skewness.png" alt="09. การกระจายตัวของแต่ละฟีเจอร์ (12 Features) & การทำ Log Transform" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>10. การกระจายตัวของปัจจัยน้ำท่วม & อคติขนาดพื้นที่เขต (Area Bias)</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับน้ำท่วมสูงสุด (r = +0.67) และกราฟ B พิสูจน์ว่า บางขุนเทียน (507 เรื่อง) กับลาดกระบัง (432 เรื่อง) ถูกจัดเป็นเสี่ยงต่ำเพราะพื้นที่เขตใหญ่เกิน 120 ตร.กม.</p>
+          <a href="charts/10_flood_factors_and_area_bias.png" target="_blank">
+            <img src="charts/10_flood_factors_and_area_bias.png" alt="10. การกระจายตัวของปัจจัยน้ำท่วม & อคติขนาดพื้นที่เขต (Area Bias)" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>11. คุณภาพข้อมูล Outliers และ Distribution Shift (Train vs Valid vs Test)</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> ชุดข้อมูล Test (ก.ย.) มีชั่วโมงฝนตกพุ่งสูงถึง 13.3% (เพิ่มขึ้น +75% จากชุด Train ที่ 7.6%) ยืนยันว่าเกิด Covariate Shift ตามฤดูกาลที่ต้องใช้ฟีเจอร์ฝนและน้ำท่วมช่วยในการพยากรณ์</p>
+          <a href="charts/11_data_quality_outliers_and_split_shift.png" target="_blank">
+            <img src="charts/11_data_quality_outliers_and_split_shift.png" alt="11. คุณภาพข้อมูล Outliers และ Distribution Shift (Train vs Valid vs Test)" loading="lazy" />
+          </a>
+        </section>
+        
+  </main>
+  <footer>สร้างอัตโนมัติด้วย DuckDB + Seaborn (รันซ้ำได้ด้วย <code>python eda.py</code>)</footer>
+</body>
+</html>
