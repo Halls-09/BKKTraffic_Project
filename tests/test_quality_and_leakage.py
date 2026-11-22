@@ -191,6 +191,25 @@ def test_ml_features_and_as_of_cutoff_leakage():
         }
         assert bounds["train"][1] < bounds["valid"][0], "Train overlaps or exceeds Valid!"
         assert bounds["valid"][1] < bounds["test"][0], "Valid overlaps or exceeds Test!"
+
+        # 5) Imputed ML table: 0 NULLs across all 94 columns + plausible speed range [3, 120]
+        n_imp = con.execute("SELECT COUNT(*) FROM gold.ml_features_15m_imputed").fetchone()[0]
+        assert n_imp > 15_000_000, f"Expected >15M rows in gold.ml_features_15m_imputed, got {n_imp}"
+        imp_cols = [
+            r[0]
+            for r in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_catalog = 'bkk_traffic_features' "
+                "  AND table_schema = 'gold' AND table_name = 'ml_features_15m_imputed'"
+            ).fetchall()
+        ]
+        null_sum_sql = " + ".join(f'SUM(CASE WHEN "{c}" IS NULL THEN 1 ELSE 0 END)' for c in imp_cols)
+        total_imp_nulls = con.execute(f"SELECT {null_sum_sql} FROM gold.ml_features_15m_imputed").fetchone()[0]
+        assert total_imp_nulls == 0, f"Found {total_imp_nulls} NULL cells in gold.ml_features_15m_imputed!"
+        min_l15, max_l15 = con.execute(
+            "SELECT MIN(speed_lag_15m), MAX(speed_lag_15m) FROM gold.ml_features_15m_imputed"
+        ).fetchone()
+        assert 3.0 <= min_l15 and max_l15 <= 120.0, f"Imputed lag speed out of range: {min_l15}..{max_l15}"
     finally:
         con.close()
 

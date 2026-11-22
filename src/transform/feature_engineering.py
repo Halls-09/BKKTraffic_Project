@@ -483,5 +483,195 @@ def build_ml_features(run_id: str = "manual", force_rebuild: bool = False) -> di
         con.close()
 
 
+def build_imputed_ml_features(run_id: str = "manual") -> dict:
+    """Create `gold.ml_features_15m_imputed` inside `data/bkk_traffic_features.duckdb`.
+
+    Design principles (academically sound, physically plausible, 0% NULLs, Zero Leakage):
+    1. Real Ground Truth Only: Keep only rows with genuine `target_ratio IS NOT NULL` (never fabricate targets).
+    2. Train-Only Plausible Imputation + Deterministic +/-3% Jitter:
+       - Missing lags (`speed_lag_*`, `ratio_lag_*`) are filled from that segment's own Train-only
+         historical average for the same time-of-day & day_type (`hist_avg_speed_t`), plus a small
+         reproducible hash-based jitter (+/-3%), clipped strictly to [3.0, 120.0] km/h.
+       - Missing downstream road features are filled from the district's real-time traffic at the
+         exact same timestamp `t` (fallback: current segment speed/ratio).
+       - Missing `length_m` is filled with the median segment length across Bangkok.
+    3. Full Transparency: Adds `is_lag_15m_imputed` and `is_downstream_imputed` boolean flags.
+    """
+    t0 = time.time()
+    if not FEATURE_DB_PATH.exists():
+        raise FileNotFoundError(f"Missing {FEATURE_DB_PATH}. Run build_ml_features first.")
+
+    con = duckdb.connect(str(FEATURE_DB_PATH))
+    in_docker = Path("/opt/airflow").exists()
+    n_threads = 4 if in_docker else max(4, (os.cpu_count() or 8) - 2)
+    con.execute(f"PRAGMA threads={n_threads};")
+    con.execute("PRAGMA memory_limit='8GB';")
+
+    try:
+        log.info("[IMPUTE] Building gold.ml_features_15m_imputed (0% NULLs, plausible Train-only imputation)...")
+        con.execute(
+            """
+            CREATE OR REPLACE TABLE gold.ml_features_15m_imputed AS
+            WITH med_len AS (
+                SELECT MEDIAN(length_m)::FLOAT AS med_length_m
+                FROM gold.ml_features_15m
+                WHERE length_m IS NOT NULL
+            ),
+            step1 AS (
+                SELECT
+                    f.*,
+                    (f.speed_lag_15m IS NULL) AS is_lag_15m_imputed,
+                    (f.downstream_avg_ratio_t IS NULL) AS is_downstream_imputed,
+                    -- Deterministic +/-3% jitter factors in [-0.03, +0.03] per (seg_id, ts, lag)
+                    ((ABS(HASH(f.seg_id, f.ts, 15)) % 1001) / 1000.0 - 0.5) * 0.06 AS j15,
+                    ((ABS(HASH(f.seg_id, f.ts, 30)) % 1001) / 1000.0 - 0.5) * 0.06 AS j30,
+                    ((ABS(HASH(f.seg_id, f.ts, 45)) % 1001) / 1000.0 - 0.5) * 0.06 AS j45,
+                    ((ABS(HASH(f.seg_id, f.ts, 60)) % 1001) / 1000.0 - 0.5) * 0.06 AS j60,
+                    -- Base Train-only historical fallback (never uses valid/test future data)
+                    COALESCE(f.hist_avg_speed_t, f.speed_kmh)::FLOAT AS base_hist_spd_t,
+                    COALESCE(f.hist_avg_ratio_t, f.ratio)::FLOAT AS base_hist_rat_t,
+                    COALESCE(f.hist_pct_congested_t, CASE WHEN f.is_congested THEN 1.0 ELSE 0.0 END)::FLOAT AS base_hist_cong_t,
+                    COALESCE(f.hist_avg_speed_t60, f.hist_avg_speed_t, f.speed_kmh)::FLOAT AS base_hist_spd_t60,
+                    COALESCE(f.hist_avg_ratio_t60, f.hist_avg_ratio_t, f.ratio)::FLOAT AS base_hist_rat_t60,
+                    COALESCE(f.hist_pct_congested_t60, f.hist_pct_congested_t, CASE WHEN f.is_congested THEN 1.0 ELSE 0.0 END)::FLOAT AS base_hist_cong_t60,
+                    ml.med_length_m
+                FROM gold.ml_features_15m f
+                CROSS JOIN med_len ml
+                WHERE f.target_ratio IS NOT NULL
+                  AND f.target_speed_kmh IS NOT NULL
+                  AND f.target_congested IS NOT NULL
+                  AND f.new_onset IS NOT NULL
+            ),
+            step2 AS (
+                SELECT
+                    s.*,
+                    COALESCE(
+                        s.speed_lag_15m,
+                        ROUND(LEAST(120.0, GREATEST(3.0, s.base_hist_spd_t * (1.0 + s.j15))), 2)
+                    )::FLOAT AS imp_speed_lag_15m,
+                    COALESCE(
+                        s.speed_lag_30m,
+                        ROUND(LEAST(120.0, GREATEST(3.0, s.base_hist_spd_t * (1.0 + s.j30))), 2)
+                    )::FLOAT AS imp_speed_lag_30m,
+                    COALESCE(
+                        s.speed_lag_45m,
+                        ROUND(LEAST(120.0, GREATEST(3.0, s.base_hist_spd_t * (1.0 + s.j45))), 2)
+                    )::FLOAT AS imp_speed_lag_45m,
+                    COALESCE(
+                        s.speed_lag_60m,
+                        ROUND(LEAST(120.0, GREATEST(3.0, s.base_hist_spd_t * (1.0 + s.j60))), 2)
+                    )::FLOAT AS imp_speed_lag_60m
+                FROM step1 s
+            )
+            SELECT
+                -- ID & Metadata
+                seg_id, ts, date, target_ts, split, event_time, available_time,
+                -- Targets (100% genuine, never fabricated)
+                target_speed_kmh, target_ratio, target_congested, new_onset,
+                -- Quality & Imputation Flags
+                flag_ratio_gt_1_2, flag_jump_gt_60, flag_incomplete_day,
+                is_lag_15m_imputed, is_downstream_imputed,
+                -- Group 1: Current Traffic
+                speed_kmh, ratio, congestion_level, is_congested, n_obs,
+                -- Group 2: Temporal Lags & Rolling (imputed with realistic Train-only baseline +/-3%)
+                imp_speed_lag_15m AS speed_lag_15m,
+                imp_speed_lag_30m AS speed_lag_30m,
+                imp_speed_lag_45m AS speed_lag_45m,
+                imp_speed_lag_60m AS speed_lag_60m,
+                COALESCE(ratio_lag_15m, ROUND(imp_speed_lag_15m / NULLIF(free_flow_kmh, 0), 4))::FLOAT AS ratio_lag_15m,
+                COALESCE(ratio_lag_30m, ROUND(imp_speed_lag_30m / NULLIF(free_flow_kmh, 0), 4))::FLOAT AS ratio_lag_30m,
+                COALESCE(ratio_lag_45m, ROUND(imp_speed_lag_45m / NULLIF(free_flow_kmh, 0), 4))::FLOAT AS ratio_lag_45m,
+                COALESCE(ratio_lag_60m, ROUND(imp_speed_lag_60m / NULLIF(free_flow_kmh, 0), 4))::FLOAT AS ratio_lag_60m,
+                ROUND(speed_kmh - imp_speed_lag_15m, 2)::FLOAT AS speed_diff_15m,
+                ROUND(speed_kmh - imp_speed_lag_30m, 2)::FLOAT AS speed_diff_30m,
+                ROUND(ratio - COALESCE(ratio_lag_15m, ROUND(imp_speed_lag_15m / NULLIF(free_flow_kmh, 0), 4)), 4)::FLOAT AS ratio_diff_15m,
+                speed_roll_mean_1h,
+                speed_roll_std_1h,
+                ratio_roll_mean_1h,
+                congested_slots_last_1h,
+                -- Group 3: Historical Profile (Train-Only)
+                base_hist_spd_t AS hist_avg_speed_t,
+                base_hist_rat_t AS hist_avg_ratio_t,
+                base_hist_cong_t AS hist_pct_congested_t,
+                base_hist_spd_t60 AS hist_avg_speed_t60,
+                base_hist_rat_t60 AS hist_avg_ratio_t60,
+                base_hist_cong_t60 AS hist_pct_congested_t60,
+                ROUND(speed_kmh - base_hist_spd_t, 2)::FLOAT AS speed_vs_hist_t,
+                ROUND(ratio - base_hist_rat_t, 4)::FLOAT AS ratio_vs_hist_t,
+                -- Group 4: Spatial / Downstream (fallback: same-timestamp district traffic -> current segment)
+                COALESCE(downstream_avg_ratio_t, district_avg_ratio_t, ratio)::FLOAT AS downstream_avg_ratio_t,
+                COALESCE(downstream_min_ratio_t, district_avg_ratio_t, ratio)::FLOAT AS downstream_min_ratio_t,
+                COALESCE(downstream_avg_speed_t, district_avg_speed_t, speed_kmh)::FLOAT AS downstream_avg_speed_t,
+                COALESCE(downstream_pct_congested_t, district_pct_congested_t, CASE WHEN is_congested THEN 1.0 ELSE 0.0 END)::FLOAT AS downstream_pct_congested_t,
+                downstream_n_active_t,
+                COALESCE(district_avg_ratio_t, ratio)::FLOAT AS district_avg_ratio_t,
+                COALESCE(district_pct_congested_t, CASE WHEN is_congested THEN 1.0 ELSE 0.0 END)::FLOAT AS district_pct_congested_t,
+                COALESCE(district_avg_speed_t, speed_kmh)::FLOAT AS district_avg_speed_t,
+                -- Group 5: Weather
+                precip_mm, precip_3h_mm, precip_6h_mm, temp_c,
+                rain_bin, is_rainy_gt_1mm, is_rain_x_rush,
+                -- Group 6: Time & Calendar
+                hour, minute, target_hour, target_minute,
+                target_hour_sin, target_hour_cos,
+                COALESCE(dow, EXTRACT(DOW FROM target_ts)::TINYINT)::TINYINT AS dow,
+                COALESCE(dow_sin, ROUND(SIN(2.0 * PI() * EXTRACT(DOW FROM target_ts) / 7.0), 4))::FLOAT AS dow_sin,
+                COALESCE(dow_cos, ROUND(COS(2.0 * PI() * EXTRACT(DOW FROM target_ts) / 7.0), 4))::FLOAT AS dow_cos,
+                COALESCE(day_type, 'workday') AS day_type,
+                COALESCE(is_weekend, FALSE) AS is_weekend,
+                COALESCE(is_friday, FALSE) AS is_friday,
+                COALESCE(is_holiday, FALSE) AS is_holiday,
+                COALESCE(is_bank_holiday, FALSE) AS is_bank_holiday,
+                COALESCE(is_working_day, TRUE) AS is_working_day,
+                COALESCE(is_payday, FALSE) AS is_payday,
+                COALESCE(is_school_term, TRUE) AS is_school_term,
+                COALESCE(is_friday_evening, FALSE) AS is_friday_evening,
+                COALESCE(is_payday_evening, FALSE) AS is_payday_evening,
+                -- Group 7: Static Road
+                free_flow_kmh,
+                COALESCE(length_m, med_length_m)::FLOAT AS length_m,
+                lat, lon, inbound_outbound, n_downstream, district, weather_point,
+                -- Group 8: Traffy Fondue
+                train_flood_reports, train_flood_per_sq_km, train_traffic_per_sq_km,
+                traffy_flood_last_1h, traffy_flood_last_3h, traffy_flood_last_6h,
+                traffy_traffic_last_1h, traffy_traffic_last_3h
+            FROM step2;
+            """
+        )
+        n_rows = con.execute("SELECT COUNT(*) FROM gold.ml_features_15m_imputed").fetchone()[0]
+        cols = [
+            r[0]
+            for r in con.execute(
+                "SELECT column_name FROM information_schema.columns "
+                "WHERE table_catalog='bkk_traffic_features' AND table_schema='gold' AND table_name='ml_features_15m_imputed'"
+            ).fetchall()
+        ]
+        null_exprs = " + ".join(f'SUM(CASE WHEN "{c}" IS NULL THEN 1 ELSE 0 END)' for c in cols)
+        total_nulls = int(con.execute(f"SELECT {null_exprs} FROM gold.ml_features_15m_imputed").fetchone()[0])
+
+        elapsed = round(time.time() - t0, 2)
+        report = {
+            "run_id": run_id,
+            "table": "gold.ml_features_15m_imputed",
+            "rows": int(n_rows),
+            "cols": len(cols),
+            "total_null_cells": total_nulls,
+            "elapsed_seconds": elapsed,
+            "database_size_mb": round(FEATURE_DB_PATH.stat().st_size / 1e6, 2),
+            "pass": n_rows > 15_000_000 and total_nulls == 0,
+        }
+        write_json(report, path("quality") / f"{run_id}_ml_features_imputed.json")
+        log.info(
+            "[IMPUTE DONE] gold.ml_features_15m_imputed: %s rows x %s cols, total_nulls=%s in %.1fs",
+            f"{n_rows:,}",
+            len(cols),
+            total_nulls,
+            elapsed,
+        )
+        return report
+    finally:
+        con.close()
+
+
 if __name__ == "__main__":
     build_ml_features()
+    build_imputed_ml_features()
