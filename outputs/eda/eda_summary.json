@@ -348,5 +348,13 @@
       "rainy_pct": 13.34,
       "flood_rate": 3.22
     }
-  ]
+  ],
+  "root_cause_drivers": {
+    "after_rain_trap_cong_pct": 25.12,
+    "after_rain_trap_speed_kmh": 35.08,
+    "pareto_top10_share_pct": 28.87,
+    "pareto_top20_share_pct": 48.91,
+    "pre_holiday_eve_cong_pct": 45.34,
+    "perfect_storm_payday_fri_pct": 44.82
+  }
 }

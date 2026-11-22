@@ -109,10 +109,10 @@
         </section>
         
         <section class="card">
-          <h2>10. การกระจายตัวของปัจจัยน้ำท่วม & อคติขนาดพื้นที่เขต (Area Bias)</h2>
-          <p class="insight">💡 <strong>Key Insight:</strong> ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับน้ำท่วมสูงสุด (r = +0.67) และกราฟ B พิสูจน์ว่า บางขุนเทียน (507 เรื่อง) กับลาดกระบัง (432 เรื่อง) ถูกจัดเป็นเสี่ยงต่ำเพราะพื้นที่เขตใหญ่เกิน 120 ตร.กม.</p>
+          <h2>10. ปัจจัยน้ำท่วม (Regplot r = +0.67) & Area Denominator Bias</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับน้ำท่วมสูงสุด (r = +0.67) และกราฟ B ชี้ให้เห็น Area Denominator Bias ที่ทำให้ลาดกระบัง (831 เรื่อง) และบางขุนเทียน (645 เรื่อง) ถูกจัดเป็น Low Risk เพราะพื้นที่เขตใหญ่เกิน 120 km²</p>
           <a href="charts/10_flood_factors_and_area_bias.png" target="_blank">
-            <img src="charts/10_flood_factors_and_area_bias.png" alt="10. การกระจายตัวของปัจจัยน้ำท่วม & อคติขนาดพื้นที่เขต (Area Bias)" loading="lazy" />
+            <img src="charts/10_flood_factors_and_area_bias.png" alt="10. ปัจจัยน้ำท่วม (Regplot r = +0.67) & Area Denominator Bias" loading="lazy" />
           </a>
         </section>
         
@@ -121,6 +121,14 @@
           <p class="insight">💡 <strong>Key Insight:</strong> ชุดข้อมูล Test (ก.ย.) มีชั่วโมงฝนตกพุ่งสูงถึง 13.3% (เพิ่มขึ้น +75% จากชุด Train ที่ 7.6%) ยืนยันว่าเกิด Covariate Shift ตามฤดูกาลที่ต้องใช้ฟีเจอร์ฝนและน้ำท่วมช่วยในการพยากรณ์</p>
           <a href="charts/11_data_quality_outliers_and_split_shift.png" target="_blank">
             <img src="charts/11_data_quality_outliers_and_split_shift.png" alt="11. คุณภาพข้อมูล Outliers และ Distribution Shift (Train vs Valid vs Test)" loading="lazy" />
+          </a>
+        </section>
+        
+        <section class="card">
+          <h2>12. 6 กลไกต้นตอหลักที่ทำให้รถติดในกรุงเทพฯ (Root-Cause Drivers)</h2>
+          <p class="insight">💡 <strong>Key Insight:</strong> สรุป 6 สาเหตุเชิงโครงสร้างและพฤติกรรมที่ขับเคลื่อนรถติด กทม.: น้ำรอระบายหลังฝนหยุด (ช้าสุด 35.1 km/h), แถวคอยล้นย้อนแยก (+79% Onset), แยกถี่ <500 ม. (2.3x), กฎพาเรโต Top 20% = 48.9% ของเหตุรถติดทั้งเมือง, วันก่อนหยุดยาว (45.3%), และ Perfect Storm ซ้อนทับ (44.8%)</p>
+          <a href="charts/12_root_cause_impact_drivers.png" target="_blank">
+            <img src="charts/12_root_cause_impact_drivers.png" alt="12. 6 กลไกต้นตอหลักที่ทำให้รถติดในกรุงเทพฯ (Root-Cause Drivers)" loading="lazy" />
           </a>
         </section>
         

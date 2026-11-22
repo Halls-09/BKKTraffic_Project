@@ -1152,16 +1152,16 @@ def chart_10_flood_factors_and_area_bias(con: duckdb.DuckDBPyConnection, summary
     med_density = float(df_f["flood_per_sqkm"].median())
     df_f["tier_lbl"] = np.where(
         df_f["flood_per_sqkm"] >= med_density,
-        "จัดเป็น 'ท่วมสูง' (>= 8.1/km²)",
-        "ถูกจัดเป็น 'ท่วมต่ำ' (< 8.1/km²)",
+        "High Flood Risk (>= 8.1/km²)",
+        "Low Flood Risk (< 8.1/km²)",
     )
     r_road = float(df_f["total_road"].corr(df_f["total_flood"]))
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(18.2, 6.6))
     add_header_and_footer(
         fig,
-        "10. วิเคราะห์การกระจายตัวของปัจจัยน้ำท่วม (Road Defects r = +0.67) และอคติขนาดพื้นที่เขต (Area Bias)",
-        "ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับปริมาณน้ำท่วมสูงสุด (r = +0.67) | เขตพื้นที่ใหญ่ (>120 km²) เช่น บางขุนเทียน–ลาดกระบัง ถูกจัดเป็นเสี่ยงต่ำเพราะตัวหารพื้นที่ใหญ่",
+        "10. วิเคราะห์ปัจจัยน้ำท่วม (Road Defects r = +0.67) และ Area Denominator Bias",
+        "ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับปริมาณน้ำท่วมสูงสุด (r = +0.67) | เขตขนาดใหญ่ (>120 km²) เช่น บางขุนเทียน–ลาดกระบัง เกิด Area Bias จนถูกจัดเป็น Low Risk",
     )
 
     # Panel A: Seaborn regplot (Road complaints vs Flood complaints)
@@ -1184,15 +1184,14 @@ def chart_10_flood_factors_and_area_bias(con: duckdb.DuckDBPyConnection, summary
     ax1.legend(loc="upper left")
     sns.despine(ax=ax1)
 
-    # Panel B: Area vs Total Flood showing Denominator Bias
+    # Panel B: Area vs Total Flood showing Area Denominator Bias
     sns.scatterplot(
         data=df_f, x="area_sq_km", y="total_flood", hue="tier_lbl",
-        palette={"จัดเป็น 'ท่วมสูง' (>= 8.1/km²)": CRIMSON, "ถูกจัดเป็น 'ท่วมต่ำ' (< 8.1/km²)": TEAL},
+        palette={"High Flood Risk (>= 8.1/km²)": CRIMSON, "Low Flood Risk (< 8.1/km²)": TEAL},
         s=85, alpha=0.9, edgecolor=INK, linewidth=0.9, ax=ax2,
     )
-    # Plot the threshold line: total_flood_train ≈ 8.11 * area_sq_km (scaled to full 122d period ~1.4x)
     x_line = np.linspace(0, 245, 100)
-    ax2.plot(x_line, x_line * med_density * 1.35, color=NAVY, linestyle="--", lw=1.8, label="เส้นแบ่งเกณฑ์ความหนาแน่น (8.1 เรื่อง/km²)")
+    ax2.plot(x_line, x_line * med_density * 1.35, color=NAVY, linestyle="--", lw=1.8, label="Median Density Cutoff (8.1 reports/km²)")
 
     highlight_dists = ["ประเวศ", "บางกะปิ", "สวนหลวง", "วังทองหลาง", "บางขุนเทียน", "ลาดกระบัง", "คลองสามวา", "หนองจอก"]
     for _, r in df_f[df_f["district"].isin(highlight_dists)].iterrows():
@@ -1202,9 +1201,9 @@ def chart_10_flood_factors_and_area_bias(con: duckdb.DuckDBPyConnection, summary
             xytext=(6, 5), textcoords="offset points",
             fontsize=9.3, fontweight="bold", color=INK, path_effects=WHITE_HALO,
         )
-    ax2.set_title("B. อคติตัวหารพื้นที่เขต (Area Bias: เขตใหญ่ถูกปัดเป็น 'ท่วมต่ำ')", color=INK, pad=10)
-    ax2.set_xlabel("ขนาดพื้นที่เขต (area_sq_km, ตร.กม. — Skewness +3.24)")
-    ax2.set_ylabel("จำนวนเรื่องร้องเรียนน้ำท่วมรวม (เรื่อง)")
+    ax2.set_title("B. Area Denominator Bias (เขตพื้นที่ใหญ่ถูกกดค่าเป็น Low Risk)", color=INK, pad=10)
+    ax2.set_xlabel("District Area (area_sq_km, Skewness +3.24)")
+    ax2.set_ylabel("Total Flood Reports (traffy_flood, เรื่อง)")
     ax2.legend(title="", loc="upper right", fontsize=9.5)
     sns.despine(ax=ax2)
 
@@ -1221,8 +1220,8 @@ def chart_10_flood_factors_and_area_bias(con: duckdb.DuckDBPyConnection, summary
     return {
         "id": 10,
         "file": out.name,
-        "title": "10. การกระจายตัวของปัจจัยน้ำท่วม & อคติขนาดพื้นที่เขต (Area Bias)",
-        "insight": "ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับน้ำท่วมสูงสุด (r = +0.67) และกราฟ B พิสูจน์ว่า บางขุนเทียน (507 เรื่อง) กับลาดกระบัง (432 เรื่อง) ถูกจัดเป็นเสี่ยงต่ำเพราะพื้นที่เขตใหญ่เกิน 120 ตร.กม.",
+        "title": "10. ปัจจัยน้ำท่วม (Regplot r = +0.67) & Area Denominator Bias",
+        "insight": "ปัญหาโครงสร้างถนน (traffy_road) สัมพันธ์กับน้ำท่วมสูงสุด (r = +0.67) และกราฟ B ชี้ให้เห็น Area Denominator Bias ที่ทำให้ลาดกระบัง (831 เรื่อง) และบางขุนเทียน (645 เรื่อง) ถูกจัดเป็น Low Risk เพราะพื้นที่เขตใหญ่เกิน 120 km²",
     }
 
 
@@ -1327,6 +1326,275 @@ def chart_11_quality_outliers_and_split_shift(con: duckdb.DuckDBPyConnection, su
     }
 
 
+# ------------------------------------------------------------------------------
+# CHART 12: Executive Impact Panel — 6 Root-Cause Mechanisms of Bangkok Gridlock
+# ------------------------------------------------------------------------------
+def chart_12_root_cause_impact_drivers(con: duckdb.DuckDBPyConnection, summary: dict) -> dict:
+    # 1. Post-Rain Waterlogging Trap
+    df_after = con.execute("""
+        SELECT
+            CASE
+                WHEN precip_mm = 0 AND precip_3h_mm = 0 THEN 'แห้งสนิท\n(0 mm)'
+                WHEN precip_mm >= 1.0 AND precip_3h_mm < 5.0 THEN 'ฝนเพิ่งตก\n(>1 mm)'
+                WHEN precip_mm = 0 AND precip_3h_mm >= 5.0 THEN 'ฝนหยุดแล้ว!\n(น้ำสะสม >=5mm)'
+                WHEN precip_mm >= 1.0 AND precip_3h_mm >= 5.0 THEN 'ฝนตกซ้ำ\n(สะสม >=5mm)'
+                ELSE NULL
+            END AS state,
+            AVG(itic_pct_congested) * 100 AS cong_pct,
+            AVG(itic_avg_speed_kmh) AS avg_speed,
+            AVG(traffy_flood_15m) * 100 AS flood_rate
+        FROM gold.merged_district_15m
+        WHERE itic_active_segments > 0
+        GROUP BY 1 HAVING state IS NOT NULL
+    """).df()
+    order_1 = ["แห้งสนิท\n(0 mm)", "ฝนเพิ่งตก\n(>1 mm)", "ฝนหยุดแล้ว!\n(น้ำสะสม >=5mm)", "ฝนตกซ้ำ\n(สะสม >=5mm)"]
+    df_after["state"] = pd.Categorical(df_after["state"], categories=order_1, ordered=True)
+    df_after = df_after.sort_values("state")
+
+    # 2. Domino Queue Spillback (+1h probability given self_now x downstream_now)
+    df_spill = con.execute("""
+        WITH first_ds AS (
+            SELECT seg_id, SPLIT_PART(downstream_seg_ids, ',', 1) AS ds_seg
+            FROM silver.dim_segment
+            WHERE n_downstream >= 1 AND from_loc != to_loc
+        )
+        SELECT
+            CASE WHEN a.is_congested THEN 'ถนนเราติดอยู่แล้ว\n(t0)' ELSE 'ถนนเรายังโล่งอยู่\n(t0)' END AS self_lbl,
+            CASE WHEN b.is_congested THEN 'แยกข้างหน้าติด (Downstream Red)' ELSE 'แยกข้างหน้าโล่ง (Downstream Free)' END AS ds_lbl,
+            AVG(CASE WHEN a.target_congested THEN 1.0 ELSE 0.0 END) * 100 AS prob_1h
+        FROM gold.itic_seg15_targets a
+        JOIN first_ds f ON a.seg_id = f.seg_id
+        JOIN gold.itic_seg15_targets b ON b.seg_id = f.ds_seg AND b.ts = a.ts
+        WHERE a.target_congested IS NOT NULL AND a.from_loc != a.to_loc
+        GROUP BY 1, 2
+    """).df()
+
+    # 3. Intersection Density / Segment Length Trap
+    df_len = con.execute("""
+        SELECT
+            CASE
+                WHEN d.length_m < 250 THEN '<250m'
+                WHEN d.length_m < 500 THEN '250-500m'
+                WHEN d.length_m < 1000 THEN '0.5-1km'
+                WHEN d.length_m < 2000 THEN '1-2km'
+                ELSE '>2km'
+            END AS len_lbl,
+            MIN(d.length_m) AS ord_k,
+            AVG(CASE WHEN t.is_congested THEN 1.0 ELSE 0.0 END) * 100 AS cong_pct,
+            AVG(t.speed_kmh) AS avg_speed
+        FROM gold.itic_seg15_targets t
+        JOIN silver.dim_segment d ON t.seg_id = d.seg_id
+        WHERE t.from_loc != t.to_loc AND d.length_m > 0
+        GROUP BY 1 ORDER BY ord_k
+    """).df()
+
+    # 4. Pareto Lorenz Curve of Congestion across all segments
+    df_par = con.execute("""
+        SELECT seg_id, SUM(CASE WHEN is_congested THEN 1 ELSE 0 END) AS cong_cnt
+        FROM gold.itic_seg15_targets
+        WHERE from_loc != to_loc
+        GROUP BY 1
+        ORDER BY cong_cnt DESC
+    """).df()
+    df_par["cum_seg_pct"] = (np.arange(1, len(df_par) + 1) / len(df_par)) * 100.0
+    df_par["cum_cong_pct"] = (df_par["cong_cnt"].cumsum() / df_par["cong_cnt"].sum()) * 100.0
+    top20_share = float(df_par.loc[df_par["cum_seg_pct"] <= 20.0, "cum_cong_pct"].max())
+    top10_share = float(df_par.loc[df_par["cum_seg_pct"] <= 10.0, "cum_cong_pct"].max())
+
+    # 5. Pre-Holiday Exodus vs Normal Days (Evening Rush 16-19h)
+    df_hol = con.execute("""
+        SELECT
+            CASE
+                WHEN date IN ('2022-06-02', '2022-07-12', '2022-07-27', '2022-08-11') THEN 'เย็นวันก่อนหยุดยาว\n(Pre-Holiday)'
+                WHEN is_working_day AND is_friday THEN 'เย็นวันศุกร์ปกติ\n(Friday)'
+                WHEN is_working_day THEN 'เย็นวันทำงานปกติ\n(Mon-Thu)'
+                WHEN is_weekend THEN 'เย็นเสาร์-อาทิตย์\n(Weekend)'
+                ELSE 'เย็นวันหยุดนักขัตฤกษ์\n(Holiday)'
+            END AS grp,
+            AVG(itic_pct_congested) * 100 AS eve_cong,
+            AVG(itic_avg_speed_kmh) AS eve_speed
+        FROM gold.merged_district_15m
+        WHERE itic_active_segments > 0 AND hour BETWEEN 16 AND 19
+        GROUP BY 1 ORDER BY eve_cong DESC
+    """).df()
+
+    # 6. Compound Perfect Storm Escalation (Evening Rush 16-19h)
+    df_storm = con.execute("""
+        WITH payday_weeks AS (
+            SELECT DISTINCT YEARWEEK(CAST(date AS DATE)) AS yw
+            FROM silver.calendar_daily WHERE is_payday = TRUE
+        )
+        SELECT
+            CASE
+                WHEN m.is_working_day AND NOT m.is_friday AND NOT m.is_rainy_gt_1mm AND m.traffy_flood_15m = 0 THEN '1. ฐาน: เย็นวันทำงานปกติ'
+                WHEN m.is_working_day AND m.is_rainy_gt_1mm AND m.traffy_flood_15m = 0 THEN '2. + ฝนตก >1mm'
+                WHEN m.is_working_day AND m.is_friday AND NOT m.is_rainy_gt_1mm AND m.traffy_flood_15m = 0 THEN '3. + เย็นวันศุกร์ (แห้ง)'
+                WHEN m.is_working_day AND m.traffy_flood_15m >= 1 AND NOT m.is_friday THEN '4. + แจ้งน้ำท่วมสด Traffy'
+                WHEN m.is_working_day AND m.is_friday AND (m.is_rainy_gt_1mm OR m.traffy_flood_15m >= 1) THEN '5. ศุกร์ + ฝนตก/น้ำท่วม!'
+                ELSE NULL
+            END AS tier,
+            AVG(m.itic_pct_congested) * 100 AS eve_cong
+        FROM gold.merged_district_15m m
+        WHERE m.itic_active_segments > 0 AND m.hour BETWEEN 16 AND 19
+        GROUP BY 1 HAVING tier IS NOT NULL
+        ORDER BY 1
+    """).df()
+    # Append Payday-Week Friday peak bar
+    pay_fri = con.execute("""
+        WITH payday_weeks AS (
+            SELECT DISTINCT YEARWEEK(CAST(date AS DATE)) AS yw
+            FROM silver.calendar_daily WHERE is_payday = TRUE
+        )
+        SELECT AVG(m.itic_pct_congested) * 100
+        FROM gold.merged_district_15m m
+        JOIN silver.calendar_daily c ON m.date = c.date
+        WHERE m.itic_active_segments > 0 AND m.hour BETWEEN 16 AND 19
+          AND c.is_working_day AND c.is_friday AND NOT c.is_payday
+          AND YEARWEEK(CAST(c.date AS DATE)) IN (SELECT yw FROM payday_weeks)
+    """).fetchone()[0]
+    df_storm = pd.concat([
+        df_storm,
+        pd.DataFrame([{"tier": "6. ศุกร์สัปดาห์เงินเดือนออก!", "eve_cong": float(pay_fri)}]),
+    ], ignore_index=True)
+
+    fig, axes = plt.subplots(2, 3, figsize=(19.5, 11.4))
+    add_header_and_footer(
+        fig,
+        "12. ทำไมรถถึงติดในกรุงเทพฯ? 6 กลไกต้นตอหลักจากข้อมูลจริง 23.84 ล้านระเบียน (Root-Cause Drivers)",
+        "รถติด กทม. ไม่ได้เกิดจากปริมาณรถอย่างเดียว แต่ถูกขับเคลื่อนโดย 6 กลไก: น้ำรอระบายหลังฝนหยุด, แถวคอยล้นแยก (+79%), แยกถี่ <500ม. (2.3x), กฎพาเรโต 20%, วันก่อนหยุดยาว และปัจจัยซ้อนทับ",
+    )
+
+    # --- Panel 1: Post-Rain Waterlogging Trap ---
+    ax = axes[0, 0]
+    pal1 = [TEAL, AMBER, CRIMSON, DARK_RED]
+    sns.barplot(data=df_after, x="state", y="cong_pct", palette=pal1, hue="state", edgecolor=INK, linewidth=0.7, legend=False, ax=ax)
+    ax.set_title("1. กับดักหลังฝนหยุด: น้ำรอระบายติดหนักกว่าตอนตก!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("")
+    ax.set_ylabel("สัดส่วนรถติดเฉลี่ย (%)")
+    ax.set_ylim(0, 36.5)
+    for i, r in enumerate(df_after.itertuples()):
+        ax.text(i, r.cong_pct + 0.6, f"{r.cong_pct:.1f}%\n({r.avg_speed:.1f} km/h)", ha="center", va="bottom", fontsize=9.2, fontweight="bold", color=INK)
+    ax.annotate(
+        "ความเร็วต่ำสุด 35.1 km/h\nน้ำท่วมพุ่ง 2.3x!",
+        xy=(2, 29.5), xytext=(0.75, 32.8), ha="center",
+        fontsize=9.2, fontweight="bold", color=DARK_RED,
+        bbox=dict(boxstyle="round,pad=0.28", facecolor="#FEF2F2", edgecolor=CRIMSON, lw=1.2),
+        arrowprops=dict(arrowstyle="-|>", color=CRIMSON, lw=1.4),
+    )
+    sns.despine(ax=ax)
+
+    # --- Panel 2: Domino Spillback Effect ---
+    ax = axes[0, 1]
+    sns.barplot(
+        data=df_spill, x="self_lbl", y="prob_1h", hue="ds_lbl",
+        order=["ถนนเรายังโล่งอยู่\n(t0)", "ถนนเราติดอยู่แล้ว\n(t0)"],
+        hue_order=["แยกข้างหน้าโล่ง (Downstream Free)", "แยกข้างหน้าติด (Downstream Red)"],
+        palette={"แยกข้างหน้าโล่ง (Downstream Free)": TEAL, "แยกข้างหน้าติด (Downstream Red)": CRIMSON},
+        edgecolor=INK, linewidth=0.7, ax=ax,
+    )
+    ax.set_title("2. โดมิโนแถวคอยล้นแยก: แยกหน้าติด -> โอกาสเราติด +79%!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("")
+    ax.set_ylabel("โอกาสที่ถนนเราจะติดใน +1 ชม. (%)")
+    ax.set_ylim(0, 68)
+    ax.legend(title="", loc="upper left", fontsize=9)
+    for c in ax.containers:
+        ax.bar_label(c, fmt="%.1f%%", padding=3, fontsize=10, fontweight="bold", color=INK)
+    ax.annotate(
+        "+79.3% Spillback Risk!",
+        xy=(0.2, 32.0), xytext=(0.05, 45.5), ha="center",
+        fontsize=9.5, fontweight="bold", color=DARK_RED,
+        bbox=dict(boxstyle="round,pad=0.28", facecolor="#FEF2F2", edgecolor=CRIMSON, lw=1.2),
+        arrowprops=dict(arrowstyle="-|>", color=CRIMSON, lw=1.5),
+    )
+    sns.despine(ax=ax)
+
+    # --- Panel 3: Frequent Intersection / Short Segment Trap ---
+    ax = axes[0, 2]
+    pal3 = [DARK_RED, CRIMSON, AMBER, TEAL, GREEN]
+    sns.barplot(data=df_len, x="len_lbl", y="cong_pct", palette=pal3, hue="len_lbl", edgecolor=INK, linewidth=0.7, legend=False, ax=ax)
+    ax.set_title("3. โครงสร้างแยกถี่ (<500 ม.): ติดหนักกว่าถนนยาว 2.3 เท่า!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("ระยะห่างระหว่างทางแยก (length_m)")
+    ax.set_ylabel("สัดส่วนเวลารถติดเฉลี่ย (%)")
+    ax.set_ylim(0, 37)
+    for i, r in enumerate(df_len.itertuples()):
+        ax.text(i, r.cong_pct + 0.6, f"{r.cong_pct:.1f}%\n({r.avg_speed:.0f} km/h)", ha="center", va="bottom", fontsize=9.2, fontweight="bold", color=INK)
+    ax.text(
+        2.9, 32.5, "ช่วงสั้น <500 ม. เก็บแถวคอยไม่ได้\nติดหนัก 28.7% vs 12.4% (2.3x)",
+        ha="center", va="center", fontsize=9.2, fontweight="bold", color=INK,
+        bbox=dict(boxstyle="round,pad=0.3", facecolor="#FFFBEB", edgecolor=AMBER, lw=1.2),
+    )
+    sns.despine(ax=ax)
+
+    # --- Panel 4: Pareto 20% Bottleneck Concentration ---
+    ax = axes[1, 0]
+    ax.plot([0, 100], [0, 100], color="#94A3B8", linestyle="--", lw=1.5, label="กระจายเท่ากันทุกถนน (Equality Line)")
+    ax.plot(df_par["cum_seg_pct"], df_par["cum_cong_pct"], color=CRIMSON, lw=3.0, label="ข้อมูลจริง กทม. (Pareto Curve)")
+    ax.fill_between(df_par["cum_seg_pct"], df_par["cum_cong_pct"], where=(df_par["cum_seg_pct"] <= 20), color=CRIMSON, alpha=0.22)
+    ax.axvline(20, color=NAVY, linestyle=":", lw=1.8)
+    ax.axhline(top20_share, color=NAVY, linestyle=":", lw=1.8)
+    ax.scatter([10, 20], [top10_share, top20_share], color=DARK_RED, s=75, zorder=6, edgecolor="white", lw=1.2)
+    ax.annotate(
+        f"Top 20% ของถนน\nสร้างรถติดถึง {top20_share:.1f}% ของทั้ง กทม.!",
+        xy=(20, top20_share), xytext=(42, 34),
+        fontsize=9.8, fontweight="bold", color=DARK_RED,
+        bbox=dict(boxstyle="round,pad=0.32", facecolor="#FEF2F2", edgecolor=CRIMSON, lw=1.3),
+        arrowprops=dict(arrowstyle="-|>", color=CRIMSON, lw=1.6),
+    )
+    ax.set_title("4. กฎพาเรโต: ถนนแค่ 20% สร้างรถติดเกือบครึ่งเมือง!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("สัดส่วนช่วงถนนสะสม (% of Segments)")
+    ax.set_ylabel("สัดส่วนเหตุการณ์รถติดสะสม (% of Congestion)")
+    ax.set_xlim(0, 100)
+    ax.set_ylim(0, 105)
+    ax.legend(loc="lower right", fontsize=9)
+    sns.despine(ax=ax)
+
+    # --- Panel 5: Pre-Holiday Exodus ---
+    ax = axes[1, 1]
+    pal5 = [DARK_RED, CRIMSON, NAVY, TEAL, GREEN]
+    sns.barplot(data=df_hol, y="grp", x="eve_cong", palette=pal5, hue="grp", edgecolor=INK, linewidth=0.7, legend=False, ax=ax)
+    ax.set_title("5. วันก่อนหยุดยาว (Pre-Holiday): โหดกว่าศุกร์แห่งชาติ!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("สัดส่วนรถติดช่วงเย็น 16:00–19:45 น. (%)")
+    ax.set_ylabel("")
+    ax.set_xlim(0, 58)
+    for i, r in enumerate(df_hol.itertuples()):
+        ax.text(r.eve_cong + 0.7, i, f"{r.eve_cong:.1f}% ({r.eve_speed:.0f} km/h)", va="center", fontsize=9.5, fontweight="bold", color=INK)
+    sns.despine(ax=ax)
+
+    # --- Panel 6: Compound Perfect Storm Stacking ---
+    ax = axes[1, 2]
+    pal6 = [NAVY, "#0284C7", AMBER, "#EA580C", CRIMSON, DARK_RED]
+    sns.barplot(data=df_storm, y="tier", x="eve_cong", palette=pal6, hue="tier", edgecolor=INK, linewidth=0.7, legend=False, ax=ax)
+    ax.set_title("6. ปัจจัยซ้อนทับ (Perfect Storm): จาก 37% พุ่งแตะ 45%!", color=INK, pad=10, fontsize=12.5)
+    ax.set_xlabel("สัดส่วนรถติดช่วงเย็น 16:00–19:45 น. (%)")
+    ax.set_ylabel("")
+    ax.set_xlim(0, 54)
+    base_v = float(df_storm.iloc[0]["eve_cong"])
+    for i, r in enumerate(df_storm.itertuples()):
+        diff_txt = "" if i == 0 else f" (+{r.eve_cong - base_v:.1f}pp)"
+        ax.text(r.eve_cong + 0.5, i, f"{r.eve_cong:.1f}%{diff_txt}", va="center", fontsize=9.3, fontweight="bold", color=INK)
+    sns.despine(ax=ax)
+
+    plt.tight_layout(rect=[0, 0.03, 1, 0.90])
+    out = CHARTS_DIR / "12_root_cause_impact_drivers.png"
+    fig.savefig(out, dpi=200)
+    plt.close(fig)
+
+    summary["root_cause_drivers"] = {
+        "after_rain_trap_cong_pct": round(float(df_after.iloc[2]["cong_pct"]), 2),
+        "after_rain_trap_speed_kmh": round(float(df_after.iloc[2]["avg_speed"]), 2),
+        "pareto_top10_share_pct": round(top10_share, 2),
+        "pareto_top20_share_pct": round(top20_share, 2),
+        "pre_holiday_eve_cong_pct": round(float(df_hol.iloc[0]["eve_cong"]), 2),
+        "perfect_storm_payday_fri_pct": round(float(pay_fri), 2),
+    }
+    return {
+        "id": 12,
+        "file": out.name,
+        "title": "12. 6 กลไกต้นตอหลักที่ทำให้รถติดในกรุงเทพฯ (Root-Cause Drivers)",
+        "insight": "สรุป 6 สาเหตุเชิงโครงสร้างและพฤติกรรมที่ขับเคลื่อนรถติด กทม.: น้ำรอระบายหลังฝนหยุด (ช้าสุด 35.1 km/h), แถวคอยล้นย้อนแยก (+79% Onset), แยกถี่ <500 ม. (2.3x), กฎพาเรโต Top 20% = 48.9% ของเหตุรถติดทั้งเมือง, วันก่อนหยุดยาว (45.3%), และ Perfect Storm ซ้อนทับ (44.8%)",
+    }
+
+
 def build_html_gallery(cards: list[dict], summary: dict) -> None:
     ov = summary.get("overview", {})
     card_html = []
@@ -1397,8 +1665,9 @@ CHART_REGISTRY = [
     (7, "ห่วงโซ่ผลกระทบ: ความแรงฝน -> เขตเสี่ยงท่วม -> Traffy สด", chart_07_rain_and_traffy_impact),
     (8, "ปฏิทิน (ศุกร์สัปดาห์เงินเดือนออก) & เมทริกซ์สหสัมพันธ์ 10 ปัจจัย", chart_08_calendar_and_correlation),
     (9, "การกระจายตัวของแต่ละฟีเจอร์ (12 Features) & Log Transform", chart_09_statistical_distributions),
-    (10, "การกระจายตัวของปัจจัยน้ำท่วม (Regplot) & อคติขนาดพื้นที่เขต", chart_10_flood_factors_and_area_bias),
+    (10, "ปัจจัยน้ำท่วม (Regplot r = +0.67) & Area Denominator Bias", chart_10_flood_factors_and_area_bias),
     (11, "ความครบถ้วนข้อมูล (Completeness), Outliers & Train/Test Split Shift", chart_11_quality_outliers_and_split_shift),
+    (12, "6 กลไกต้นตอหลักที่ทำให้รถติดในกรุงเทพฯ (Root-Cause Impact Drivers)", chart_12_root_cause_impact_drivers),
 ]
 
 
